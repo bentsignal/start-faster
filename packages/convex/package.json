@@ -1,0 +1,45 @@
+{
+  "name": "@acme/convex",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./api": {
+      "types": "./src/_generated/api.d.ts",
+      "default": "./src/_generated/api.js"
+    },
+    "./model": {
+      "types": "./src/_generated/dataModel.d.ts"
+    },
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "build": "convex deploy",
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "setup": "convex dev --until-success",
+    "dev": "convex dev",
+    "logs": "convex logs"
+  },
+  "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "@convex-dev/eslint-plugin": "^1.1.1",
+    "@types/node": "^22.19.1",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@acme/prettier-config",
+  "dependencies": {
+    "@better-auth/expo": "^1.4.7",
+    "@convex-dev/better-auth": "catalog:",
+    "better-auth": "^1.4.7",
+    "convex": "catalog:",
+    "convex-env": "^2.3.0",
+    "convex-helpers": "^0.1.108",
+    "uploadthing": "^7.7.4"
+  }
+}
