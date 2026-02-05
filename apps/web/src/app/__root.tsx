@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie } from "@tanstack/react-start/server";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { z } from "zod/v4";
 
@@ -18,19 +17,9 @@ import { Toaster } from "@acme/ui/toast";
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
-import * as Auth from "~/features/auth/atom";
-import { LoginModal } from "~/features/auth/molecules/login-modal";
-import * as Theme from "~/features/theme/atom";
-import { getTheme } from "~/features/theme/utils";
+import { AuthStore } from "~/features/auth/store";
 import { authClient } from "~/lib/auth-client";
 import { getToken } from "~/lib/auth-server";
-
-const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
-  const themeCookie = getCookie("theme");
-  return {
-    theme: getTheme(themeCookie),
-  };
-});
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   return await getToken();
@@ -48,16 +37,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Ruby" },
       { name: "description", content: "A place to share your adventures." },
-      {
-        name: "theme-color",
-        content: "white",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        name: "theme-color",
-        content: "black",
-        media: "(prefers-color-scheme: dark)",
-      },
     ],
   }),
   beforeLoad: async ({ context }) => {
@@ -70,12 +49,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
 
-    const { theme } = await getThemeFromCookie();
-
     return {
       isAuthenticated: !!token,
       token,
-      theme,
     };
   },
   component: RootComponent,
@@ -101,29 +77,21 @@ function RootComponent() {
           initialToken={context.token}
         >
           <QueryClientProvider client={context.queryClient}>
-            <Theme.Store
-              attribute="class"
-              defaultTheme="dark"
-              disableTransitionOnChange
-              initialTheme={context.theme}
-            >
-              <Auth.Store isAuthenticatedServerSide={context.isAuthenticated}>
-                <Outlet />
-                <TanStackDevtools
-                  config={{
-                    position: "bottom-right",
-                  }}
-                  plugins={[
-                    {
-                      name: "react-router",
-                      render: <TanStackRouterDevtoolsPanel />,
-                    },
-                  ]}
-                />
-                <LoginModal />
-              </Auth.Store>
-              <Toaster />
-            </Theme.Store>
+            <AuthStore isAuthenticatedServerSide={context.isAuthenticated}>
+              <Outlet />
+              <TanStackDevtools
+                config={{
+                  position: "bottom-right",
+                }}
+                plugins={[
+                  {
+                    name: "react-router",
+                    render: <TanStackRouterDevtoolsPanel />,
+                  },
+                ]}
+              />
+            </AuthStore>
+            <Toaster />
             <Scripts />
           </QueryClientProvider>
         </ConvexBetterAuthProvider>

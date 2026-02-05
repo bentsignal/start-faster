@@ -40,12 +40,9 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     baseURL: env.SITE_URL,
     trustedOrigins: [env.SITE_URL],
     database: authComponent.adapter(ctx),
-    socialProviders: {
-      google: {
-        prompt: "select_account",
-        clientId: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
-      },
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: false,
     },
     plugins: [expo(), convex({ authConfig })],
   });

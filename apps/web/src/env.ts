@@ -15,9 +15,9 @@ export const env = createEnv({
     VITE_NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
-    VITE_CONVEX_URL: z.string().url(),
-    VITE_CONVEX_SITE_URL: z.string().url(),
-    VITE_SITE_URL: z.string().url(),
+    VITE_CONVEX_URL: z.url(),
+    VITE_CONVEX_SITE_URL: z.url(),
+    VITE_SITE_URL: z.url(),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,

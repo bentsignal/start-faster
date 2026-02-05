@@ -1,4 +1,4 @@
-import * as Auth from "~/features/auth/atom";
+import { useAuthStore } from "~/features/auth/store";
 
 /**
  *
@@ -13,9 +13,9 @@ function useMaybeRedirect({
   func: () => void;
   redirectTo: string;
 }) {
-  const imNotSignedIn = Auth.useStore((s) => s.imSignedOut);
-  const setIsLoginModalOpen = Auth.useStore((s) => s.setIsLoginModalOpen);
-  const setRedirectURL = Auth.useStore((s) => s.setRedirectURL);
+  const imNotSignedIn = useAuthStore((s) => s.imSignedOut);
+  const setIsLoginModalOpen = useAuthStore((s) => s.setIsLoginModalOpen);
+  const setRedirectURL = useAuthStore((s) => s.setRedirectURL);
   if (imNotSignedIn) {
     setIsLoginModalOpen(true);
     setRedirectURL(redirectTo);

@@ -1,20 +1,9 @@
 import type { Infer } from "convex/values";
 
-import type { Id } from "./_generated/dataModel";
-import type { vFriendshipStatus, vImage, vPost, vProfile } from "./validators";
-
-type UIImage = Infer<typeof vImage>;
+import type { vFriendshipStatus, vProfile } from "./validators";
 
 type Profile = Infer<typeof vProfile>;
 type UIProfile = Omit<Profile, "userId" | "searchTerm">;
-
-type Post = Infer<typeof vPost>;
-type UIPost = Omit<Post, "profileId" | "imagesIds"> & {
-  _id: Id<"posts">;
-  _creationTime: number;
-  creator: UIProfile;
-  images: UIImage[];
-};
 
 type FriendshipStatus = Infer<typeof vFriendshipStatus>;
 type Relationship =
@@ -24,12 +13,4 @@ type Relationship =
   | "pending-outgoing"
   | "my-profile";
 
-export type {
-  Post,
-  UIPost,
-  Profile,
-  UIProfile,
-  UIImage,
-  FriendshipStatus,
-  Relationship,
-};
+export type { Profile, UIProfile, FriendshipStatus, Relationship };

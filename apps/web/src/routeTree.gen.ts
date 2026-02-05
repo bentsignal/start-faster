@@ -9,48 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
-import { Route as TabsRouteImport } from './app/_tabs'
-import { Route as TabsIndexRouteImport } from './app/_tabs.index'
-import { Route as TabsSearchRouteImport } from './app/_tabs.search'
-import { Route as TabsNotificationsRouteImport } from './app/_tabs.notifications'
-import { Route as TabsEditProfileRouteImport } from './app/_tabs.edit-profile'
-import { Route as TabsCreateRouteImport } from './app/_tabs.create'
-import { Route as TabsUsernameRouteImport } from './app/_tabs.$username'
+import { Route as IndexRouteImport } from './app/index'
 import { Route as ApiAuthSplatRouteImport } from './app/api.auth.$'
 
-const TabsRoute = TabsRouteImport.update({
-  id: '/_tabs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TabsIndexRoute = TabsIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsSearchRoute = TabsSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsNotificationsRoute = TabsNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsEditProfileRoute = TabsEditProfileRouteImport.update({
-  id: '/edit-profile',
-  path: '/edit-profile',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsCreateRoute = TabsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsUsernameRoute = TabsUsernameRouteImport.update({
-  id: '/$username',
-  path: '/$username',
-  getParentRoute: () => TabsRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -59,120 +24,39 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/$username': typeof TabsUsernameRoute
-  '/create': typeof TabsCreateRoute
-  '/edit-profile': typeof TabsEditProfileRoute
-  '/notifications': typeof TabsNotificationsRoute
-  '/search': typeof TabsSearchRoute
-  '/': typeof TabsIndexRoute
+  '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
-  '/$username': typeof TabsUsernameRoute
-  '/create': typeof TabsCreateRoute
-  '/edit-profile': typeof TabsEditProfileRoute
-  '/notifications': typeof TabsNotificationsRoute
-  '/search': typeof TabsSearchRoute
-  '/': typeof TabsIndexRoute
+  '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_tabs': typeof TabsRouteWithChildren
-  '/_tabs/$username': typeof TabsUsernameRoute
-  '/_tabs/create': typeof TabsCreateRoute
-  '/_tabs/edit-profile': typeof TabsEditProfileRoute
-  '/_tabs/notifications': typeof TabsNotificationsRoute
-  '/_tabs/search': typeof TabsSearchRoute
-  '/_tabs/': typeof TabsIndexRoute
+  '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/$username'
-    | '/create'
-    | '/edit-profile'
-    | '/notifications'
-    | '/search'
-    | '/'
-    | '/api/auth/$'
+  fullPaths: '/' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/$username'
-    | '/create'
-    | '/edit-profile'
-    | '/notifications'
-    | '/search'
-    | '/'
-    | '/api/auth/$'
-  id:
-    | '__root__'
-    | '/_tabs'
-    | '/_tabs/$username'
-    | '/_tabs/create'
-    | '/_tabs/edit-profile'
-    | '/_tabs/notifications'
-    | '/_tabs/search'
-    | '/_tabs/'
-    | '/api/auth/$'
+  to: '/' | '/api/auth/$'
+  id: '__root__' | '/' | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  TabsRoute: typeof TabsRouteWithChildren
+  IndexRoute: typeof IndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_tabs': {
-      id: '/_tabs'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof TabsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_tabs/': {
-      id: '/_tabs/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof TabsIndexRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/search': {
-      id: '/_tabs/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof TabsSearchRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/notifications': {
-      id: '/_tabs/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof TabsNotificationsRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/edit-profile': {
-      id: '/_tabs/edit-profile'
-      path: '/edit-profile'
-      fullPath: '/edit-profile'
-      preLoaderRoute: typeof TabsEditProfileRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/create': {
-      id: '/_tabs/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof TabsCreateRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/$username': {
-      id: '/_tabs/$username'
-      path: '/$username'
-      fullPath: '/$username'
-      preLoaderRoute: typeof TabsUsernameRouteImport
-      parentRoute: typeof TabsRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -184,28 +68,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface TabsRouteChildren {
-  TabsUsernameRoute: typeof TabsUsernameRoute
-  TabsCreateRoute: typeof TabsCreateRoute
-  TabsEditProfileRoute: typeof TabsEditProfileRoute
-  TabsNotificationsRoute: typeof TabsNotificationsRoute
-  TabsSearchRoute: typeof TabsSearchRoute
-  TabsIndexRoute: typeof TabsIndexRoute
-}
-
-const TabsRouteChildren: TabsRouteChildren = {
-  TabsUsernameRoute: TabsUsernameRoute,
-  TabsCreateRoute: TabsCreateRoute,
-  TabsEditProfileRoute: TabsEditProfileRoute,
-  TabsNotificationsRoute: TabsNotificationsRoute,
-  TabsSearchRoute: TabsSearchRoute,
-  TabsIndexRoute: TabsIndexRoute,
-}
-
-const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
-  TabsRoute: TabsRouteWithChildren,
+  IndexRoute: IndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -6,7 +6,7 @@ import { createStore } from "rostra";
 import { api } from "@acme/convex/api";
 
 import { useLoading } from "~/hooks/use-loading";
-import { authClient } from "../../../lib/auth-client";
+import { authClient } from "../../lib/auth-client";
 
 function useInternalStore({
   isAuthenticatedServerSide,
@@ -76,4 +76,5 @@ function useInternalStore({
   };
 }
 
-export const { Store, useStore } = createStore(useInternalStore);
+export const { Store: AuthStore, useStore: useAuthStore } =
+  createStore(useInternalStore);

@@ -19,26 +19,4 @@ const vFriendship = v.object({
   initiatedBy: v.id("profiles"),
 });
 
-const vTrip = v.object({
-  creatorId: v.id("profiles"),
-  name: v.string(),
-  imageId: v.optional(v.id("images")),
-  description: v.optional(v.string()),
-  location: v.optional(v.string()),
-  startDate: v.optional(v.number()),
-  endDate: v.optional(v.number()),
-});
-
-const vImage = v.object({
-  url: v.string(),
-  alt: v.optional(v.string()),
-});
-
-const vPost = v.object({
-  tripId: v.id("trips"),
-  profileId: v.id("profiles"),
-  imagesIds: v.array(v.id("images")),
-  caption: v.optional(v.string()),
-});
-
-export { vProfile, vPost, vTrip, vImage, vFriendship, vFriendshipStatus };
+export { vProfile, vFriendship, vFriendshipStatus };

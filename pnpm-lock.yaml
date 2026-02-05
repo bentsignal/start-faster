@@ -12,9 +12,6 @@ catalogs:
     '@eslint/js':
       specifier: ^9.38.0
       version: 9.38.0
-    '@legendapp/list':
-      specifier: beta
-      version: 3.0.0-beta.31
     '@tailwindcss/postcss':
       specifier: ^4.1.16
       version: 4.1.16
@@ -133,9 +130,6 @@ importers:
       '@fontsource-variable/roboto':
         specifier: ^5.2.9
         version: 5.2.9
-      '@legendapp/list':
-        specifier: 'catalog:'
-        version: 3.0.0-beta.31(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
       '@t3-oss/env-core':
         specifier: ^0.13.8
         version: 0.13.8(arktype@2.1.20)(typescript@5.9.3)(valibot@1.0.0-beta.15(typescript@5.9.3))(zod@4.1.12)
@@ -2031,18 +2025,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
-  '@legendapp/list@3.0.0-beta.31':
-    resolution: {integrity: sha512-9KpPvwK/14QTJZVbEgDxjzRwcgSf1gkYSxw/d8GE03uasjnzCHe/fm4qrqpobDLYYt90wuemhjkE3YE18XMKEg==}
-    peerDependencies:
-      react: '*'
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
 
   '@levischuck/tiny-cbor@0.2.11':
     resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
@@ -11209,13 +11191,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@legendapp/list@3.0.0-beta.31(react-dom@19.1.4(react@19.1.4))(react@19.1.4)':
-    dependencies:
-      react: 19.1.4
-      use-sync-external-store: 1.6.0(react@19.1.4)
-    optionalDependencies:
-      react-dom: 19.1.4(react@19.1.4)
 
   '@levischuck/tiny-cbor@0.2.11': {}
 
