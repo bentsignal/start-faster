@@ -38,7 +38,7 @@
     "@convex-dev/better-auth": "catalog:",
     "better-auth": "^1.4.7",
     "convex": "catalog:",
-    "convex-env": "^2.3.0",
+    "convex-env": "^2.5.0",
     "convex-helpers": "^0.1.108",
     "uploadthing": "^7.7.4"
   }

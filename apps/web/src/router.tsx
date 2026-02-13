@@ -1,11 +1,12 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createRouter, Link } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { ConvexReactClient } from "convex/react";
-import { House } from "lucide-react";
 
-import { Button } from "@acme/ui/button";
-
+import { Error } from "~/components/error";
+import { NotFound } from "~/components/not-found";
+import { Pending } from "~/components/pending";
 import { env } from "~/env";
 import { routeTree } from "./routeTree.gen";
 
@@ -30,7 +31,7 @@ export function getRouter() {
     },
   });
   convexQueryClient.connect(queryClient);
-  return createRouter({
+  const router = createRouter({
     routeTree,
     scrollRestoration: true,
     context: {
@@ -38,24 +39,17 @@ export function getRouter() {
       queryClient,
       convexQueryClient,
     },
-    defaultErrorComponent: (props) => {
-      console.error(props.error);
-      return (
-        <div className="flex h-screen flex-col items-center justify-center gap-2">
-          <h1 className="text-2xl font-bold">Sorry about that</h1>
-          <p className="text-muted-foreground">
-            Something went wrong while loading this page.
-          </p>
-          <Button asChild className="mt-1">
-            <Link to="/">
-              <House className="size-4" />
-              Back to home
-            </Link>
-          </Button>
-        </div>
-      );
-    },
+    defaultNotFoundComponent: NotFound,
+    defaultErrorComponent: Error,
+    defaultPendingComponent: Pending,
   });
+
+  setupRouterSsrQueryIntegration({
+    router,
+    queryClient,
+  });
+
+  return router;
 }
 
 declare module "@tanstack/react-router" {

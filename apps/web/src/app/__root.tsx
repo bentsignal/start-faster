@@ -8,8 +8,9 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import { z } from "zod/v4";
+import { convert } from "great-time";
 
 import { cn } from "@acme/ui";
 import { Toaster } from "@acme/ui/toast";
@@ -17,30 +18,53 @@ import { Toaster } from "@acme/ui/toast";
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
+import { authClient } from "~/features/auth/lib/client";
+import { getToken } from "~/features/auth/lib/server";
 import { AuthStore } from "~/features/auth/store";
-import { authClient } from "~/lib/auth-client";
-import { getToken } from "~/lib/auth-server";
+import { ThemeStore } from "~/features/theme/store";
+import { getTheme } from "~/features/theme/utils";
+
+const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
+  const themeCookie = getCookie("theme");
+  return {
+    theme: getTheme(themeCookie),
+  };
+});
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   return await getToken();
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  validateSearch: z.object({
-    showLogin: z.boolean().optional(),
-    redirectTo: z.string().optional(),
-  }),
   head: () => ({
     links: [{ rel: "stylesheet", href: appStyles }],
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ruby" },
-      { name: "description", content: "A place to share your adventures." },
+      { title: "Start Faster" },
+      {
+        name: "description",
+        content: "The fastest shopping experience you've ever seen.",
+      },
+      {
+        name: "theme-color",
+        content: "white",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        name: "theme-color",
+        content: "black",
+        media: "(prefers-color-scheme: dark)",
+      },
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const token = await getAuth();
+    const token = await context.queryClient.fetchQuery({
+      queryKey: ["auth-token"],
+      queryFn: async () => (await getAuth()) ?? null,
+      staleTime: convert(50, "minutes", "to ms"),
+      gcTime: Infinity,
+    });
     // all queries, mutations and actions through TanStack Query will be
     // authenticated during SSR if we have a valid token
     if (token) {
@@ -49,9 +73,17 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
 
+    const { theme } = await context.queryClient.fetchQuery({
+      queryKey: ["theme"],
+      queryFn: async () => await getThemeFromCookie(),
+      staleTime: Infinity,
+      gcTime: Infinity,
+    });
+
     return {
       isAuthenticated: !!token,
       token,
+      theme,
     };
   },
   component: RootComponent,
@@ -77,21 +109,28 @@ function RootComponent() {
           initialToken={context.token}
         >
           <QueryClientProvider client={context.queryClient}>
-            <AuthStore isAuthenticatedServerSide={context.isAuthenticated}>
-              <Outlet />
-              <TanStackDevtools
-                config={{
-                  position: "bottom-right",
-                }}
-                plugins={[
-                  {
-                    name: "react-router",
-                    render: <TanStackRouterDevtoolsPanel />,
-                  },
-                ]}
-              />
-            </AuthStore>
-            <Toaster />
+            <ThemeStore
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+              initialTheme={context.theme}
+            >
+              <AuthStore isAuthenticatedServerSide={context.isAuthenticated}>
+                <Outlet />
+                <TanStackDevtools
+                  config={{
+                    position: "bottom-right",
+                  }}
+                  plugins={[
+                    {
+                      name: "react-router",
+                      render: <TanStackRouterDevtoolsPanel />,
+                    },
+                  ]}
+                />
+              </AuthStore>
+              <Toaster />
+            </ThemeStore>
             <Scripts />
           </QueryClientProvider>
         </ConvexBetterAuthProvider>

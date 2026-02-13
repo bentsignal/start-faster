@@ -12,14 +12,14 @@ export default defineConfig({
     noExternal: ["@convex-dev/better-auth"],
   },
   plugins: [
+    devtools({
+      consolePiping: { enabled: false },
+    }),
     tailwindcss(),
     tsconfigPaths(),
     tanstackStart({
       srcDirectory: "src",
       router: { routesDirectory: "app" },
-      spa: {
-        enabled: true,
-      },
     }),
     viteReact({
       babel: {
@@ -27,6 +27,5 @@ export default defineConfig({
       },
     }),
     nitro(),
-    devtools(),
   ],
 });

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useConvexAuth, useQuery } from "convex/react";
 import { createStore } from "rostra";
 
 import { api } from "@acme/convex/api";
+import { toast } from "@acme/ui/toast";
 
 import { useLoading } from "~/hooks/use-loading";
-import { authClient } from "../../lib/auth-client";
+import { authClient } from "./lib/client";
 
 function useInternalStore({
   isAuthenticatedServerSide,
@@ -14,22 +16,9 @@ function useInternalStore({
   isAuthenticatedServerSide: boolean;
 }) {
   const { isLoading, start } = useLoading();
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const urlShowLogin = useSearch({
-    from: "__root__",
-    select: (s) => s.showLogin ?? false,
-  });
-  const urlRedirectTo = useSearch({
-    from: "__root__",
-    select: (s) => s.redirectTo ?? null,
-  });
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(urlShowLogin);
-  const [redirectTo, setRedirectTo] = useState(urlRedirectTo);
-  const setRedirectURL = (url: string) => setRedirectTo(url);
-
-  // use serverside auth value until client is mounted
   const { isAuthenticated: isAuthenticatedClientSide } = useConvexAuth();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -43,14 +32,14 @@ function useInternalStore({
     : isAuthenticatedServerSide;
   const imSignedOut = !imSignedIn;
 
-  const myProfile = useQuery(api.profile.getMine, imSignedIn ? {} : "skip");
+  const myProfile = useQuery(api.profile.getMine);
 
-  const signInWithGoogle = () => {
+  const signInWithGoogle = (redirectUri?: string) => {
     if (imSignedIn) return;
     start(async () => {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: redirectTo ?? "/",
+        callbackURL: redirectUri ?? "/",
       });
     });
   };
@@ -58,8 +47,21 @@ function useInternalStore({
   const signOut = () => {
     if (imSignedOut) return;
     start(async () => {
-      void navigate({ to: "/", replace: true });
-      await authClient.signOut();
+      void navigate({ to: "/", replace: true, search: { signedOut: true } });
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            queryClient.removeQueries({ queryKey: ["auth-token"] });
+            const url = new URL(window.location.href);
+            url.searchParams.delete("signedOut");
+            window.location.replace(url.toString());
+          },
+          onError: (error: unknown) => {
+            console.error(error);
+            toast.error("Failed to sign out");
+          },
+        },
+      });
     });
   };
 
@@ -70,9 +72,6 @@ function useInternalStore({
     imSignedOut,
     signInWithGoogle,
     signOut,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
-    setRedirectURL,
   };
 }
 

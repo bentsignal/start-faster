@@ -9,11 +9,9 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as friends from "../friends.js";
 import type * as http from "../http.js";
 import type * as profile from "../profile.js";
 import type * as types from "../types.js";
-import type * as uploadthing from "../uploadthing.js";
 import type * as utils from "../utils.js";
 import type * as validators from "../validators.js";
 
@@ -25,11 +23,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  friends: typeof friends;
   http: typeof http;
   profile: typeof profile;
   types: typeof types;
-  uploadthing: typeof uploadthing;
   utils: typeof utils;
   validators: typeof validators;
 }>;
