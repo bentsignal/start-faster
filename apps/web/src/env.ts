@@ -14,7 +14,7 @@ export const env = createEnv({
   client: {
     VITE_NODE_ENV: z
       .enum(["development", "production", "test"])
-      .default("development"),
+      .default("production"),
     VITE_CONVEX_URL: z.url(),
     VITE_CONVEX_SITE_URL: z.url(),
     VITE_SITE_URL: z.url(),

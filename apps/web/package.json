@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "pnpm with-env vite build",
+    "deploy": "wrangler deploy",
     "clean": "git clean -xdf .cache .vinxi dist .turbo node_modules",
     "dev": "pnpm with-env vite dev",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
     "start": "pnpm with-env vite preview",
     "preview": "pnpm with-env vite preview",
-    "deploy": "pnpm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "typecheck": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
