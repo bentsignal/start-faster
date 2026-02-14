@@ -1,6 +1,9 @@
 import { convexBetterAuthReactStart } from "@convex-dev/better-auth/react-start";
+import { FastResponse } from "srvx";
 
 import { env } from "~/env";
+
+globalThis.Response = FastResponse;
 
 export const {
   handler,
