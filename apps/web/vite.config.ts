@@ -1,8 +1,8 @@
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import viteReact from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -15,6 +15,7 @@ export default defineConfig({
     devtools({
       consolePiping: { enabled: false },
     }),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
     tsconfigPaths(),
     tanstackStart({
@@ -26,6 +27,5 @@ export default defineConfig({
         plugins: ["babel-plugin-react-compiler"],
       },
     }),
-    nitro(),
   ],
 });
