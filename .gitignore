@@ -47,6 +47,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare
+.wrangler
+
 # typescript
 dist/
 .cache
