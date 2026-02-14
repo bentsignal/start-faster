@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Turborepo monorepo** containing a TanStack Start web app and a Convex backend.
+This is a **Turborepo monorepo** containing TanStack Start web apps and a Convex backend.
 
 ## Key Tech Stack
 
@@ -41,7 +41,7 @@ To run a command for a specific app or package, use `--filter <target-name>`
 
 ### Examples
 
-- Installing zustand to the web app: `pnpm i zustand --filter @acme/web`
+- Installing zustand to one of the web apps: `pnpm i zustand --filter @acme/shop`
 - Running lint on the convex backend: `pnpm run lint --filter convex`
 
 Below are some commands you should run after making changes for the user. You don't have to run all of them every time, it depends on the types of changes you make.
