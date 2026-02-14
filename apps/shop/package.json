@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm with-env vite build",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy --keep-vars",
     "clean": "git clean -xdf .cache .vinxi dist .turbo node_modules",
     "dev": "pnpm with-env vite dev",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
