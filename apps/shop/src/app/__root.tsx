@@ -11,6 +11,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { convert } from "great-time";
+import z from "zod";
 
 import { cn } from "@acme/ui";
 import { Toaster } from "@acme/ui/toast";
@@ -18,6 +19,7 @@ import { Toaster } from "@acme/ui/toast";
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
+import { LoginModal } from "~/features/auth/components/login-modal";
 import { authClient } from "~/features/auth/lib/client";
 import { getToken } from "~/features/auth/lib/server";
 import { AuthStore } from "~/features/auth/store";
@@ -57,6 +59,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         media: "(prefers-color-scheme: dark)",
       },
     ],
+  }),
+  validateSearch: z.object({
+    showLogin: z.boolean().optional(),
+    redirect_uri: z.string().optional(),
   }),
   beforeLoad: async ({ context }) => {
     const token = await context.queryClient.fetchQuery({
@@ -117,6 +123,7 @@ function RootComponent() {
             >
               <AuthStore isAuthenticatedServerSide={context.isAuthenticated}>
                 <Outlet />
+                <LoginModal />
                 <TanStackDevtools
                   config={{
                     position: "bottom-right",

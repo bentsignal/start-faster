@@ -47,7 +47,7 @@ function useInternalStore({
   const signOut = () => {
     if (imSignedOut) return;
     start(async () => {
-      void navigate({ to: "/", replace: true, search: { signedOut: true } });
+      void navigate({ to: "/", replace: true });
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {

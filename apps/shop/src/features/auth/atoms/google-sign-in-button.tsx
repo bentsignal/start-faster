@@ -10,7 +10,7 @@ export function GoogleSignInButton({ className }: { className?: string }) {
   const disabled = useAuthStore((s) => s.isLoading || s.imSignedIn);
 
   const redirectUri = useSearch({
-    from: "/login",
+    from: "/",
     select: (s) => s.redirect_uri,
   });
 

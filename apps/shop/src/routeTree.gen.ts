@@ -9,19 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
-import { Route as LoginRouteImport } from './app/login'
+import { Route as ShopRouteRouteImport } from './app/shop/route'
+import { Route as SettingsRouteRouteImport } from './app/settings/route'
+import { Route as CmsRouteRouteImport } from './app/cms/route'
 import { Route as IndexRouteImport } from './app/index'
+import { Route as ShopItemRouteImport } from './app/shop/$item'
+import { Route as SettingsAccountRouteImport } from './app/settings/account'
+import { Route as CmsSettingsRouteImport } from './app/cms/settings'
 import { Route as ApiAuthSplatRouteImport } from './app/api.auth.$'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const ShopRouteRoute = ShopRouteRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRouteRoute = SettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CmsRouteRoute = CmsRouteRouteImport.update({
+  id: '/cms',
+  path: '/cms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ShopItemRoute = ShopItemRouteImport.update({
+  id: '/$item',
+  path: '/$item',
+  getParentRoute: () => ShopRouteRoute,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
+const CmsSettingsRoute = CmsSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => CmsRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -31,41 +61,97 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/cms': typeof CmsRouteRouteWithChildren
+  '/settings': typeof SettingsRouteRouteWithChildren
+  '/shop': typeof ShopRouteRouteWithChildren
+  '/cms/settings': typeof CmsSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/shop/$item': typeof ShopItemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/cms': typeof CmsRouteRouteWithChildren
+  '/settings': typeof SettingsRouteRouteWithChildren
+  '/shop': typeof ShopRouteRouteWithChildren
+  '/cms/settings': typeof CmsSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/shop/$item': typeof ShopItemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/cms': typeof CmsRouteRouteWithChildren
+  '/settings': typeof SettingsRouteRouteWithChildren
+  '/shop': typeof ShopRouteRouteWithChildren
+  '/cms/settings': typeof CmsSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/shop/$item': typeof ShopItemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/cms'
+    | '/settings'
+    | '/shop'
+    | '/cms/settings'
+    | '/settings/account'
+    | '/shop/$item'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/api/auth/$'
-  id: '__root__' | '/' | '/login' | '/api/auth/$'
+  to:
+    | '/'
+    | '/cms'
+    | '/settings'
+    | '/shop'
+    | '/cms/settings'
+    | '/settings/account'
+    | '/shop/$item'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/cms'
+    | '/settings'
+    | '/shop'
+    | '/cms/settings'
+    | '/settings/account'
+    | '/shop/$item'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
+  CmsRouteRoute: typeof CmsRouteRouteWithChildren
+  SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
+  ShopRouteRoute: typeof ShopRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cms': {
+      id: '/cms'
+      path: '/cms'
+      fullPath: '/cms'
+      preLoaderRoute: typeof CmsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -74,6 +160,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/shop/$item': {
+      id: '/shop/$item'
+      path: '/$item'
+      fullPath: '/shop/$item'
+      preLoaderRoute: typeof ShopItemRouteImport
+      parentRoute: typeof ShopRouteRoute
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
+    '/cms/settings': {
+      id: '/cms/settings'
+      path: '/settings'
+      fullPath: '/cms/settings'
+      preLoaderRoute: typeof CmsSettingsRouteImport
+      parentRoute: typeof CmsRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -85,9 +192,47 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface CmsRouteRouteChildren {
+  CmsSettingsRoute: typeof CmsSettingsRoute
+}
+
+const CmsRouteRouteChildren: CmsRouteRouteChildren = {
+  CmsSettingsRoute: CmsSettingsRoute,
+}
+
+const CmsRouteRouteWithChildren = CmsRouteRoute._addFileChildren(
+  CmsRouteRouteChildren,
+)
+
+interface SettingsRouteRouteChildren {
+  SettingsAccountRoute: typeof SettingsAccountRoute
+}
+
+const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
+  SettingsAccountRoute: SettingsAccountRoute,
+}
+
+const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
+  SettingsRouteRouteChildren,
+)
+
+interface ShopRouteRouteChildren {
+  ShopItemRoute: typeof ShopItemRoute
+}
+
+const ShopRouteRouteChildren: ShopRouteRouteChildren = {
+  ShopItemRoute: ShopItemRoute,
+}
+
+const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
+  ShopRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
+  CmsRouteRoute: CmsRouteRouteWithChildren,
+  SettingsRouteRoute: SettingsRouteRouteWithChildren,
+  ShopRouteRoute: ShopRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
