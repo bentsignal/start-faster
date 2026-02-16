@@ -1,8 +1,14 @@
+import { useCallback, useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { ConvexQueryClient } from "@convex-dev/react-query";
-import { ConvexReactClient } from "convex/react";
+import {
+  AuthKitProvider,
+  useAccessToken,
+  useAuth,
+} from "@workos/authkit-tanstack-react-start/client";
+import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 
 import { Error } from "~/components/error";
 import { NotFound } from "~/components/not-found";
@@ -35,11 +41,19 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     defaultPreload: "intent",
+    defaultPreloadStaleTime: 0,
     context: {
       convex,
       queryClient,
       convexQueryClient,
     },
+    Wrap: ({ children }) => (
+      <AuthKitProvider>
+        <ConvexProviderWithAuth client={convex} useAuth={useAuthFromWorkOS}>
+          {children}
+        </ConvexProviderWithAuth>
+      </AuthKitProvider>
+    ),
     defaultNotFoundComponent: NotFound,
     defaultErrorComponent: Error,
     defaultPendingComponent: Pending,
@@ -51,6 +65,33 @@ export function getRouter() {
   });
 
   return router;
+}
+
+function useAuthFromWorkOS() {
+  const { loading, user } = useAuth();
+  const { getAccessToken, refresh } = useAccessToken();
+
+  const fetchAccessToken = useCallback(
+    async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
+      if (!user) {
+        return null;
+      }
+      if (forceRefreshToken) {
+        return (await refresh()) ?? null;
+      }
+      return (await getAccessToken()) ?? null;
+    },
+    [user, refresh, getAccessToken],
+  );
+
+  return useMemo(
+    () => ({
+      isLoading: loading,
+      isAuthenticated: !!user,
+      fetchAccessToken,
+    }),
+    [loading, user, fetchAccessToken],
+  );
 }
 
 declare module "@tanstack/react-router" {

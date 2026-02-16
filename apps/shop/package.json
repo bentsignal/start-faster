@@ -16,7 +16,6 @@
   "dependencies": {
     "@acme/convex": "workspace:*",
     "@acme/ui": "workspace:*",
-    "@convex-dev/better-auth": "^0.10.4",
     "@convex-dev/react-query": "^0.1.0",
     "@fontsource-variable/geist": "^5.2.7",
     "@fontsource-variable/geist-mono": "^5.2.7",
@@ -31,7 +30,7 @@
     "@tanstack/react-router-ssr-query": "^1.159.6",
     "@tanstack/react-start": "^1.159.6",
     "@unpic/react": "^0.1.14",
-    "better-auth": "catalog:",
+    "@workos/authkit-tanstack-react-start": "0.5.0",
     "class-variance-authority": "catalog:",
     "convex": "catalog:",
     "great-time": "^1.0.0",

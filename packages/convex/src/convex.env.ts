@@ -1,10 +1,8 @@
 import { createEnv } from "convex-env";
-import { betterAuth, environment, oAuth } from "convex-env/presets";
+import { environment } from "convex-env/presets";
 import { v } from "convex/values";
 
 export const env = createEnv({
   ...environment,
-  ...betterAuth,
-  ...oAuth.google,
-  SITE_URL: v.string(),
+  WORKOS_CLIENT_ID: v.string(),
 });

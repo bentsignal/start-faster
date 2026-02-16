@@ -1,6 +1,21 @@
 import type { AuthConfig } from "convex/server";
-import { getAuthConfigProvider } from "@convex-dev/better-auth/auth-config";
+
+import { env } from "./convex.env";
 
 export default {
-  providers: [getAuthConfigProvider()],
+  providers: [
+    {
+      type: "customJwt",
+      issuer: "https://api.workos.com/",
+      algorithm: "RS256",
+      jwks: `https://api.workos.com/sso/jwks/${env.WORKOS_CLIENT_ID}`,
+      applicationID: env.WORKOS_CLIENT_ID,
+    },
+    {
+      type: "customJwt",
+      issuer: `https://api.workos.com/user_management/${env.WORKOS_CLIENT_ID}`,
+      algorithm: "RS256",
+      jwks: `https://api.workos.com/sso/jwks/${env.WORKOS_CLIENT_ID}`,
+    },
+  ],
 } satisfies AuthConfig;

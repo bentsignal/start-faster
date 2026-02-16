@@ -9,28 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
+import { Route as CallbackRouteImport } from './app/callback'
+import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as ShopRouteRouteImport } from './app/shop/route'
-import { Route as SettingsRouteRouteImport } from './app/settings/route'
-import { Route as CmsRouteRouteImport } from './app/cms/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopItemRouteImport } from './app/shop/$item'
-import { Route as SettingsAccountRouteImport } from './app/settings/account'
-import { Route as CmsSettingsRouteImport } from './app/cms/settings'
-import { Route as ApiAuthSplatRouteImport } from './app/api.auth.$'
+import { Route as AuthenticatedSettingsRouteRouteImport } from './app/_authenticated/settings/route'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings/account'
 
+const CallbackRoute = CallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRouteRoute = ShopRouteRouteImport.update({
   id: '/shop',
   path: '/shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRouteRoute = SettingsRouteRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CmsRouteRoute = CmsRouteRouteImport.update({
-  id: '/cms',
-  path: '/cms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,115 +41,101 @@ const ShopItemRoute = ShopItemRouteImport.update({
   path: '/$item',
   getParentRoute: () => ShopRouteRoute,
 } as any)
-const SettingsAccountRoute = SettingsAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => SettingsRouteRoute,
-} as any)
-const CmsSettingsRoute = CmsSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => CmsRouteRoute,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedSettingsRouteRoute =
+  AuthenticatedSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cms': typeof CmsRouteRouteWithChildren
-  '/settings': typeof SettingsRouteRouteWithChildren
   '/shop': typeof ShopRouteRouteWithChildren
-  '/cms/settings': typeof CmsSettingsRoute
-  '/settings/account': typeof SettingsAccountRoute
+  '/callback': typeof CallbackRoute
+  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/shop/$item': typeof ShopItemRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cms': typeof CmsRouteRouteWithChildren
-  '/settings': typeof SettingsRouteRouteWithChildren
   '/shop': typeof ShopRouteRouteWithChildren
-  '/cms/settings': typeof CmsSettingsRoute
-  '/settings/account': typeof SettingsAccountRoute
+  '/callback': typeof CallbackRoute
+  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/shop/$item': typeof ShopItemRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/cms': typeof CmsRouteRouteWithChildren
-  '/settings': typeof SettingsRouteRouteWithChildren
   '/shop': typeof ShopRouteRouteWithChildren
-  '/cms/settings': typeof CmsSettingsRoute
-  '/settings/account': typeof SettingsAccountRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/callback': typeof CallbackRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/shop/$item': typeof ShopItemRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/cms'
-    | '/settings'
     | '/shop'
-    | '/cms/settings'
-    | '/settings/account'
+    | '/callback'
+    | '/settings'
     | '/shop/$item'
-    | '/api/auth/$'
+    | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/cms'
-    | '/settings'
     | '/shop'
-    | '/cms/settings'
-    | '/settings/account'
+    | '/callback'
+    | '/settings'
     | '/shop/$item'
-    | '/api/auth/$'
+    | '/settings/account'
   id:
     | '__root__'
     | '/'
-    | '/cms'
-    | '/settings'
     | '/shop'
-    | '/cms/settings'
-    | '/settings/account'
+    | '/_authenticated'
+    | '/callback'
+    | '/_authenticated/settings'
     | '/shop/$item'
-    | '/api/auth/$'
+    | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CmsRouteRoute: typeof CmsRouteRouteWithChildren
-  SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   ShopRouteRoute: typeof ShopRouteRouteWithChildren
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  CallbackRoute: typeof CallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/callback': {
+      id: '/callback'
+      path: '/callback'
+      fullPath: '/callback'
+      preLoaderRoute: typeof CallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cms': {
-      id: '/cms'
-      path: '/cms'
-      fullPath: '/cms'
-      preLoaderRoute: typeof CmsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -168,53 +152,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopItemRouteImport
       parentRoute: typeof ShopRouteRoute
     }
-    '/settings/account': {
-      id: '/settings/account'
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
       path: '/account'
       fullPath: '/settings/account'
-      preLoaderRoute: typeof SettingsAccountRouteImport
-      parentRoute: typeof SettingsRouteRoute
-    }
-    '/cms/settings': {
-      id: '/cms/settings'
-      path: '/settings'
-      fullPath: '/cms/settings'
-      preLoaderRoute: typeof CmsSettingsRouteImport
-      parentRoute: typeof CmsRouteRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
   }
 }
-
-interface CmsRouteRouteChildren {
-  CmsSettingsRoute: typeof CmsSettingsRoute
-}
-
-const CmsRouteRouteChildren: CmsRouteRouteChildren = {
-  CmsSettingsRoute: CmsSettingsRoute,
-}
-
-const CmsRouteRouteWithChildren = CmsRouteRoute._addFileChildren(
-  CmsRouteRouteChildren,
-)
-
-interface SettingsRouteRouteChildren {
-  SettingsAccountRoute: typeof SettingsAccountRoute
-}
-
-const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
-  SettingsAccountRoute: SettingsAccountRoute,
-}
-
-const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
-  SettingsRouteRouteChildren,
-)
 
 interface ShopRouteRouteChildren {
   ShopItemRoute: typeof ShopItemRoute
@@ -228,22 +181,48 @@ const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
   ShopRouteRouteChildren,
 )
 
+interface AuthenticatedSettingsRouteRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+}
+
+const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
+  {
+    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  }
+
+const AuthenticatedSettingsRouteRouteWithChildren =
+  AuthenticatedSettingsRouteRoute._addFileChildren(
+    AuthenticatedSettingsRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CmsRouteRoute: CmsRouteRouteWithChildren,
-  SettingsRouteRoute: SettingsRouteRouteWithChildren,
   ShopRouteRoute: ShopRouteRouteWithChildren,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  CallbackRoute: CallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

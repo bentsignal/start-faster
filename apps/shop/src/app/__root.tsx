@@ -9,9 +9,8 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { convert } from "great-time";
-import z from "zod";
 
 import { cn } from "@acme/ui";
 import { Toaster } from "@acme/ui/toast";
@@ -19,10 +18,6 @@ import { Toaster } from "@acme/ui/toast";
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
-import { LoginModal } from "~/features/auth/components/login-modal";
-import { authClient } from "~/features/auth/lib/client";
-import { getToken } from "~/features/auth/lib/server";
-import { AuthStore } from "~/features/auth/store";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
 
@@ -33,8 +28,20 @@ const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   };
 });
 
-const getAuth = createServerFn({ method: "GET" }).handler(async () => {
-  return await getToken();
+const fetchWorkosAuth = createServerFn({ method: "GET" }).handler(async () => {
+  const auth = await getAuth();
+  const user = auth.user;
+  return user
+    ? {
+        user,
+        token: auth.accessToken,
+        isSignedIn: true,
+      }
+    : {
+        user: null,
+        token: null,
+        isSignedIn: false,
+      };
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -60,23 +67,19 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
     ],
   }),
-  validateSearch: z.object({
-    showLogin: z.boolean().optional(),
-    redirect_uri: z.string().optional(),
-  }),
   beforeLoad: async ({ context }) => {
-    const token = await context.queryClient.fetchQuery({
-      queryKey: ["auth-token"],
-      queryFn: async () => (await getAuth()) ?? null,
+    const auth = await context.queryClient.fetchQuery({
+      queryKey: ["workos-auth"],
+      queryFn: async () => await fetchWorkosAuth(),
       staleTime: convert(50, "minutes", "to ms"),
       gcTime: Infinity,
     });
     // all queries, mutations and actions through TanStack Query will be
     // authenticated during SSR if we have a valid token
-    if (token) {
+    if (auth.isSignedIn) {
       // During SSR only (the only time serverHttpClient exists),
       // set the auth token to make HTTP queries with.
-      context.convexQueryClient.serverHttpClient?.setAuth(token);
+      context.convexQueryClient.serverHttpClient?.setAuth(auth.token);
     }
 
     const { theme } = await context.queryClient.fetchQuery({
@@ -86,9 +89,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       gcTime: Infinity,
     });
 
+    const { token: _, ...rest } = auth;
+
     return {
-      isAuthenticated: !!token,
-      token,
+      auth: rest,
       theme,
     };
   },
@@ -109,38 +113,29 @@ function RootComponent() {
           "bg-background text-foreground min-h-screen font-sans antialiased",
         )}
       >
-        <ConvexBetterAuthProvider
-          client={context.convex}
-          authClient={authClient}
-          initialToken={context.token}
-        >
-          <QueryClientProvider client={context.queryClient}>
-            <ThemeStore
-              attribute="class"
-              defaultTheme="dark"
-              disableTransitionOnChange
-              initialTheme={context.theme}
-            >
-              <AuthStore isAuthenticatedServerSide={context.isAuthenticated}>
-                <Outlet />
-                <LoginModal />
-                <TanStackDevtools
-                  config={{
-                    position: "bottom-right",
-                  }}
-                  plugins={[
-                    {
-                      name: "react-router",
-                      render: <TanStackRouterDevtoolsPanel />,
-                    },
-                  ]}
-                />
-              </AuthStore>
-              <Toaster />
-            </ThemeStore>
-            <Scripts />
-          </QueryClientProvider>
-        </ConvexBetterAuthProvider>
+        <QueryClientProvider client={context.queryClient}>
+          <ThemeStore
+            attribute="class"
+            defaultTheme="dark"
+            disableTransitionOnChange
+            initialTheme={context.theme}
+          >
+            <Outlet />
+            <TanStackDevtools
+              config={{
+                position: "bottom-right",
+              }}
+              plugins={[
+                {
+                  name: "react-router",
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+              ]}
+            />
+            <Toaster />
+          </ThemeStore>
+          <Scripts />
+        </QueryClientProvider>
       </body>
     </html>
   );

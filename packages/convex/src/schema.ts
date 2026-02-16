@@ -1,10 +1,11 @@
 import { defineSchema, defineTable } from "convex/server";
-
-import { vProfile } from "./validators";
+import { v } from "convex/values";
 
 export default defineSchema(
   {
-    profiles: defineTable(vProfile).index("by_userId", ["userId"]),
+    products: defineTable({
+      name: v.string(),
+    }),
   },
   { schemaValidation: true },
 );
