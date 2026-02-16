@@ -17,20 +17,26 @@
     "build": "convex deploy",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
-    "lint": "eslint",
+    "lint": "eslint --ignore-pattern 'src/shopify/genql/**'",
     "typecheck": "tsc --noEmit",
     "setup": "convex dev --until-success",
-    "logs": "convex logs"
+    "logs": "convex logs",
+    "genql:admin": "genql --schema src/shopify/genql/schemas/admin.graphql --output src/shopify/genql/admin -S DateTime:string -S Decimal:string -S HTML:string -S URL:string --sort",
+    "genql:storefront": "genql --schema src/shopify/genql/schemas/storefront.graphql --output src/shopify/genql/storefront -S Decimal:string -S URL:string --sort",
+    "genql": "pnpm run genql:admin && pnpm run genql:storefront",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
     "@convex-dev/eslint-plugin": "^1.1.1",
+    "@genql/cli": "^6.3.3",
     "@types/node": "^22.19.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^3.2.4"
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {

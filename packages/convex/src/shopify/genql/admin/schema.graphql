@@ -1,0 +1,128 @@
+type Collection {
+  description: String!
+  handle: String!
+  id: ID!
+  image: Image
+  title: String!
+  updatedAt: DateTime!
+}
+
+type CollectionConnection {
+  edges: [CollectionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CollectionEdge {
+  cursor: String!
+  node: Collection!
+}
+
+enum CurrencyCode {
+  CAD
+  EUR
+  GBP
+  JPY
+  USD
+}
+
+scalar DateTime
+
+scalar Decimal
+
+scalar HTML
+
+type Image {
+  altText: String
+  height: Int
+  url: URL!
+  width: Int
+}
+
+type MoneyV2 {
+  amount: Decimal!
+  currencyCode: CurrencyCode!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type Product {
+  collections(first: Int!): CollectionConnection!
+  description: String!
+  descriptionHtml: HTML!
+  featuredImage: Image
+  handle: String!
+  id: ID!
+  options: [ProductOption!]!
+  productType: String!
+  publishedAt: DateTime
+  status: ProductStatus!
+  tags: [String!]!
+  title: String!
+  updatedAt: DateTime!
+  variants(first: Int!): ProductVariantConnection!
+  vendor: String!
+}
+
+type ProductConnection {
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
+type ProductOption {
+  name: String!
+  values: [String!]!
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+  DRAFT
+}
+
+type ProductVariant {
+  availableForSale: Boolean!
+  compareAtPrice: MoneyV2
+  id: ID!
+  inventoryPolicy: ProductVariantInventoryPolicy
+  price: MoneyV2!
+  selectedOptions: [SelectedOption!]!
+  sku: String
+  title: String!
+  updatedAt: DateTime!
+}
+
+type ProductVariantConnection {
+  edges: [ProductVariantEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductVariantEdge {
+  cursor: String!
+  node: ProductVariant!
+}
+
+enum ProductVariantInventoryPolicy {
+  CONTINUE
+  DENY
+}
+
+type Query {
+  collections(after: String, first: Int!, query: String): CollectionConnection!
+  product(id: ID!): Product
+  products(after: String, first: Int!, query: String): ProductConnection!
+}
+
+type SelectedOption {
+  name: String!
+  value: String!
+}
+
+scalar URL

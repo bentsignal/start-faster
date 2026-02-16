@@ -1,0 +1,81 @@
+type Cart {
+  checkoutUrl: URL!
+  id: ID!
+  lines(first: Int!): CartLineConnection!
+}
+
+type CartCreatePayload {
+  cart: Cart
+  userErrors: [CartUserError!]!
+  warnings: [CartWarning!]!
+}
+
+input CartInput {
+  lines: [CartLineInput!]
+}
+
+type CartLine {
+  cost: CartLineCost!
+  id: ID!
+  quantity: Int!
+}
+
+type CartLineConnection {
+  edges: [CartLineEdge!]!
+}
+
+type CartLineCost {
+  amountPerQuantity: MoneyV2!
+}
+
+type CartLineEdge {
+  cursor: String!
+  node: CartLine!
+}
+
+input CartLineInput {
+  merchandiseId: ID!
+  quantity: Int!
+}
+
+type CartLinesAddPayload {
+  cart: Cart
+  userErrors: [CartUserError!]!
+  warnings: [CartWarning!]!
+}
+
+type CartUserError {
+  field: [String!]
+  message: String!
+}
+
+type CartWarning {
+  code: String!
+  message: String!
+}
+
+enum CurrencyCode {
+  CAD
+  EUR
+  GBP
+  JPY
+  USD
+}
+
+scalar Decimal
+
+type MoneyV2 {
+  amount: Decimal!
+  currencyCode: CurrencyCode!
+}
+
+type Mutation {
+  cartCreate(input: CartInput): CartCreatePayload!
+  cartLinesAdd(cartId: ID!, lines: [CartLineInput!]!): CartLinesAddPayload!
+}
+
+type Query {
+  shopName: String
+}
+
+scalar URL

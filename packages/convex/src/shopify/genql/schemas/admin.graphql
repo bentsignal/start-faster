@@ -1,0 +1,125 @@
+scalar DateTime
+scalar Decimal
+scalar HTML
+scalar URL
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+  DRAFT
+}
+
+enum ProductVariantInventoryPolicy {
+  CONTINUE
+  DENY
+}
+
+enum CurrencyCode {
+  USD
+  CAD
+  EUR
+  GBP
+  JPY
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type Image {
+  url: URL!
+  altText: String
+  width: Int
+  height: Int
+}
+
+type MoneyV2 {
+  amount: Decimal!
+  currencyCode: CurrencyCode!
+}
+
+type SelectedOption {
+  name: String!
+  value: String!
+}
+
+type ProductOption {
+  name: String!
+  values: [String!]!
+}
+
+type ProductVariant {
+  id: ID!
+  title: String!
+  sku: String
+  availableForSale: Boolean!
+  selectedOptions: [SelectedOption!]!
+  price: MoneyV2!
+  compareAtPrice: MoneyV2
+  inventoryPolicy: ProductVariantInventoryPolicy
+  updatedAt: DateTime!
+}
+
+type ProductVariantEdge {
+  cursor: String!
+  node: ProductVariant!
+}
+
+type ProductVariantConnection {
+  pageInfo: PageInfo!
+  edges: [ProductVariantEdge!]!
+}
+
+type Collection {
+  id: ID!
+  handle: String!
+  title: String!
+  description: String!
+  updatedAt: DateTime!
+  image: Image
+}
+
+type CollectionEdge {
+  cursor: String!
+  node: Collection!
+}
+
+type CollectionConnection {
+  pageInfo: PageInfo!
+  edges: [CollectionEdge!]!
+}
+
+type Product {
+  id: ID!
+  handle: String!
+  title: String!
+  description: String!
+  descriptionHtml: HTML!
+  status: ProductStatus!
+  vendor: String!
+  productType: String!
+  tags: [String!]!
+  featuredImage: Image
+  options: [ProductOption!]!
+  variants(first: Int!): ProductVariantConnection!
+  collections(first: Int!): CollectionConnection!
+  updatedAt: DateTime!
+  publishedAt: DateTime
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
+type ProductConnection {
+  pageInfo: PageInfo!
+  edges: [ProductEdge!]!
+}
+
+type Query {
+  products(first: Int!, after: String, query: String): ProductConnection!
+  collections(first: Int!, after: String, query: String): CollectionConnection!
+  product(id: ID!): Product
+}
