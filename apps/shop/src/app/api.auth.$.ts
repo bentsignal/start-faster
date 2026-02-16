@@ -6,10 +6,18 @@ export const Route = createFileRoute("/api/auth/$")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        return handler(request);
+        console.log("GET");
+        console.log(request);
+        const response = await handler(request);
+        console.log(response);
+        return response;
       },
       POST: async ({ request }) => {
-        return handler(request);
+        console.log("POST");
+        console.log(request);
+        const response = await handler(request);
+        console.log(response);
+        return response;
       },
     },
   },

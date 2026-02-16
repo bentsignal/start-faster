@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequestHeaders } from "@tanstack/react-start/server";
+import { getCookie } from "@tanstack/react-start/server";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { convert } from "great-time";
 import z from "zod";
@@ -65,14 +65,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     redirect_uri: z.string().optional(),
   }),
   beforeLoad: async ({ context }) => {
-    // const token = await context.queryClient.fetchQuery({
-    //   queryKey: ["auth-token"],
-    //   queryFn: async () => (await getAuth()) ?? null,
-    //   staleTime: convert(50, "minutes", "to ms"),
-    //   gcTime: Infinity,
-    // });
-    const token = await getAuth();
-    console.log("token", token);
+    const token = await context.queryClient.fetchQuery({
+      queryKey: ["auth-token"],
+      queryFn: async () => (await getAuth()) ?? null,
+      staleTime: convert(50, "minutes", "to ms"),
+      gcTime: Infinity,
+    });
     // all queries, mutations and actions through TanStack Query will be
     // authenticated during SSR if we have a valid token
     if (token) {
