@@ -6,14 +6,12 @@ export const Route = createFileRoute("/shop/$item")({
   params: z.object({
     item: z.string(),
   }),
-  validateSearch: z
-    .object({
-      quantity: z.number().optional(),
-      size: z.enum(["small", "medium", "large"]).optional(),
-      color: z.enum(["red", "blue", "green"]).optional(),
-      sort: z.enum(["price", "name"]).optional(),
-    })
-    .partial(),
+  validateSearch: z.object({
+    quantity: z.number().optional(),
+    size: z.enum(["small", "medium", "large"]).optional(),
+    color: z.enum(["red", "blue", "green"]).optional(),
+    sort: z.enum(["price", "name"]).optional(),
+  }),
 });
 
 function RouteComponent() {
