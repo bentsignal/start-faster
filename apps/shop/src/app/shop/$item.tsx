@@ -39,23 +39,25 @@ function ProductPage() {
   );
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden md:flex-row">
-      <div className="relative flex h-100 shrink-0 items-center justify-center overflow-hidden bg-white sm:h-full md:w-3/5">
-        {product.featuredImage ? (
-          <Image
-            src={product.featuredImage.url}
-            alt={product.featuredImage.altText ?? product.title}
-            layout="fullWidth"
-            className="my-auto object-cover"
-          />
-        ) : (
-          <div className="bg-muted h-full w-full" />
-        )}
-        <div className="from-background/30 md:to-background/8 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent md:bg-linear-to-r md:from-transparent" />
+    <main className="lg:grid lg:min-h-screen lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+      <div className="relative overflow-hidden bg-white lg:sticky lg:top-0 lg:h-screen">
+        <div className="relative aspect-square w-full lg:h-full lg:aspect-auto">
+          {product.featuredImage ? (
+            <Image
+              src={product.featuredImage.url}
+              alt={product.featuredImage.altText ?? product.title}
+              layout="fullWidth"
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="bg-muted h-full w-full" />
+          )}
+          <div className="from-background/30 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent lg:bg-linear-to-r lg:from-transparent lg:to-background/8" />
+        </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-8 py-10 md:px-12 lg:px-16 xl:px-20">
-        <div className="max-w-sm">
+      <div className="px-6 py-10 sm:px-8 md:px-10 lg:px-12 lg:py-14 xl:px-16">
+        <div className="mx-auto max-w-xl lg:mx-0 lg:max-w-md xl:max-w-lg">
           <p className="animate-in fade-in slide-in-from-bottom-1 fill-mode-both text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase duration-500">
             {item}
           </p>
