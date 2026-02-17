@@ -9,7 +9,6 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
-import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { convert } from "great-time";
 
 import { cn } from "@acme/ui";
@@ -20,6 +19,7 @@ import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
+import { getShopifyCustomerAuthState } from "~/lib/shopify/customer-auth.server";
 
 const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   const themeCookie = getCookie("theme");
@@ -28,20 +28,8 @@ const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   };
 });
 
-const fetchWorkosAuth = createServerFn({ method: "GET" }).handler(async () => {
-  const auth = await getAuth();
-  const user = auth.user;
-  return user
-    ? {
-        user,
-        token: auth.accessToken,
-        isSignedIn: true,
-      }
-    : {
-        user: null,
-        token: null,
-        isSignedIn: false,
-      };
+const fetchShopifyAuth = createServerFn({ method: "GET" }).handler(() => {
+  return getShopifyCustomerAuthState();
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -69,18 +57,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   beforeLoad: async ({ context }) => {
     const auth = await context.queryClient.fetchQuery({
-      queryKey: ["workos-auth"],
-      queryFn: async () => await fetchWorkosAuth(),
-      staleTime: convert(50, "minutes", "to ms"),
+      queryKey: ["shopify-auth"],
+      queryFn: async () => await fetchShopifyAuth(),
+      staleTime: convert(5, "minutes", "to ms"),
       gcTime: Infinity,
     });
-    // all queries, mutations and actions through TanStack Query will be
-    // authenticated during SSR if we have a valid token
-    if (auth.isSignedIn) {
-      // During SSR only (the only time serverHttpClient exists),
-      // set the auth token to make HTTP queries with.
-      context.convexQueryClient.serverHttpClient?.setAuth(auth.token);
-    }
 
     const { theme } = await context.queryClient.fetchQuery({
       queryKey: ["theme"],
@@ -89,10 +70,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       gcTime: Infinity,
     });
 
-    const { token: _, ...rest } = auth;
-
     return {
-      auth: rest,
+      auth,
       theme,
     };
   },

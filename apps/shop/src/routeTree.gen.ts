@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopItemRouteImport } from './app/shop/$item'
+import { Route as AuthLogoutRouteImport } from './app/auth/logout'
+import { Route as AuthLoginRouteImport } from './app/auth/login'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/_authenticated/settings/route'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings/account'
 
@@ -41,6 +43,16 @@ const ShopItemRoute = ShopItemRouteImport.update({
   path: '/$item',
   getParentRoute: () => ShopRouteRoute,
 } as any)
+const AuthLogoutRoute = AuthLogoutRouteImport.update({
+  id: '/auth/logout',
+  path: '/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
     id: '/settings',
@@ -59,6 +71,8 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -67,6 +81,8 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -77,6 +93,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -87,6 +105,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/callback'
     | '/settings'
+    | '/auth/login'
+    | '/auth/logout'
     | '/shop/$item'
     | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
@@ -95,6 +115,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/callback'
     | '/settings'
+    | '/auth/login'
+    | '/auth/logout'
     | '/shop/$item'
     | '/settings/account'
   id:
@@ -104,6 +126,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/callback'
     | '/_authenticated/settings'
+    | '/auth/login'
+    | '/auth/logout'
     | '/shop/$item'
     | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
@@ -113,6 +137,8 @@ export interface RootRouteChildren {
   ShopRouteRoute: typeof ShopRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthLogoutRoute: typeof AuthLogoutRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,6 +177,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/shop/$item'
       preLoaderRoute: typeof ShopItemRouteImport
       parentRoute: typeof ShopRouteRoute
+    }
+    '/auth/logout': {
+      id: '/auth/logout'
+      path: '/auth/logout'
+      fullPath: '/auth/logout'
+      preLoaderRoute: typeof AuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -212,6 +252,8 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRouteRoute: ShopRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthLogoutRoute: AuthLogoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
