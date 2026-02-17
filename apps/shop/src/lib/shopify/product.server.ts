@@ -87,12 +87,7 @@ export const getProductByHandle = createServerFn({ method: "GET" })
     >(productByHandleQuery, {
       handle: data.handle,
     });
-    if (!result.product) {
-      throw new Error(
-        `Shopify product "${data.handle}" not found. Verify the product handle, ensure it is active, and publish it to the sales channel used by your Storefront token.`,
-      );
-    }
-    return result;
+    return result.product;
   });
 
 export const getProductsByCollectionHandle = createServerFn({ method: "GET" })
