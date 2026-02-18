@@ -19,7 +19,7 @@ import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
-import { getShopifyCustomerAuthState } from "~/lib/shopify/customer-auth.server";
+import { getShopifyCustomerAuthState } from "~/lib/auth";
 
 const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   const themeCookie = getCookie("theme");

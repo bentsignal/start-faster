@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { handleCustomerAuthCallback } from "~/lib/shopify/customer-auth.server";
+import { handleCustomerAuthCallback } from "~/lib/auth";
 
 export const Route = createFileRoute("/callback")({
   server: {

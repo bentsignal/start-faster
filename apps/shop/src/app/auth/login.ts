@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { createCustomerLoginUrl } from "~/lib/shopify/customer-auth.server";
+import { createCustomerLoginUrl } from "~/lib/auth";
 
 export const Route = createFileRoute("/auth/login")({
   server: {

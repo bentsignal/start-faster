@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { clearCustomerSession } from "~/lib/shopify/customer-auth.server";
+import { clearCustomerSession } from "~/lib/auth";
 
 export const Route = createFileRoute("/auth/logout")({
   server: {

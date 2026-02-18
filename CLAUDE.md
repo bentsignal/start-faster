@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Turborepo monorepo** containing TanStack Start web apps and a Convex backend.
+This is a **Turborepo monorepo** containing a TanStack Start storefront app for a shopify backend.
 
 ## Key Tech Stack
 
 - React 19 (react compiler enabled)
 - TanStack Start (Vite + TanStack Router) for web
 - Tailwind CSS v4
-- Convex for backend/db
-- Better Auth for authentication
+- Shopify Storefront API
+- Shopify Customer Account OAuth
 - Rostra for state management
 
 Since the react compiler is enabled, you often don't need to manually memoize with useMemo and useCallback.
@@ -41,8 +41,8 @@ To run a command for a specific app or package, use `--filter <target-name>`
 
 ### Examples
 
-- Installing zustand to one of the web apps: `pnpm i zustand --filter @acme/shop`
-- Running lint on the convex backend: `pnpm run lint --filter convex`
+- Installing a dependency in the shop app: `pnpm i zustand --filter @acme/shop`
+- Running lint on the Shopify package: `pnpm run lint --filter @acme/shopify`
 
 Below are some commands you should run after making changes for the user. You don't have to run all of them every time, it depends on the types of changes you make.
 
@@ -61,13 +61,13 @@ Make sure that any commands you choose to run are passing before completing your
 .vscode
   └─ Recommended extensions and settings for VSCode users
 apps
-  └─ web
+  └─ shop
       ├─ TanStack Start (Vite + TanStack Router)
       ├─ React 19 (react compiler enabled)
       └─ Tailwind CSS v4
 packages
-  ├─ convex
-  │   └─ backend, db, auth.
+  ├─ shopify
+  │   └─ Shared Shopify GraphQL operations and generated types.
   └─ ui
       └─ Components from shadcn registries.
 tooling
@@ -81,34 +81,38 @@ tooling
       └─ shared tsconfig you can extend from
 ```
 
-### Backend (packages/convex)
+### Shopify Data Layer (packages/shopify)
 
-Uses **Convex** as the backend-as-a-service.
+Uses **Shopify Storefront API** with shared GraphQL operations and generated types.
 
-- `src/schema.ts` - Database schema.
-- `src/auth.ts` - Better Auth integration with Google OAuth
-- Auto-generated code in `src/_generated/`. DO NOT MAKE CHANGES IN HERE EVER.
+- `src/product/get-product.ts` - Product-by-handle query.
+- `src/product/get-products-by-collection.ts` - Collection products query.
+- `src/generated/` - Generated Shopify schema/types. Do not edit generated files manually.
 
 API usage in apps:
 
 ```typescript
-import { api } from "@acme/convex/api";
+import { getProduct } from "@acme/shopify/product";
 
-const posts = useQuery(api.posts.getAll);
+import { shopify } from "~/lib/shopify";
+
+const response = await shopify.request(getProduct, {
+  variables: { handle: "my-product-handle" },
+});
 ```
 
 ### Authentication
 
-Uses **Better Auth** with Convex adapter for both platforms:
+Uses Shopify Customer Account OAuth flow:
 
-- **Web**: `apps/web/src/lib/auth-client.ts`, `auth-server.ts`
-- OAuth handled via `@better-auth/expo`
+- **Server auth utilities**: `apps/shop/src/lib/auth.ts`
+- **Auth routes**: `apps/shop/src/app/auth/login.ts`, `apps/shop/src/app/callback.ts`, `apps/shop/src/app/auth/logout.ts`
 
 Auth should typically be handled through the Auth Store.
 
 ### Environment Variables
 
-Web and Convex both have a file that shows what environment variables they require
+Shop and Shopify workflows depend on environment variables defined in:
 
-- Web: `./apps/web/src/env.ts`
-- Convex: `./packages/convex/src/convex.env.ts`
+- Shop app runtime/env validation: `./apps/shop/src/env.ts`
+- Shopify codegen and package scripts: `./packages/shopify/.graphqlrc.ts` and `./packages/shopify/package.json`

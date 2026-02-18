@@ -1,18 +1,31 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { LogIn, LogOut } from "lucide-react";
 
+import type { GetQueryVariables } from "@acme/shopify/generated";
+import { getProductsByCollection } from "@acme/shopify/product";
 import { Button } from "@acme/ui/button";
 
-import { getProductsByCollectionHandle } from "~/lib/shopify/product.server";
+import { shopify } from "~/lib/shopify";
+
+const getProductsByCollectionFn = createServerFn({ method: "GET" })
+  .inputValidator((value: GetQueryVariables) => value)
+  .handler(async ({ data }) => {
+    const response = await shopify.request(getProductsByCollection, {
+      variables: data,
+    });
+    return response.data?.collection?.products;
+  });
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    return getProductsByCollectionHandle({
+    const data = await getProductsByCollectionFn({
       data: {
         handle: "frontpage",
         first: 24,
       },
     });
+    return data?.nodes ?? [];
   },
   component: RouteComponent,
 });
@@ -23,8 +36,7 @@ function RouteComponent() {
       auth: context.auth,
     }),
   });
-  const data = Route.useLoaderData();
-  const products = data.collection?.products.nodes ?? [];
+  const products = Route.useLoaderData();
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-12">

@@ -1,7 +1,7 @@
 import type { IGraphQLConfig } from "graphql-config";
 import { ApiType, shopifyApiProject } from "@shopify/api-codegen-preset";
 
-const storefrontTypesOutputPath = "./src/lib/shopify/generated/storefront.types.d.ts";
+const storefrontTypesOutputPath = "./src/generated/storefront.types.d.ts";
 
 const storefrontScalarMappings = {
   Color: "string",
@@ -18,7 +18,7 @@ const storefrontProject = shopifyApiProject({
   apiType: ApiType.Storefront,
   apiVersion: "2025-10",
   documents: ["./src/**/*.{ts,tsx}"],
-  outputDir: "./src/lib/shopify/generated",
+  outputDir: "./src/generated",
 });
 
 type CodegenOutputConfig = {

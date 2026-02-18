@@ -96,12 +96,7 @@ export type AppliedGiftCard = Node & {
   presentmentAmountUsed: MoneyV2;
 };
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type Article = HasMetafields & Node & OnlineStorePublishable & Trackable & {
   __typename?: 'Article';
   /**
@@ -151,12 +146,7 @@ export type Article = HasMetafields & Node & OnlineStorePublishable & Trackable 
 };
 
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type ArticleCommentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -166,46 +156,26 @@ export type ArticleCommentsArgs = {
 };
 
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type ArticleContentArgs = {
   truncateAt?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type ArticleExcerptArgs = {
   truncateAt?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type ArticleMetafieldArgs = {
   key: Scalars['String']['input'];
   namespace?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/**
- * A post that belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog). Each article includes content with optional HTML formatting, an excerpt for previews, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, and an associated [`Image`](https://shopify.dev/docs/api/storefront/current/objects/Image).
- *
- * Articles can be organized with tags and include [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) metadata. You can manage [comments](https://shopify.dev/docs/api/storefront/current/objects/Comment) when the blog's comment policy enables them.
- *
- */
+/** An article in an online store blog. */
 export type ArticleMetafieldsArgs = {
   identifiers: Array<HasMetafieldsIdentifier>;
 };
@@ -381,12 +351,7 @@ export type BaseCartLineEdge = {
   node: BaseCartLine;
 };
 
-/**
- * A blog container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects. Stores can have multiple blogs, for example to organize content by topic or purpose.
- *
- * Each blog provides access to its articles, contributing [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) objects, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information. You can retrieve articles individually [by handle](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articleByHandle) or as a [paginated list](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articles).
- *
- */
+/** An online store blog. */
 export type Blog = HasMetafields & Node & OnlineStorePublishable & {
   __typename?: 'Blog';
   /** Find an article by its handle. */
@@ -415,23 +380,13 @@ export type Blog = HasMetafields & Node & OnlineStorePublishable & {
 };
 
 
-/**
- * A blog container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects. Stores can have multiple blogs, for example to organize content by topic or purpose.
- *
- * Each blog provides access to its articles, contributing [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) objects, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information. You can retrieve articles individually [by handle](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articleByHandle) or as a [paginated list](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articles).
- *
- */
+/** An online store blog. */
 export type BlogArticleByHandleArgs = {
   handle: Scalars['String']['input'];
 };
 
 
-/**
- * A blog container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects. Stores can have multiple blogs, for example to organize content by topic or purpose.
- *
- * Each blog provides access to its articles, contributing [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) objects, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information. You can retrieve articles individually [by handle](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articleByHandle) or as a [paginated list](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articles).
- *
- */
+/** An online store blog. */
 export type BlogArticlesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -443,24 +398,14 @@ export type BlogArticlesArgs = {
 };
 
 
-/**
- * A blog container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects. Stores can have multiple blogs, for example to organize content by topic or purpose.
- *
- * Each blog provides access to its articles, contributing [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) objects, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information. You can retrieve articles individually [by handle](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articleByHandle) or as a [paginated list](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articles).
- *
- */
+/** An online store blog. */
 export type BlogMetafieldArgs = {
   key: Scalars['String']['input'];
   namespace?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/**
- * A blog container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects. Stores can have multiple blogs, for example to organize content by topic or purpose.
- *
- * Each blog provides access to its articles, contributing [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) objects, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information. You can retrieve articles individually [by handle](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articleByHandle) or as a [paginated list](https://shopify.dev/docs/api/storefront/current/objects/Blog#field-Blog.fields.articles).
- *
- */
+/** An online store blog. */
 export type BlogMetafieldsArgs = {
   identifiers: Array<HasMetafieldsIdentifier>;
 };
@@ -508,7 +453,7 @@ export enum BlogSortKeys {
 }
 
 /**
- * The store's [branding configuration](https://help.shopify.com/manual/promoting-marketing/managing-brand-assets), such as logos, colors, and slogan. Access this through the [`Shop`](https://shopify.dev/docs/api/storefront/current/objects/Shop#field-Shop.fields.brand) object to display consistent brand assets across your storefront.
+ * The store's [branding configuration](https://help.shopify.com/en/manual/promoting-marketing/managing-brand-assets).
  *
  */
 export type Brand = {
@@ -5198,9 +5143,8 @@ export enum MediaPresentationFormat {
 }
 
 /**
- * A navigation structure for building store [menus](https://help.shopify.com/manual/online-store/menus-and-links). Each menu contains [`MenuItem`](https://shopify.dev/docs/api/storefront/current/objects/MenuItem) objects that can be nested to create multi-level navigation hierarchies.
- *
- * Menu items can link to [collections](https://shopify.dev/docs/api/storefront/current/objects/Collection), [products](https://shopify.dev/docs/api/storefront/current/objects/Product), [pages](https://shopify.dev/docs/api/storefront/current/objects/Page), [blogs](https://shopify.dev/docs/api/storefront/current/objects/Blog), or external URLs. Use the [`menu`](https://shopify.dev/docs/api/storefront/current/queries/menu) query to retrieve a menu by its handle.
+ * A [navigation menu](https://help.shopify.com/manual/online-store/menus-and-links) representing a hierarchy
+ * of hyperlinks (items).
  *
  */
 export type Menu = Node & {
@@ -5217,12 +5161,7 @@ export type Menu = Node & {
   title: Scalars['String']['output'];
 };
 
-/**
- * A navigation link within a [`Menu`](https://shopify.dev/docs/api/storefront/current/objects/Menu). Each item has a title, URL, and can link to store resources like [products](https://shopify.dev/docs/api/storefront/current/objects/Product), [collections](https://shopify.dev/docs/api/storefront/current/objects/Collection), [pages](https://shopify.dev/docs/api/storefront/current/objects/Page), [blogs](https://shopify.dev/docs/api/storefront/current/objects/Blog), or external URLs.
- *
- * Menu items support nested hierarchies through the [`items`](https://shopify.dev/docs/api/storefront/current/objects/MenuItem#field-MenuItem.fields.items) field, enabling dropdown or multi-level navigation structures. The [`tags`](https://shopify.dev/docs/api/storefront/current/objects/MenuItem#field-MenuItem.fields.tags) field filters results when the item links to a collection specifically.
- *
- */
+/** A menu item within a parent menu. */
 export type MenuItem = Node & {
   __typename?: 'MenuItem';
   /** A globally-unique ID. */
@@ -6370,12 +6309,7 @@ export enum OrderSortKeys {
   TotalPrice = 'TOTAL_PRICE'
 }
 
-/**
- * A [custom content page](https://help.shopify.com/manual/online-store/add-edit-pages) on a merchant's store. Pages display HTML-formatted content, such as "About Us", contact details, or store policies.
- *
- * Each page has a unique [`handle`](https://shopify.dev/docs/api/storefront/current/objects/Page#field-Page.fields.handle) for URL routing and includes [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information for search engine optimization. Pages support [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) attachments for storing additional custom data.
- *
- */
+/** Shopify merchants can create pages to hold static HTML content. Each Page object represents a custom page on the online store. */
 export type Page = HasMetafields & Node & OnlineStorePublishable & Trackable & {
   __typename?: 'Page';
   /** The description of the page, complete with HTML formatting. */
@@ -6405,24 +6339,14 @@ export type Page = HasMetafields & Node & OnlineStorePublishable & Trackable & {
 };
 
 
-/**
- * A [custom content page](https://help.shopify.com/manual/online-store/add-edit-pages) on a merchant's store. Pages display HTML-formatted content, such as "About Us", contact details, or store policies.
- *
- * Each page has a unique [`handle`](https://shopify.dev/docs/api/storefront/current/objects/Page#field-Page.fields.handle) for URL routing and includes [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information for search engine optimization. Pages support [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) attachments for storing additional custom data.
- *
- */
+/** Shopify merchants can create pages to hold static HTML content. Each Page object represents a custom page on the online store. */
 export type PageMetafieldArgs = {
   key: Scalars['String']['input'];
   namespace?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/**
- * A [custom content page](https://help.shopify.com/manual/online-store/add-edit-pages) on a merchant's store. Pages display HTML-formatted content, such as "About Us", contact details, or store policies.
- *
- * Each page has a unique [`handle`](https://shopify.dev/docs/api/storefront/current/objects/Page#field-Page.fields.handle) for URL routing and includes [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information for search engine optimization. Pages support [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) attachments for storing additional custom data.
- *
- */
+/** Shopify merchants can create pages to hold static HTML content. Each Page object represents a custom page on the online store. */
 export type PageMetafieldsArgs = {
   identifiers: Array<HasMetafieldsIdentifier>;
 };
@@ -7612,33 +7536,18 @@ export type QuantityRule = {
 /** The schema’s entry-point for queries. This acts as the public, top-level API from which all queries must start. */
 export type QueryRoot = {
   __typename?: 'QueryRoot';
-  /**
-   * Returns an [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) by its ID. Each article belongs to a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) and includes content in both plain text and HTML formats, [`ArticleAuthor`](https://shopify.dev/docs/api/storefront/current/objects/ArticleAuthor) information, [`Comment`](https://shopify.dev/docs/api/storefront/current/objects/Comment) objects, tags, and [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) data.
-   *
-   */
+  /** Fetch a specific Article by its ID. */
   article?: Maybe<Article>;
-  /**
-   * Returns a paginated list of [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects from the shop's [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) objects. Each article is a blog post containing content, author information, tags, and optional images.
-   *
-   * Use the `query` argument to filter results by author, blog title, tags, or date fields. Sort results using the `sortKey` argument and reverse them with the `reverse` argument.
-   *
-   */
+  /** List of the shop's articles. */
   articles: ArticleConnection;
-  /**
-   * Retrieves a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) by its handle or ID. A blog organizes [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects for the online store and includes author information, [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) settings, and custom [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) objects.
-   *
-   */
+  /** Fetch a specific `Blog` by one of its unique attributes. */
   blog?: Maybe<Blog>;
   /**
-   * Retrieves a [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) by its handle. A blog organizes [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects for the online store and includes author information, [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) settings, and custom [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) objects.
-   *
+   * Find a blog by its handle.
    * @deprecated Use `blog` instead.
    */
   blogByHandle?: Maybe<Blog>;
-  /**
-   * Returns a paginated list of the shop's [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) objects. Each blog serves as a container for [`Article`](https://shopify.dev/docs/api/storefront/current/objects/Article) objects.
-   *
-   */
+  /** List of the shop's blogs. */
   blogs: BlogConnection;
   /**
    * Returns a [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart) by its ID. The cart contains the merchandise lines a buyer intends to purchase, along with estimated costs, applied discounts, gift cards, and delivery options.
@@ -7677,12 +7586,7 @@ export type QueryRoot = {
    *
    */
   locations: LocationConnection;
-  /**
-   * Retrieves a [`Menu`](https://shopify.dev/docs/api/storefront/current/objects/Menu) by its handle. Menus are [hierarchical navigation structures](https://help.shopify.com/manual/online-store/menus-and-links) that merchants configure for their storefront, such as header and footer navigation.
-   *
-   * Each menu contains [`MenuItem`](https://shopify.dev/docs/api/storefront/current/objects/MenuItem) objects that can nest up to three levels deep, with each item linking to [collections](https://shopify.dev/docs/api/storefront/current/objects/Collection), [products](https://shopify.dev/docs/api/storefront/current/objects/Product), [pages](https://shopify.dev/docs/api/storefront/current/objects/Page), [blogs](https://shopify.dev/docs/api/storefront/current/objects/Blog), or external URLs.
-   *
-   */
+  /** Retrieve a [navigation menu](https://help.shopify.com/manual/online-store/menus-and-links) by its handle. */
   menu?: Maybe<Menu>;
   /** Fetch a specific Metaobject by one of its unique identifiers. */
   metaobject?: Maybe<Metaobject>;
@@ -7692,23 +7596,14 @@ export type QueryRoot = {
   node?: Maybe<Node>;
   /** Returns the list of nodes with the given IDs. */
   nodes: Array<Maybe<Node>>;
-  /**
-   * Retrieves a [`Page`](https://shopify.dev/docs/api/storefront/current/objects/Page) by its [`handle`](https://shopify.dev/docs/api/storefront/current/queries/page#arguments-handle) or [`id`](https://shopify.dev/docs/api/storefront/current/queries/page#arguments-id). Pages are static content pages that merchants display outside their product catalog, such as "About Us," "Contact," or policy pages.
-   *
-   * The returned page includes information such as the [HTML body content](https://shopify.dev/docs/api/storefront/current/queries/page#returns-Page.fields.body), [`SEO`](https://shopify.dev/docs/api/storefront/current/objects/SEO) information, and any associated [`Metafield`](https://shopify.dev/docs/api/storefront/current/objects/Metafield) objects.
-   *
-   */
+  /** Fetch a specific `Page` by one of its unique attributes. */
   page?: Maybe<Page>;
   /**
-   * Retrieves a [`Page`](https://shopify.dev/docs/api/storefront/current/objects/Page) by its handle.
-   *
+   * Find a page by its handle.
    * @deprecated Use `page` instead.
    */
   pageByHandle?: Maybe<Page>;
-  /**
-   * Returns a paginated list of the shop's content [pages](https://shopify.dev/docs/api/storefront/current/objects/Page). Pages are custom HTML content like "About Us", "Contact", or policy information that merchants display outside their product catalog.
-   *
-   */
+  /** List of the shop's pages. */
   pages: PageConnection;
   /** Settings related to payments. */
   paymentSettings: PaymentSettings;
@@ -7744,17 +7639,9 @@ export type QueryRoot = {
   search: SearchResultItemConnection;
   /** The shop associated with the storefront access token. */
   shop: Shop;
-  /**
-   * Returns sitemap data for a specific resource type, enabling headless storefronts to generate XML sitemaps for search engine optimization. The query provides a page count and paginated access to resources like [`Product`](https://shopify.dev/docs/api/storefront/current/objects/Product), [`Collection`](https://shopify.dev/docs/api/storefront/current/objects/Collection), [`Page`](https://shopify.dev/docs/api/storefront/current/objects/Page), and [`Blog`](https://shopify.dev/docs/api/storefront/current/objects/Blog) objects.
-   *
-   * When paginating through resources, the number of items per page varies from 0 to 250, and empty pages can occur without indicating the end of results. Always check [`hasNextPage`](https://shopify.dev/docs/api/storefront/current/objects/PaginatedSitemapResources#field-PaginatedSitemapResources.fields.hasNextPage) to determine if more pages are available.
-   *
-   */
+  /** Contains all fields required to generate sitemaps. */
   sitemap: Sitemap;
-  /**
-   * Returns a paginated list of [`UrlRedirect`](https://shopify.dev/docs/api/storefront/current/objects/UrlRedirect) objects configured for the shop. Each redirect maps an old path to a target location.
-   *
-   */
+  /** A list of redirects for a shop. */
   urlRedirects: UrlRedirectConnection;
 };
 
@@ -8161,10 +8048,7 @@ export type SelectedOptionInput = {
   value: Scalars['String']['input'];
 };
 
-/**
- * Represents deferred or recurring purchase options for [products](https://shopify.dev/docs/api/storefront/current/objects/Product) and [product variants](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant), such as subscriptions, pre-orders, or try-before-you-buy. Each selling plan belongs to a [`SellingPlanGroup`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlanGroup) and defines billing, pricing, inventory, and delivery policies.
- *
- */
+/** Represents how products and variants can be sold and purchased. */
 export type SellingPlan = HasMetafields & {
   __typename?: 'SellingPlan';
   /** The billing policy for the selling plan. */
@@ -8192,30 +8076,19 @@ export type SellingPlan = HasMetafields & {
 };
 
 
-/**
- * Represents deferred or recurring purchase options for [products](https://shopify.dev/docs/api/storefront/current/objects/Product) and [product variants](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant), such as subscriptions, pre-orders, or try-before-you-buy. Each selling plan belongs to a [`SellingPlanGroup`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlanGroup) and defines billing, pricing, inventory, and delivery policies.
- *
- */
+/** Represents how products and variants can be sold and purchased. */
 export type SellingPlanMetafieldArgs = {
   key: Scalars['String']['input'];
   namespace?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/**
- * Represents deferred or recurring purchase options for [products](https://shopify.dev/docs/api/storefront/current/objects/Product) and [product variants](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant), such as subscriptions, pre-orders, or try-before-you-buy. Each selling plan belongs to a [`SellingPlanGroup`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlanGroup) and defines billing, pricing, inventory, and delivery policies.
- *
- */
+/** Represents how products and variants can be sold and purchased. */
 export type SellingPlanMetafieldsArgs = {
   identifiers: Array<HasMetafieldsIdentifier>;
 };
 
-/**
- * Links a [`ProductVariant`](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant) to a [`SellingPlan`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlan), providing the pricing details for that specific combination. Each allocation includes the checkout charge amount, any remaining balance due for the purchase, and up to two price adjustments that show how the selling plan affects the variant's price.
- *
- * Selling plan allocations are available on product variants and [cart lines](https://shopify.dev/docs/api/storefront/current/objects/CartLine), enabling storefronts to display information such as subscription or purchase option pricing before and during checkout.
- *
- */
+/** Represents an association between a variant and a selling plan. Selling plan allocations describe the options offered for each variant, and the price of the variant when purchased with a selling plan. */
 export type SellingPlanAllocation = {
   __typename?: 'SellingPlanAllocation';
   /** The checkout charge amount due for the purchase. */
@@ -8340,12 +8213,7 @@ export type SellingPlanFixedPriceAdjustment = {
   price: MoneyV2;
 };
 
-/**
- * A selling method that defines how products can be sold through purchase options like subscriptions, pre-orders, or try-before-you-buy. Groups one or more [`SellingPlan`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlan) objects that share the same selling method and options.
- *
- * The `SellingPlanGroup` acts as a container for one or more individual `SellingPlan` objects, enabling merchants to offer multiple options (like weekly or monthly deliveries) under one, unified category on a product page.
- *
- */
+/** Represents a selling method. For example, 'Subscribe and save' is a selling method where customers pay for goods or services per delivery. A selling plan group contains individual selling plans. */
 export type SellingPlanGroup = {
   __typename?: 'SellingPlanGroup';
   /** A display friendly name for the app that created the selling plan group. */
@@ -8359,12 +8227,7 @@ export type SellingPlanGroup = {
 };
 
 
-/**
- * A selling method that defines how products can be sold through purchase options like subscriptions, pre-orders, or try-before-you-buy. Groups one or more [`SellingPlan`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlan) objects that share the same selling method and options.
- *
- * The `SellingPlanGroup` acts as a container for one or more individual `SellingPlan` objects, enabling merchants to offer multiple options (like weekly or monthly deliveries) under one, unified category on a product page.
- *
- */
+/** Represents a selling method. For example, 'Subscribe and save' is a selling method where customers pay for goods or services per delivery. A selling plan group contains individual selling plans. */
 export type SellingPlanGroupSellingPlansArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;

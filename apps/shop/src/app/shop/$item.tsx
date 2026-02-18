@@ -1,20 +1,31 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { Image } from "@unpic/react";
 import { z } from "zod/v4";
 
-import { getProductByHandle } from "~/lib/shopify/product.server";
+import type { ProductByHandleQueryVariables } from "@acme/shopify/generated";
+import { getProduct } from "@acme/shopify/product";
+
+import { shopify } from "~/lib/shopify";
+
+const getProductFn = createServerFn({ method: "GET" })
+  .inputValidator((value: ProductByHandleQueryVariables) => value)
+  .handler(async ({ data }) => {
+    const response = await shopify.request(getProduct, {
+      variables: data,
+    });
+    return response.data?.product;
+  });
 
 export const Route = createFileRoute("/shop/$item")({
   component: ProductPage,
   loader: async ({ params }) => {
-    const product = await getProductByHandle({
+    const product = await getProductFn({
       data: {
         handle: params.item,
       },
     });
-    if (!product) {
-      throw notFound();
-    }
+    if (product === null || product === undefined) throw notFound();
     return product;
   },
   params: z.object({
