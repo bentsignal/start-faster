@@ -4,7 +4,6 @@
 
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
-@import "@fontsource-variable/roboto";
 
 @source "../../../../packages/ui/src/*.{ts,tsx}";
 
@@ -25,9 +24,8 @@
 
 @layer base {
   :root {
-    --font-geist-sans: "Geist Variable";
-    --font-geist-mono: "Geist Mono Variable";
-    --font-roboto: "Roboto Variable";
+    --font-sans: "Geist";
+    --font-mono: "Geist Mono";
   }
   * {
     @apply border-border;

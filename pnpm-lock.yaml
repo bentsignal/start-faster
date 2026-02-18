@@ -127,9 +127,6 @@ importers:
       '@fontsource-variable/geist-mono':
         specifier: ^5.2.7
         version: 5.2.7
-      '@fontsource-variable/roboto':
-        specifier: ^5.2.9
-        version: 5.2.9
       '@shopify/storefront-api-client':
         specifier: 'catalog:'
         version: 1.0.9
@@ -1039,9 +1036,6 @@ packages:
 
   '@fontsource-variable/geist@5.2.8':
     resolution: {integrity: sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw==}
-
-  '@fontsource-variable/roboto@5.2.9':
-    resolution: {integrity: sha512-uH58g1An9Z4Efiviu0YuN8lvYf22TXidCx2++ZPpEegviaPaYQUwNbQZyr5lO2ae3pM07AolUabngLrlYtuzfA==}
 
   '@graphql-codegen/add@5.0.3':
     resolution: {integrity: sha512-SxXPmramkth8XtBlAHu4H4jYcYXM/o3p01+psU+0NADQowA8jtYkK6MW5rV6T+CxkEaNZItfSmZRPgIuypcqnA==}
@@ -7438,8 +7432,6 @@ snapshots:
   '@fontsource-variable/geist-mono@5.2.7': {}
 
   '@fontsource-variable/geist@5.2.8': {}
-
-  '@fontsource-variable/roboto@5.2.9': {}
 
   '@graphql-codegen/add@5.0.3(graphql@16.12.0)':
     dependencies:

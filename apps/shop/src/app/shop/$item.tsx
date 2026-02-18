@@ -73,11 +73,11 @@ function ProductPage() {
             {item}
           </p>
 
-          <h1 className="animate-in fade-in slide-in-from-bottom-3 fill-mode-both mb-8 text-4xl leading-tight font-light tracking-tight delay-75 duration-700 lg:text-5xl">
+          <h1 className="animate-in fade-in slide-in-from-bottom-3 fill-mode-both mb-8 text-4xl leading-tight font-semibold tracking-tight delay-75 duration-700 lg:text-4xl">
             {product.title}
           </h1>
 
-          <p className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both mb-8 font-mono text-2xl font-medium delay-150 duration-500">
+          <p className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both mb-8 text-2xl font-medium delay-150 duration-500">
             {price}
           </p>
 
