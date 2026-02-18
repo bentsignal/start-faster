@@ -1,37 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import type {
-  ProductByHandleQuery,
   ProductByHandleQueryVariables,
+  ProductsByCollectionHandleQueryVariables,
 } from "~/lib/shopify/generated/storefront.generated";
 import { storefrontRequest } from "~/lib/shopify/storefront.server";
-
-interface ProductsByCollectionInput extends Record<string, unknown> {
-  handle: string;
-  first: number;
-}
-
-interface ProductsByCollectionResult {
-  collection: {
-    products: {
-      nodes: {
-        id: string;
-        title: string;
-        handle: string;
-        featuredImage: {
-          url: string;
-          altText: string | null;
-        } | null;
-        priceRange: {
-          minVariantPrice: {
-            amount: string;
-            currencyCode: string;
-          };
-        };
-      }[];
-    };
-  } | null;
-}
 
 const productByHandleQuery = `#graphql
   query ProductByHandle($handle: String!) {
@@ -81,22 +54,16 @@ const productsByCollectionHandleQuery = `#graphql
 export const getProductByHandle = createServerFn({ method: "GET" })
   .inputValidator((value: ProductByHandleQueryVariables) => value)
   .handler(async ({ data }) => {
-    const result = await storefrontRequest<
-      ProductByHandleQuery,
-      ProductByHandleQueryVariables
-    >(productByHandleQuery, {
+    const result = await storefrontRequest(productByHandleQuery, {
       handle: data.handle,
     });
     return result.product;
   });
 
 export const getProductsByCollectionHandle = createServerFn({ method: "GET" })
-  .inputValidator((value: ProductsByCollectionInput) => value)
+  .inputValidator((value: ProductsByCollectionHandleQueryVariables) => value)
   .handler(async ({ data }) => {
-    const result = await storefrontRequest<
-      ProductsByCollectionResult,
-      ProductsByCollectionInput
-    >(productsByCollectionHandleQuery, {
+    const result = await storefrontRequest(productsByCollectionHandleQuery, {
       handle: data.handle,
       first: data.first,
     });

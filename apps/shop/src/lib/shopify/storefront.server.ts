@@ -1,3 +1,7 @@
+import type {
+  StorefrontMutations,
+  StorefrontQueries,
+} from "@shopify/storefront-api-client";
 import { createStorefrontApiClient } from "@shopify/storefront-api-client";
 
 import { env } from "~/env";
@@ -10,16 +14,16 @@ function normalizeStoreDomain(input: string): string {
 }
 
 function getStorefrontClient() {
-  const privateToken: unknown = env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN;
-  if (typeof privateToken === "string" && privateToken.length > 0) {
+  const privateToken = env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN;
+  if (privateToken) {
     return createStorefrontApiClient({
       storeDomain: normalizeStoreDomain(env.SHOPIFY_STORE_DOMAIN),
       apiVersion: "2025-10",
       privateAccessToken: privateToken,
     });
   }
-  const publicToken: unknown = env.SHOPIFY_STOREFRONT_PUBLIC_TOKEN;
-  if (typeof publicToken !== "string" || publicToken.length === 0) {
+  const publicToken = env.SHOPIFY_STOREFRONT_PUBLIC_TOKEN;
+  if (publicToken === undefined || publicToken.length === 0) {
     throw new Error(
       "Missing Shopify Storefront token. Set SHOPIFY_STOREFRONT_PRIVATE_TOKEN or SHOPIFY_STOREFRONT_PUBLIC_TOKEN.",
     );
@@ -31,13 +35,39 @@ function getStorefrontClient() {
   });
 }
 
+type StorefrontOperation = keyof StorefrontQueries | keyof StorefrontMutations;
+
+type StorefrontOperationVariables<TOperation extends StorefrontOperation> =
+  TOperation extends keyof StorefrontQueries
+    ? StorefrontQueries[TOperation]["variables"]
+    : TOperation extends keyof StorefrontMutations
+      ? StorefrontMutations[TOperation]["variables"]
+      : never;
+
+type StorefrontOperationReturn<TOperation extends StorefrontOperation> =
+  TOperation extends keyof StorefrontQueries
+    ? StorefrontQueries[TOperation]["return"]
+    : TOperation extends keyof StorefrontMutations
+      ? StorefrontMutations[TOperation]["return"]
+      : never;
+
+export async function storefrontRequest<TOperation extends StorefrontOperation>(
+  query: TOperation,
+  variables?: StorefrontOperationVariables<TOperation>,
+): Promise<StorefrontOperationReturn<TOperation>>;
 export async function storefrontRequest<
   TData,
   TVariables extends Record<string, unknown> = Record<string, unknown>,
->(query: string, variables?: TVariables): Promise<TData> {
+>(query: string, variables?: TVariables): Promise<TData>;
+export async function storefrontRequest(
+  query: string,
+  variables?: Record<string, unknown>,
+) {
   const storefrontClient = getStorefrontClient();
-  const response = (await storefrontClient.request(query, { variables })) as {
-    data?: TData;
+  const response = (await storefrontClient.request(query, {
+    variables,
+  })) as {
+    data?: unknown;
     errors?: ({ message?: string } | string)[];
   };
   if (response.errors?.length) {
@@ -53,5 +83,5 @@ export async function storefrontRequest<
   if (!response.data) {
     throw new Error("Shopify query returned no data.");
   }
-  return response.data as TData;
+  return response.data;
 }

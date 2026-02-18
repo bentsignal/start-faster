@@ -41,7 +41,7 @@ function ProductPage() {
   return (
     <main className="lg:grid lg:min-h-screen lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
       <div className="relative overflow-hidden bg-white lg:sticky lg:top-0 lg:h-screen">
-        <div className="relative aspect-square w-full lg:h-full lg:aspect-auto">
+        <div className="relative aspect-square w-full lg:aspect-auto lg:h-full">
           {product.featuredImage ? (
             <Image
               src={product.featuredImage.url}
@@ -52,7 +52,7 @@ function ProductPage() {
           ) : (
             <div className="bg-muted h-full w-full" />
           )}
-          <div className="from-background/30 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent lg:bg-linear-to-r lg:from-transparent lg:to-background/8" />
+          <div className="from-background/30 lg:to-background/8 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent lg:bg-linear-to-r lg:from-transparent" />
         </div>
       </div>
 
