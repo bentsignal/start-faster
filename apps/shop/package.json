@@ -29,7 +29,6 @@
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@unpic/react": "^0.1.14",
-    "class-variance-authority": "catalog:",
     "great-time": "^1.0.0",
     "lucide-react": "catalog:",
     "next-themes": "^0.4.6",
@@ -39,7 +38,6 @@
     "rostra": "catalog:",
     "srvx": "^0.11.4",
     "superjson": "2.2.3",
-    "tailwind-merge": "catalog:",
     "vinxi": "^0.5.6",
     "zod": "catalog:"
   },

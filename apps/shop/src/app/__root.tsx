@@ -12,7 +12,7 @@ import { getCookie } from "@tanstack/react-start/server";
 import { convert } from "great-time";
 
 import { cn } from "@acme/ui";
-import { Toaster } from "@acme/ui/toast";
+import { Toaster } from "@acme/ui/toaster";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";

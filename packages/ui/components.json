@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "new-york",
-  "rsc": true,
+  "style": "base-maia",
+  "rsc": false,
   "tsx": true,
   "tailwind": {
     "config": "",
@@ -9,9 +9,10 @@
     "baseColor": "zinc",
     "cssVariables": true
   },
+  "iconLibrary": "lucide",
   "aliases": {
-    "utils": "@acme/ui",
-    "components": "src/",
-    "ui": "src/"
+    "utils": "~/lib/utils.ts",
+    "components": "~/components",
+    "ui": "~/components"
   }
 }

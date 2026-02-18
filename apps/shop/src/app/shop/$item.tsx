@@ -5,6 +5,7 @@ import { z } from "zod/v4";
 
 import type { ProductByHandleQueryVariables } from "@acme/shopify/generated";
 import { getProduct } from "@acme/shopify/product";
+import { Button } from "@acme/ui/button";
 
 import { shopify } from "~/lib/shopify";
 
@@ -80,6 +81,10 @@ function ProductPage() {
           <p className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both mb-8 text-2xl font-medium delay-150 duration-500">
             {price}
           </p>
+          <div className="mb-8 flex flex-col gap-2">
+            <Button>Add to Cart</Button>
+            <Button variant="outline">Buy Now</Button>
+          </div>
 
           <div className="animate-in fade-in fill-mode-both bg-border mb-8 h-px delay-200 duration-700" />
 
