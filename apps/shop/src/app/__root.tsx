@@ -23,9 +23,7 @@ import { getShopifyCustomerAuthState } from "~/lib/shopify/customer-auth.server"
 
 const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   const themeCookie = getCookie("theme");
-  return {
-    theme: getTheme(themeCookie),
-  };
+  return getTheme(themeCookie);
 });
 
 const fetchShopifyAuth = createServerFn({ method: "GET" }).handler(() => {
@@ -56,19 +54,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const auth = await context.queryClient.fetchQuery({
-      queryKey: ["shopify-auth"],
-      queryFn: async () => await fetchShopifyAuth(),
-      staleTime: convert(5, "minutes", "to ms"),
-      gcTime: Infinity,
-    });
-
-    const { theme } = await context.queryClient.fetchQuery({
-      queryKey: ["theme"],
-      queryFn: async () => await getThemeFromCookie(),
-      staleTime: Infinity,
-      gcTime: Infinity,
-    });
+    const [auth, theme] = await Promise.all([
+      context.queryClient.fetchQuery({
+        queryKey: ["shopify-auth"],
+        queryFn: fetchShopifyAuth,
+        staleTime: convert(5, "minutes", "to ms"),
+        gcTime: Infinity,
+      }),
+      context.queryClient.fetchQuery({
+        queryKey: ["theme"],
+        queryFn: getThemeFromCookie,
+        staleTime: Infinity,
+        gcTime: Infinity,
+      }),
+    ]);
 
     return {
       auth,
