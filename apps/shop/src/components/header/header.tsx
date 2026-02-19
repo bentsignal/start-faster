@@ -9,13 +9,12 @@ export function Header() {
   return (
     <header className="bg-background sticky top-0 z-50">
       <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
-        <Link to="/">
+        <Link to="/" className="w-48">
           <Image
             src="/public/logo.webp"
             alt="Start Faster"
-            width={200}
-            height={200}
-            className="h-6 xl:h-12"
+            width={36}
+            height={36}
           />
         </Link>
         <SearchBar className="hidden sm:block" />
