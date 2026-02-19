@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { LogIn, LogOut } from "lucide-react";
 
 import type { GetQueryVariables } from "@acme/shopify/generated";
 import { getProductsByCollection } from "@acme/shopify/product";
-import { Button } from "@acme/ui/button";
 
 import { shopify } from "~/lib/shopify";
 
@@ -31,42 +29,10 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
-  const { auth } = Route.useRouteContext({
-    select: (context) => ({
-      auth: context.auth,
-    }),
-  });
   const products = Route.useLoaderData();
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-12">
-      <h1 className="text-3xl font-semibold">Shop</h1>
-      {auth.isSignedIn ? (
-        <div className="flex flex-col gap-2">
-          <p>{auth.customer?.email ?? auth.customer?.name ?? "Signed in"}</p>
-          <Button
-            variant="link"
-            className="px-0!"
-            render={(props) => (
-              <a href="/auth/logout?returnTo=/" {...props}>
-                <LogOut size={16} />
-                <span>Sign out</span>
-              </a>
-            )}
-          />
-        </div>
-      ) : (
-        <Button
-          variant="link"
-          className="px-0!"
-          render={(props) => (
-            <a href="/auth/login?returnTo=/" {...props}>
-              <LogIn size={16} />
-              <span>Sign in</span>
-            </a>
-          )}
-        />
-      )}
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-medium">Frontpage Collection</h2>
         {products.length > 0 ? (
