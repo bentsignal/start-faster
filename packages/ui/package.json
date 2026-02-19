@@ -4,8 +4,18 @@
   "type": "module",
   "exports": {
     ".": "./src/lib/utils.ts",
+    "./accordion": "./src/components/accordion.tsx",
     "./button": "./src/components/button.tsx",
-    "./toaster": "./src/components/sonner.tsx"
+    "./card": "./src/components/card.tsx",
+    "./input": "./src/components/input.tsx",
+    "./navigation-menu": "./src/components/navigation-menu.tsx",
+    "./scroll-area": "./src/components/scroll-area.tsx",
+    "./separator": "./src/components/separator.tsx",
+    "./sheet": "./src/components/sheet.tsx",
+    "./sidebar": "./src/components/sidebar.tsx",
+    "./skeleton": "./src/components/skeleton.tsx",
+    "./toaster": "./src/components/sonner.tsx",
+    "./tooltip": "./src/components/tooltip.tsx"
   },
   "license": "MIT",
   "scripts": {
