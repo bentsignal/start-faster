@@ -81,6 +81,16 @@ tooling
       └─ shared tsconfig you can extend from
 ```
 
+### UI
+
+ShadCN components are stored in the UI package found at `packages/ui`
+
+Usage in apps:
+
+```tsx
+import { Button } from "@acme/ui";
+```
+
 ### Shopify Data Layer (packages/shopify)
 
 Uses **Shopify Storefront API** with shared GraphQL operations and generated types.

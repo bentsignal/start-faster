@@ -16,6 +16,7 @@ import { Toaster } from "@acme/ui/toaster";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
+import { Header } from "~/components/header/header";
 import { env } from "~/env";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
@@ -98,6 +99,7 @@ function RootComponent() {
             disableTransitionOnChange
             initialTheme={context.theme}
           >
+            <Header />
             <Outlet />
             <TanStackDevtools
               config={{
