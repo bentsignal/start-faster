@@ -10,12 +10,15 @@ export function NotFound() {
       <p className="text-muted-foreground">
         We couldn't find the page you're looking for.
       </p>
-      <Button asChild className="mt-1">
-        <Link to="/">
-          <House className="size-4" />
-          Back to home
-        </Link>
-      </Button>
+      <Button
+        className="mt-1"
+        render={(props) => (
+          <Link to="/" {...props}>
+            <House className="size-4" />
+            Back to home
+          </Link>
+        )}
+      />
     </div>
   );
 }

@@ -44,20 +44,28 @@ function RouteComponent() {
       {auth.isSignedIn ? (
         <div className="flex flex-col gap-2">
           <p>{auth.customer?.email ?? auth.customer?.name ?? "Signed in"}</p>
-          <Button variant="link" className="px-0!" asChild>
-            <a href="/auth/logout?returnTo=/">
-              <LogOut size={16} />
-              <span>Sign out</span>
-            </a>
-          </Button>
+          <Button
+            variant="link"
+            className="px-0!"
+            render={(props) => (
+              <a href="/auth/logout?returnTo=/" {...props}>
+                <LogOut size={16} />
+                <span>Sign out</span>
+              </a>
+            )}
+          />
         </div>
       ) : (
-        <Button variant="link" className="px-0!" asChild>
-          <a href="/auth/login?returnTo=/">
-            <LogIn size={16} />
-            <span>Sign in</span>
-          </a>
-        </Button>
+        <Button
+          variant="link"
+          className="px-0!"
+          render={(props) => (
+            <a href="/auth/login?returnTo=/" {...props}>
+              <LogIn size={16} />
+              <span>Sign in</span>
+            </a>
+          )}
+        />
       )}
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-medium">Frontpage Collection</h2>
