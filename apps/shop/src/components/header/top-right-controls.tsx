@@ -18,6 +18,7 @@ export function TopRightControls() {
       <Link
         to="/settings/account"
         className="hover:text-primary transition-colors"
+        preload={false}
       >
         <User className="h-6 w-6" strokeWidth={1.5} />
         <span className="sr-only">Account</span>
