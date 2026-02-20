@@ -111,6 +111,8 @@ const response = await shopify.request(getProduct, {
 });
 ```
 
+After making changes in to the graphQL queries in the shopify package, you will need to run the following command to generate new types: `pnpm run build --filter @acme/shopify`.
+
 ### Authentication
 
 Uses Shopify Customer Account OAuth flow:
