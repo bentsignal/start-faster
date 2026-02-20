@@ -27,7 +27,7 @@ export function VerticalNav() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger
         aria-label="Open navigation menu"
-        className="min-[1380px]:hidden"
+        className="mr-0! min-[1380px]:hidden"
       >
         <Menu className="text-muted-foreground h-6 w-6" strokeWidth={1.5} />
       </SheetTrigger>
