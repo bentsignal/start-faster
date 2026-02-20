@@ -8,10 +8,10 @@ import {
 } from "@acme/ui/hover-card";
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
-import { VerticalNav } from "~/components/header/vertical-nav";
+import { VerticalMenu } from "~/components/header/vertical-menu";
 import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
-export function SessionControls() {
+export function TopRightControls() {
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
       <button type="button" className="hover:text-primary transition-colors">
@@ -50,7 +50,7 @@ export function SessionControls() {
           <ThemeToggle />
         </HoverCardContent>
       </HoverCard>
-      <VerticalNav />
+      <VerticalMenu />
     </div>
   );
 }

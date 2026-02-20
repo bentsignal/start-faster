@@ -11,8 +11,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { convert } from "great-time";
 
-import { cn } from "@acme/ui";
 import { Toaster } from "@acme/ui/toaster";
+import { cn } from "@acme/ui/utils";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";

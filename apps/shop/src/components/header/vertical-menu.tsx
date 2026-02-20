@@ -20,7 +20,7 @@ import {
 
 import { navItems, secondaryNavLinks } from "~/components/header/nav-data";
 
-export function VerticalNav() {
+export function VerticalMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
