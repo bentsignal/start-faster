@@ -40,7 +40,7 @@ export function ProductImageGalleryMobile({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselDots className="mt-5" />
+        <CarouselDots className="mt-5" fallbackDotCount={images.length} />
       </Carousel>
     </div>
   );

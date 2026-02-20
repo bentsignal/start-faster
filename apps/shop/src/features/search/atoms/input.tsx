@@ -1,5 +1,4 @@
 import type { InputHTMLAttributes } from "react";
-import { useEffect } from "react";
 
 import { cn } from "@acme/ui/utils";
 
@@ -9,14 +8,9 @@ export function SearchInput({
   className,
   ...props
 }: Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
-  const focusInput = useSearchStore((s) => s.focusInput);
   const searchTerm = useSearchStore((s) => s.searchTerm);
   const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
   const inputRef = useSearchStore((s) => s.inputRef);
-
-  useEffect(() => {
-    focusInput();
-  }, [focusInput]);
 
   return (
     <input

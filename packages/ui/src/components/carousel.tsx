@@ -250,14 +250,20 @@ function CarouselDots({
   className,
   dotClassName,
   activeDotClassName,
+  fallbackDotCount,
   ...props
 }: React.ComponentProps<"div"> & {
   dotClassName?: string;
   activeDotClassName?: string;
+  fallbackDotCount?: number;
 }) {
   const { scrollSnaps, selectedIndex, scrollTo } = useCarousel();
+  const dots =
+    scrollSnaps.length > 0
+      ? scrollSnaps
+      : Array.from({ length: fallbackDotCount ?? 0 }, (_, index) => index);
 
-  if (scrollSnaps.length <= 1) return null;
+  if (dots.length <= 1) return null;
 
   return (
     <div
@@ -265,7 +271,7 @@ function CarouselDots({
       className={cn("flex items-center justify-center gap-2", className)}
       {...props}
     >
-      {scrollSnaps.map((_, index) => (
+      {dots.map((_, index) => (
         <button
           key={index}
           type="button"
