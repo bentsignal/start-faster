@@ -13,8 +13,8 @@ export function Header() {
         <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
           <Link to="/" className="w-48">
             <Image
-              src="/public/logo.webp"
-              alt="Start Faster"
+              src="/logo.webp"
+              alt="Start Faster Logo"
               width={36}
               height={36}
             />

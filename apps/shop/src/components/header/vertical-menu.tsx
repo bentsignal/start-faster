@@ -45,8 +45,8 @@ export function VerticalMenu() {
         <div className="flex items-center justify-between p-4">
           <div>
             <Image
-              src="/public/logo.webp"
-              alt="Start Faster"
+              src="/logo.webp"
+              alt="Start Faster Logo"
               width={200}
               height={200}
               className="h-6 xl:h-12"
