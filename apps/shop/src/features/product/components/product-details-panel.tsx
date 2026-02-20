@@ -18,7 +18,7 @@ export function ProductDetailsPanel({
   return (
     <aside className="px-6 py-10 sm:px-8 md:px-10 lg:self-stretch lg:px-0 lg:py-14">
       <div className="mx-auto max-w-xl lg:mx-0 lg:h-full lg:max-w-md xl:max-w-lg">
-        <div className="lg:sticky" style={{ top: `${stickyOffset}px` }}>
+        <div className="lg:sticky" style={{ top: `${stickyOffset + 20}px` }}>
           <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">
             {handle}
           </p>
