@@ -83,7 +83,7 @@ function ProductPage() {
           </p>
           <div className="mb-8 flex flex-col gap-2">
             <Button>Add to Cart</Button>
-            <Button variant="outline">Buy Now</Button>
+            <Button variant="secondary">Buy Now</Button>
           </div>
 
           <div className="animate-in fade-in fill-mode-both bg-border mb-8 h-px delay-200 duration-700" />
