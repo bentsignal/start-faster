@@ -5,20 +5,20 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 
-import { Button } from "~/components/button";
-import { Input } from "~/components/input";
-import { Separator } from "~/components/separator";
+import { useIsMobile } from "../hooks/use-mobile";
+import { cn } from "../lib/utils";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Separator } from "./separator";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "~/components/sheet";
-import { Skeleton } from "~/components/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/tooltip";
-import { useIsMobile } from "~/hooks/use-mobile";
-import { cn } from "~/lib/utils";
+} from "./sheet";
+import { Skeleton } from "./skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
