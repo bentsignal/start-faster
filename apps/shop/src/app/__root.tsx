@@ -16,7 +16,9 @@ import { cn } from "@acme/ui/utils";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
+import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
+import { MailingList } from "~/components/mailing-list";
 import { env } from "~/env";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
@@ -101,6 +103,8 @@ function RootComponent() {
           >
             <Header />
             <Outlet />
+            <MailingList />
+            <Footer />
             <TanStackDevtools
               config={{
                 position: "bottom-right",
