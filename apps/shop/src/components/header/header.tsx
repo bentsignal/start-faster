@@ -3,7 +3,10 @@ import { Image } from "@unpic/react";
 
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
-import { SearchBar } from "~/features/search/molecules/search-bar";
+import { SearchClearButton } from "~/features/search/atoms/clear-button";
+import { SearchIcon } from "~/features/search/atoms/icon";
+import { SearchInput } from "~/features/search/atoms/input";
+import { SearchBar } from "~/features/search/atoms/search-bar";
 import { SearchStore } from "~/features/search/store";
 
 export function Header() {
@@ -19,11 +22,19 @@ export function Header() {
               height={36}
             />
           </Link>
-          <SearchBar className="hidden w-96 sm:flex" />
+          <SearchBar className="hidden w-96 sm:flex">
+            <SearchIcon />
+            <SearchInput />
+            <SearchClearButton />
+          </SearchBar>
           <TopRightControls />
         </div>
         <div className="px-4 pb-4 sm:hidden">
-          <SearchBar />
+          <SearchBar>
+            <SearchIcon />
+            <SearchInput />
+            <SearchClearButton />
+          </SearchBar>
         </div>
         <HorizontalMenu />
       </header>

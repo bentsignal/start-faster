@@ -5,7 +5,7 @@ import { cn } from "@acme/ui/utils";
 
 import { useSearchStore } from "../store";
 
-export function Input({
+export function SearchInput({
   className,
   ...props
 }: Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {

@@ -1,6 +1,6 @@
 import { cn } from "@acme/ui/utils";
 
-export function Container({
+export function SearchBar({
   className,
   children,
 }: {

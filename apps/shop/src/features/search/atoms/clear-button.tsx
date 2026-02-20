@@ -4,7 +4,7 @@ import { cn } from "@acme/ui/utils";
 
 import { useSearchStore } from "../store";
 
-export function ClearButton({ className }: { className?: string }) {
+export function SearchClearButton({ className }: { className?: string }) {
   const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
   const hideButton = useSearchStore((s) => s.searchTerm.length === 0);
   const focusInput = useSearchStore((s) => s.focusInput);
