@@ -15,7 +15,7 @@ This is a **Turborepo monorepo** containing a TanStack Start storefront app for 
 - Shopify Customer Account OAuth
 - Rostra for state management
 
-Since the react compiler is enabled, you often don't need to manually memoize with useMemo and useCallback.
+**_IMPORTANT_** Since the react compiler is enabled, you usually don't need to manually memoize components with useMemo and functions with useCallback.
 
 ## Commands
 

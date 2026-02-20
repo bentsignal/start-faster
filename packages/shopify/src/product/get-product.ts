@@ -5,6 +5,15 @@ export const getProduct = `#graphql
       title
       handle
       description
+      images(first: 50) {
+        nodes {
+          id
+          url
+          altText
+          width
+          height
+        }
+      }
       featuredImage {
         url
         altText

@@ -12,7 +12,7 @@ import { SearchStore } from "~/features/search/store";
 export function Header() {
   return (
     <SearchStore>
-      <header className="bg-background sticky top-0 z-50">
+      <header data-site-header className="bg-background sticky top-0 z-50">
         <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
           <Link to="/" className="w-48">
             <Image

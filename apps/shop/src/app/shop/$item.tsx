@@ -1,12 +1,14 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { Image } from "@unpic/react";
 import { z } from "zod/v4";
 
 import type { ProductByHandleQueryVariables } from "@acme/shopify/generated";
 import { getProduct } from "@acme/shopify/product";
-import { Button } from "@acme/ui/button";
 
+import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
+import { ProductImageGallery } from "~/features/product/components/product-image-gallery";
+import { useStickyOffset } from "~/features/product/hooks/use-sticky-offset";
+import { getProductGalleryImages } from "~/features/product/lib/gallery-images";
 import { shopify } from "~/lib/shopify";
 
 const getProductFn = createServerFn({ method: "GET" })
@@ -44,6 +46,8 @@ function formatPrice(amount: number, currencyCode: string) {
 function ProductPage() {
   const { item } = Route.useParams();
   const product = Route.useLoaderData();
+  const stickyOffset = useStickyOffset();
+  const galleryImages = getProductGalleryImages(product);
 
   const price = formatPrice(
     product.priceRange.minVariantPrice.amount,
@@ -51,47 +55,19 @@ function ProductPage() {
   );
 
   return (
-    <main className="lg:grid lg:min-h-screen lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-      <div className="relative overflow-hidden bg-white lg:sticky lg:top-0 lg:h-screen">
-        <div className="relative aspect-square w-full lg:aspect-auto lg:h-full">
-          {product.featuredImage ? (
-            <Image
-              src={product.featuredImage.url}
-              alt={product.featuredImage.altText ?? product.title}
-              layout="fullWidth"
-              className="h-full w-full object-contain"
-            />
-          ) : (
-            <div className="bg-muted h-full w-full" />
-          )}
-          <div className="from-background/30 lg:to-background/8 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent lg:bg-linear-to-r lg:from-transparent" />
-        </div>
-      </div>
-
-      <div className="px-6 py-10 sm:px-8 md:px-10 lg:px-12 lg:py-14 xl:px-16">
-        <div className="mx-auto max-w-xl lg:mx-0 lg:max-w-md xl:max-w-lg">
-          <p className="animate-in fade-in slide-in-from-bottom-1 fill-mode-both text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase duration-500">
-            {item}
-          </p>
-
-          <h1 className="animate-in fade-in slide-in-from-bottom-3 fill-mode-both mb-8 text-4xl leading-tight font-semibold tracking-tight delay-75 duration-700 lg:text-4xl">
-            {product.title}
-          </h1>
-
-          <p className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both mb-8 text-2xl font-medium delay-150 duration-500">
-            {price}
-          </p>
-          <div className="mb-8 flex flex-col gap-2">
-            <Button>Add to Cart</Button>
-            <Button variant="secondary">Buy Now</Button>
-          </div>
-
-          <div className="animate-in fade-in fill-mode-both bg-border mb-8 h-px delay-200 duration-700" />
-
-          <p className="animate-in fade-in slide-in-from-bottom-1 fill-mode-both text-muted-foreground text-sm leading-7 delay-300 duration-500">
-            {product.description}
-          </p>
-        </div>
+    <main className="mx-auto w-full max-w-[1700px] lg:px-8 xl:px-12">
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch lg:gap-10 xl:gap-16">
+        <ProductImageGallery
+          images={galleryImages}
+          productTitle={product.title}
+          stickyOffset={stickyOffset}
+        />
+        <ProductDetailsPanel
+          handle={item}
+          product={product}
+          price={price}
+          stickyOffset={stickyOffset}
+        />
       </div>
     </main>
   );

@@ -10,7 +10,7 @@ export type ProductByHandleQueryVariables = StorefrontTypes.Exact<{
 
 export type ProductByHandleQuery = { product?: StorefrontTypes.Maybe<(
     Pick<StorefrontTypes.Product, 'id' | 'title' | 'handle' | 'description'>
-    & { featuredImage?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText'>>, priceRange: { minVariantPrice: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'> } }
+    & { images: { nodes: Array<Pick<StorefrontTypes.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>> }, featuredImage?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText'>>, priceRange: { minVariantPrice: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'> } }
   )> };
 
 export type GetQueryVariables = StorefrontTypes.Exact<{
@@ -25,7 +25,7 @@ export type GetQuery = { collection?: StorefrontTypes.Maybe<{ products: { nodes:
       )> } }> };
 
 interface GeneratedQueryTypes {
-  "#graphql\n  query ProductByHandle($handle: String!) {\n    product(handle: $handle) {\n      id\n      title\n      handle\n      description\n      featuredImage {\n        url\n        altText\n      }\n      priceRange {\n        minVariantPrice {\n          amount\n          currencyCode\n        }\n      }\n    }\n  }\n": {return: ProductByHandleQuery, variables: ProductByHandleQueryVariables},
+  "#graphql\n  query ProductByHandle($handle: String!) {\n    product(handle: $handle) {\n      id\n      title\n      handle\n      description\n      images(first: 50) {\n        nodes {\n          id\n          url\n          altText\n          width\n          height\n        }\n      }\n      featuredImage {\n        url\n        altText\n      }\n      priceRange {\n        minVariantPrice {\n          amount\n          currencyCode\n        }\n      }\n    }\n  }\n": {return: ProductByHandleQuery, variables: ProductByHandleQueryVariables},
   "#graphql\n  query get($handle: String!, $first: Int!) {\n    collection(handle: $handle) {\n      products(first: $first) {\n        nodes {\n          id\n          title\n          handle\n          featuredImage {\n            url\n            altText\n          }\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n        }\n      }\n    }\n  }\n": {return: GetQuery, variables: GetQueryVariables},
 }
 
