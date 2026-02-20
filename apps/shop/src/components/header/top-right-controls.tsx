@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -14,10 +15,13 @@ import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 export function TopRightControls() {
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
-      <button type="button" className="hover:text-primary transition-colors">
+      <Link
+        to="/settings/account"
+        className="hover:text-primary transition-colors"
+      >
         <User className="h-6 w-6" strokeWidth={1.5} />
         <span className="sr-only">Account</span>
-      </button>
+      </Link>
       <button
         type="button"
         className="hover:text-primary relative flex items-center transition-colors"
@@ -28,7 +32,6 @@ export function TopRightControls() {
         </div>
         <span className="sr-only">Cart</span>
       </button>
-
       <HoverCard>
         <HoverCardTrigger
           aria-label="Open resources menu"
