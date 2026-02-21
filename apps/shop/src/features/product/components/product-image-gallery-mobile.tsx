@@ -24,7 +24,7 @@ export function ProductImageGalleryMobile({
 
   return (
     <div className="px-4 pb-6 sm:px-8 lg:hidden">
-      <Carousel opts={{ loop: images.length > 1 }}>
+      <Carousel>
         <CarouselContent className="ml-0">
           {images.map((image, index) => (
             <CarouselItem key={image.id} className="pl-0">
