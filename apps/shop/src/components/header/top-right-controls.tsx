@@ -37,7 +37,7 @@ export function TopRightControls() {
         <HoverCardTrigger
           aria-label="Open resources menu"
           delay={0}
-          className="hover:text-primary hidden items-center transition-colors min-[1380px]:flex"
+          className="hover:text-primary hidden items-center transition-colors xl:flex"
         >
           <Menu className="h-6 w-6" strokeWidth={1.5} />
         </HoverCardTrigger>

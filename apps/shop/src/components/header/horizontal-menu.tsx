@@ -28,7 +28,7 @@ function HorizontalMenuItem({
 
 export function HorizontalMenu() {
   return (
-    <div className="border-border bg-background hidden border-b min-[1380px]:block">
+    <div className="border-border bg-background hidden border-b xl:block">
       <div className="container flex items-center justify-center px-6">
         <NavigationMenu align="center" className="justify-center">
           <NavigationMenuList className="flex w-full justify-between">

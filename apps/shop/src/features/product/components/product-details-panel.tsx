@@ -1,24 +1,29 @@
 import { Button } from "@acme/ui/button";
+import { cn } from "@acme/ui/utils";
 
 import type { Product } from "~/features/product/types";
+import { stickyHeaderTokens } from "~/components/header/header";
 
 interface ProductDetailsPanelProps {
   handle: string;
   product: Product;
   price: string;
-  stickyOffset: number;
 }
 
 export function ProductDetailsPanel({
   handle,
   product,
   price,
-  stickyOffset,
 }: ProductDetailsPanelProps) {
   return (
-    <aside className="px-6 py-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0 lg:py-14">
+    <aside
+      className={cn(
+        "px-6 py-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0",
+        stickyHeaderTokens.spacer,
+      )}
+    >
       <div className="mx-auto max-w-xl lg:mx-0 lg:h-full lg:max-w-md xl:max-w-lg">
-        <div className="lg:sticky" style={{ top: `${stickyOffset + 20}px` }}>
+        <div className={cn(stickyHeaderTokens.stickyContent)}>
           <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">
             {handle}
           </p>

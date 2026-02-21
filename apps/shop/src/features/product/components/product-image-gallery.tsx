@@ -5,22 +5,16 @@ import { ProductImageGalleryMobile } from "~/features/product/components/product
 interface ProductImageGalleryProps {
   images: ProductGalleryImage[];
   productTitle: string;
-  stickyOffset: number;
 }
 
 export function ProductImageGallery({
   images,
   productTitle,
-  stickyOffset,
 }: ProductImageGalleryProps) {
   return (
     <section className="lg:py-14">
       <ProductImageGalleryMobile images={images} productTitle={productTitle} />
-      <ProductImageGalleryDesktop
-        images={images}
-        productTitle={productTitle}
-        stickyOffset={stickyOffset}
-      />
+      <ProductImageGalleryDesktop images={images} productTitle={productTitle} />
     </section>
   );
 }

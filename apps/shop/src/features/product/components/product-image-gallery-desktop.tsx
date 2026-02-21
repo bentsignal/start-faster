@@ -1,84 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
 import type { ProductGalleryImage } from "~/features/product/types";
+import { stickyHeaderTokens } from "~/components/header/header";
 
 interface ProductImageGalleryDesktopProps {
   images: ProductGalleryImage[];
   productTitle: string;
-  stickyOffset: number;
 }
 
 export function ProductImageGalleryDesktop({
   images,
   productTitle,
-  stickyOffset,
 }: ProductImageGalleryDesktopProps) {
   const imageSectionsRef = useRef<(HTMLElement | null)[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  useEffect(() => {
-    imageSectionsRef.current = imageSectionsRef.current.slice(0, images.length);
-  }, [images.length]);
-
-  useEffect(() => {
-    if (images.length <= 1) {
-      return;
-    }
-
-    const desktopBreakpoint = window.matchMedia("(min-width: 1024px)");
-
-    if (!desktopBreakpoint.matches) {
-      return;
-    }
-
-    const imageSections = imageSectionsRef.current.filter(
-      (section): section is HTMLElement => section !== null,
-    );
-
-    if (imageSections.length === 0) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
-
-        if (visibleEntries.length === 0) {
-          return;
-        }
-
-        const mostVisibleEntry = visibleEntries.reduce(
-          (bestEntry, currentEntry) =>
-            currentEntry.intersectionRatio > bestEntry.intersectionRatio
-              ? currentEntry
-              : bestEntry,
-        );
-
-        const index = Number(
-          mostVisibleEntry.target.getAttribute("data-image-index"),
-        );
-
-        if (!Number.isNaN(index)) {
-          setActiveImageIndex(index);
-        }
-      },
-      {
-        threshold: [0.2, 0.4, 0.6, 0.8],
-        rootMargin: `-${stickyOffset}px 0px -35% 0px`,
-      },
-    );
-
-    imageSections.forEach((section) => observer.observe(section));
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [images.length, stickyOffset]);
-
-  const scrollToImage = (index: number) => {
+  function scrollToImage(index: number) {
     const targetImage = imageSectionsRef.current[index];
 
     if (!targetImage) {
@@ -90,10 +30,10 @@ export function ProductImageGalleryDesktop({
     const scrollTop = targetImage.getBoundingClientRect().top + window.scrollY;
 
     window.scrollTo({
-      top: Math.max(scrollTop - stickyOffset, 0),
+      top: Math.max(scrollTop - 100, 0),
       behavior: "smooth",
     });
-  };
+  }
 
   if (images.length === 0) {
     return (
@@ -104,19 +44,15 @@ export function ProductImageGalleryDesktop({
   return (
     <div
       className={cn(
-        "hidden lg:grid lg:items-start lg:gap-6 xl:gap-8",
+        "hidden items-start lg:grid lg:gap-6 xl:gap-8",
         images.length > 1
           ? "lg:grid-cols-[5rem_minmax(0,1fr)]"
           : "lg:grid-cols-1",
       )}
     >
       {images.length > 1 ? (
-        <aside className="relative">
-          <div
-            className="sticky space-y-3"
-            style={{ top: `${stickyOffset}px` }}
-            aria-label="Product image previews"
-          >
+        <aside className={cn("relative", stickyHeaderTokens.stickyContent)}>
+          <div className="space-y-3" aria-label="Product image previews">
             {images.map((image, index) => (
               <button
                 key={`${image.id}-thumbnail`}
@@ -148,7 +84,7 @@ export function ProductImageGalleryDesktop({
         </aside>
       ) : null}
 
-      <div className="space-y-4 xl:space-y-6">
+      <div className="w-full space-y-4 lg:max-w-2xl xl:max-w-3xl xl:space-y-6">
         {images.map((image, index) => (
           <section
             key={image.id}

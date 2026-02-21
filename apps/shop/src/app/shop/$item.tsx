@@ -7,7 +7,6 @@ import { getProduct } from "@acme/shopify/product";
 
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
 import { ProductImageGallery } from "~/features/product/components/product-image-gallery";
-import { useStickyOffset } from "~/features/product/hooks/use-sticky-offset";
 import { getProductGalleryImages } from "~/features/product/lib/gallery-images";
 import { shopify } from "~/lib/shopify";
 
@@ -46,7 +45,6 @@ function formatPrice(amount: number, currencyCode: string) {
 function ProductPage() {
   const { item } = Route.useParams();
   const product = Route.useLoaderData();
-  const stickyOffset = useStickyOffset();
   const galleryImages = getProductGalleryImages(product);
 
   const price = formatPrice(
@@ -60,14 +58,8 @@ function ProductPage() {
         <ProductImageGallery
           images={galleryImages}
           productTitle={product.title}
-          stickyOffset={stickyOffset}
         />
-        <ProductDetailsPanel
-          handle={item}
-          product={product}
-          price={price}
-          stickyOffset={stickyOffset}
-        />
+        <ProductDetailsPanel handle={item} product={product} price={price} />
       </div>
     </main>
   );
