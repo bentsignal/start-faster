@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated")({
       return;
     }
 
-    const returnTo = `${location.pathname}${location.search}${location.hash}`;
+    const returnTo = location.href;
     const href = await getCustomerLoginUrl({
       data: {
         returnTo,
