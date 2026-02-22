@@ -47,8 +47,8 @@ To run a command for a specific app or package, use `--filter <target-name>`
 Below are some commands you should run after making changes for the user. You don't have to run all of them every time, it depends on the types of changes you make.
 
 1. `pnpm run lint`: If you make changes to pretty much any file, you should make sure linting is still passing.
-2. `pnpm run format:fix`: If you make changes to any code or .md files, you should run this to make sure the changes are formatted properly.
-3. `pnpm run typecheck`: If you make any changes to typescript files, make sure to run this.
+2. `pnpm run typecheck`: If you make any changes to typescript files, make sure to run this.
+3. `pnpm run format:fix`: If you make changes to any code or .md files, you should run this to make sure the changes are formatted properly.
 
 Make sure that any commands you choose to run are passing before completing your work.
 
