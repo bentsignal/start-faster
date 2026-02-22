@@ -12,10 +12,7 @@ export const Route = createFileRoute("/_auth/login")({
           env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI,
         ).origin;
         if (url.origin !== callbackOrigin) {
-          return new Response(
-            `Auth origin mismatch. Open this app on ${callbackOrigin} while using Shopify customer auth.`,
-            { status: 400 },
-          );
+          return new Response("Auth origin mismatch.", { status: 400 });
         }
 
         if (!isTrustedCustomerAuthRequest(request)) {

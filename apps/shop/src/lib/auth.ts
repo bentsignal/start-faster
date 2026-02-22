@@ -1,4 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
+import { createRemoteJWKSet, jwtVerify } from "jose";
+import type { JWTPayload } from "jose";
 import { deleteCookie, getCookie } from "@tanstack/react-start/server";
 
 import { env } from "~/env";
@@ -39,13 +41,9 @@ interface CustomerAuthSession {
   customer: ShopifyCustomerIdentity | null;
 }
 
-interface JwtPayload {
-  sub?: string;
+interface JwtPayload extends JWTPayload {
   email?: string;
   name?: string;
-  aud?: string | string[];
-  iss?: string;
-  exp?: number;
 }
 
 interface OAuthTokenResponse {
@@ -124,36 +122,6 @@ function toBase64Url(input: Buffer | string): string {
     .replace(/=+$/g, "");
 }
 
-function fromBase64Url(input: string): Buffer {
-  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = normalized.length % 4;
-  const padded = pad === 0 ? normalized : normalized + "=".repeat(4 - pad);
-  return Buffer.from(padded, "base64");
-}
-
-function decodeJwtPayload(
-  idToken: string | null | undefined,
-): JwtPayload | null {
-  if (!idToken) {
-    return null;
-  }
-  const parts = idToken.split(".");
-  if (parts.length !== 3) {
-    return null;
-  }
-  const payloadSegment = parts[1];
-  if (!payloadSegment) {
-    return null;
-  }
-  try {
-    return JSON.parse(
-      fromBase64Url(payloadSegment).toString("utf8"),
-    ) as JwtPayload;
-  } catch {
-    return null;
-  }
-}
-
 function toCustomerIdentity(payload: JwtPayload): ShopifyCustomerIdentity {
   return {
     sub: payload.sub ?? null,
@@ -180,6 +148,20 @@ function createOpaqueId(): string {
 
 const oauthStateMaxAgeSeconds = 60 * 10;
 const sessionMaxAgeSeconds = 60 * 60 * 24 * 30;
+const oauthStateStoreMaxEntries = 2000;
+const sessionStoreMaxEntries = 10000;
+const openIdConfigurationCacheMaxAgeMs = 5 * 60 * 1000;
+
+interface OpenIdConfiguration {
+  issuer: string;
+  jwks_uri: string;
+}
+
+let openIdConfigurationCache:
+  | { value: OpenIdConfiguration; fetchedAt: number }
+  | null = null;
+let customerJwksCache: ReturnType<typeof createRemoteJWKSet> | null = null;
+let customerJwksUriCache: string | null = null;
 
 interface CustomerAuthStores {
   oauth: Map<string, CustomerOAuthState>;
@@ -216,6 +198,16 @@ function cleanupExpiredSessions(now: number) {
   }
 }
 
+function enforceStoreLimit<T>(store: Map<string, T>, maxEntries: number) {
+  while (store.size > maxEntries) {
+    const oldestKey = store.keys().next().value;
+    if (typeof oldestKey !== "string") {
+      break;
+    }
+    store.delete(oldestKey);
+  }
+}
+
 function parseCookieValue(request: Request, name: string): string | null {
   const cookies = parseCookieHeader(request.headers.get("cookie"));
   const value = cookies[name];
@@ -238,32 +230,55 @@ function clearCustomerOAuthCookie(): void {
   deleteCookie(customerOAuthCookieName, options);
 }
 
-function validateIdTokenClaims(payload: JwtPayload): boolean {
-  if (typeof payload.exp !== "number") {
-    return false;
+async function getCustomerOpenIdConfiguration(): Promise<OpenIdConfiguration> {
+  const now = Date.now();
+  if (
+    openIdConfigurationCache &&
+    now - openIdConfigurationCache.fetchedAt < openIdConfigurationCacheMaxAgeMs
+  ) {
+    return openIdConfigurationCache.value;
   }
-  if (Math.floor(Date.now() / 1000) >= payload.exp) {
-    return false;
+  const storeDomain = env.SHOPIFY_STORE_DOMAIN.trim();
+  const storeBaseUrl =
+    storeDomain.startsWith("http://") || storeDomain.startsWith("https://")
+      ? storeDomain
+      : `https://${storeDomain}`;
+  const discoveryUrl = new URL("/.well-known/openid-configuration", storeBaseUrl);
+  const response = await fetch(discoveryUrl.toString());
+  if (!response.ok) {
+    throw new Error("Unable to fetch Shopify OpenID configuration.");
   }
+  const body = (await response.json()) as Record<string, unknown>;
+  if (typeof body.issuer !== "string" || typeof body.jwks_uri !== "string") {
+    throw new Error("Invalid Shopify OpenID configuration.");
+  }
+  const value: OpenIdConfiguration = {
+    issuer: body.issuer,
+    jwks_uri: body.jwks_uri,
+  };
+  openIdConfigurationCache = {
+    value,
+    fetchedAt: now,
+  };
+  return value;
+}
 
-  const expectedAudience = env.SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID;
-  const audience = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-  if (!audience.some((candidate) => candidate === expectedAudience)) {
-    return false;
+function getCustomerJwks(jwksUri: string): ReturnType<typeof createRemoteJWKSet> {
+  if (!customerJwksCache || customerJwksUriCache !== jwksUri) {
+    customerJwksCache = createRemoteJWKSet(new URL(jwksUri));
+    customerJwksUriCache = jwksUri;
   }
+  return customerJwksCache;
+}
 
-  if (typeof payload.iss !== "string" || !payload.iss) {
-    return false;
-  }
-  try {
-    const expectedOrigin = new URL(
-      env.SHOPIFY_CUSTOMER_ACCOUNT_AUTHORIZATION_ENDPOINT,
-    ).origin;
-    const issuerOrigin = new URL(payload.iss).origin;
-    return issuerOrigin === expectedOrigin;
-  } catch {
-    return false;
-  }
+async function verifyCustomerIdToken(idToken: string): Promise<JwtPayload> {
+  const openIdConfiguration = await getCustomerOpenIdConfiguration();
+  const jwks = getCustomerJwks(openIdConfiguration.jwks_uri);
+  const { payload } = await jwtVerify(idToken, jwks, {
+    issuer: openIdConfiguration.issuer,
+    audience: env.SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID,
+  });
+  return payload as JwtPayload;
 }
 
 function getScopes(): string {
@@ -327,7 +342,9 @@ export function createCustomerLogin(params: {
     returnTo: nextReturnTo,
     expiresAt: now + oauthStateMaxAgeSeconds * 1000,
   };
-  getCustomerAuthStores().oauth.set(oauthNonce, oauthState);
+  const stores = getCustomerAuthStores();
+  stores.oauth.set(oauthNonce, oauthState);
+  enforceStoreLimit(stores.oauth, oauthStateStoreMaxEntries);
   const secure = shouldUseSecureCookies(params.request);
   const oauthCookie = serializeCookie({
     name: customerOAuthCookieName,
@@ -417,8 +434,11 @@ export async function handleCustomerAuthCallback(params: {
   }
 
   const expiresAt = now + (payload.expires_in ?? 3600) * 1000;
-  const idTokenPayload = decodeJwtPayload(payload.id_token);
-  if (!idTokenPayload || !validateIdTokenClaims(idTokenPayload)) {
+  if (!payload.id_token) {
+    throw new Error("Shopify customer auth token response is invalid.");
+  }
+  const idTokenPayload = await verifyCustomerIdToken(payload.id_token);
+  if (!idTokenPayload.sub) {
     throw new Error("Invalid id token.");
   }
   const customer = toCustomerIdentity(idTokenPayload);
@@ -432,6 +452,7 @@ export async function handleCustomerAuthCallback(params: {
   };
   cleanupExpiredSessions(now);
   stores.sessions.set(sessionId, session);
+  enforceStoreLimit(stores.sessions, sessionStoreMaxEntries);
   const sessionCookie = serializeCookie({
     name: customerSessionCookieName,
     value: sessionId,
@@ -455,13 +476,24 @@ export function clearCustomerSession() {
   clearCustomerOAuthCookie();
 }
 
-export function createCustomerLogoutCookies(request: Request): string[] {
-  const sessionId = parseCookieValue(request, customerSessionCookieName);
+export function createCustomerLogout(params: {
+  request: Request;
+  returnTo: string;
+}): { logoutUrl: string; cookies: string[] } {
+  const requestUrl = new URL(params.request.url);
+  const normalizedReturnTo = normalizeCustomerReturnTo(params.returnTo);
+  const postLogoutRedirectUri = new URL(
+    normalizedReturnTo,
+    requestUrl.origin,
+  ).toString();
+  const sessionId = parseCookieValue(params.request, customerSessionCookieName);
+  const stores = getCustomerAuthStores();
+  const session = sessionId ? stores.sessions.get(sessionId) ?? null : null;
   if (sessionId) {
-    getCustomerAuthStores().sessions.delete(sessionId);
+    stores.sessions.delete(sessionId);
   }
-  const secure = shouldUseSecureCookies(request);
-  return [
+  const secure = shouldUseSecureCookies(params.request);
+  const cookies = [
     serializeCookie({
       name: customerSessionCookieName,
       value: "",
@@ -475,6 +507,24 @@ export function createCustomerLogoutCookies(request: Request): string[] {
       secure,
     }),
   ];
+  if (!session?.idToken) {
+    return {
+      logoutUrl: postLogoutRedirectUri,
+      cookies,
+    };
+  }
+  const logoutUrl = new URL(
+    String(env.SHOPIFY_CUSTOMER_ACCOUNT_LOGOUT_ENDPOINT),
+  );
+  logoutUrl.searchParams.set("id_token_hint", session.idToken);
+  logoutUrl.searchParams.set(
+    "post_logout_redirect_uri",
+    postLogoutRedirectUri,
+  );
+  return {
+    logoutUrl: logoutUrl.toString(),
+    cookies,
+  };
 }
 
 function readSession(): CustomerAuthSession | null {
