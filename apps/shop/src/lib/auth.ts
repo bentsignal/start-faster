@@ -1,8 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import {
-  deleteCookie,
-  getCookie,
-} from "@tanstack/react-start/server";
+import { deleteCookie, getCookie } from "@tanstack/react-start/server";
 
 import { env } from "~/env";
 
@@ -237,7 +234,11 @@ export async function handleCustomerAuthCallback(params: {
   request: Request;
   code: string;
   state: string;
-}): Promise<{ returnTo: string; clearOAuthCookie: string; sessionCookie: string }> {
+}): Promise<{
+  returnTo: string;
+  clearOAuthCookie: string;
+  sessionCookie: string;
+}> {
   const cookies = parseCookieHeader(params.request.headers.get("cookie"));
   const stateCookieValue = cookies[customerOAuthCookieName] ?? null;
   const stateCookie = stateCookieValue

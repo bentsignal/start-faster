@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { createCustomerLogoutCookies, normalizeCustomerReturnTo } from "~/lib/auth";
+import {
+  createCustomerLogoutCookies,
+  normalizeCustomerReturnTo,
+} from "~/lib/auth";
 
 export const Route = createFileRoute("/auth/logout")({
   server: {
