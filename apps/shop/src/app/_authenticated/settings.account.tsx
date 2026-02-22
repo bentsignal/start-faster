@@ -7,13 +7,13 @@ export const Route = createFileRoute("/_authenticated/settings/account")({
 });
 
 function RouteComponent() {
-  const auth = Route.useRouteContext({
-    select: (context) => context.verifiedAuth,
+  const customer = Route.useRouteContext({
+    select: (context) => context.customer,
   });
   return (
     <div className="flex h-screen flex-col items-center justify-center">
       Hello "/settings/account"!
-      {auth.customer.email}
+      {customer.email}
       <Button
         render={(props) => (
           <a href="/logout" {...props}>

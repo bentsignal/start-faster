@@ -1,19 +1,12 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-
-import { getShopifyCustomerAuthState } from "~/lib/auth";
-
-const getCustomerAuthState = createServerFn({ method: "GET" }).handler(() => {
-  return getShopifyCustomerAuthState();
-});
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
-  beforeLoad: async ({ location }) => {
-    const auth = await getCustomerAuthState();
-    if (auth.isSignedIn) {
+  beforeLoad: ({ location, context }) => {
+    if (context.auth.isSignedIn) {
       return {
-        verifiedAuth: auth,
+        accessToken: context.auth.accessToken,
+        customer: context.auth.customer,
       };
     }
     const href = `/login?returnTo=${encodeURIComponent(location.href)}`;
