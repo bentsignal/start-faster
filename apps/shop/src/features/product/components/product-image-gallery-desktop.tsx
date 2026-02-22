@@ -50,39 +50,39 @@ export function ProductImageGalleryDesktop({
           : "lg:grid-cols-1",
       )}
     >
-      {images.length > 1 ? (
-        <aside className={cn("relative", stickyHeaderTokens.stickyContent)}>
-          <div className="space-y-3" aria-label="Product image previews">
-            {images.map((image, index) => (
-              <button
-                key={`${image.id}-thumbnail`}
-                type="button"
-                onClick={() => scrollToImage(index)}
-                className={cn(
-                  "bg-muted/40 block w-full overflow-hidden border transition-colors",
-                  activeImageIndex === index
-                    ? "border-foreground"
-                    : "border-border hover:border-foreground/40",
-                )}
-                aria-label={`View image ${index + 1}`}
-                aria-current={activeImageIndex === index ? "true" : undefined}
-              >
-                <div className="aspect-square w-full">
-                  <Image
-                    src={image.url}
-                    alt={
-                      image.altText ?? `${productTitle} preview ${index + 1}`
-                    }
-                    width={image.width ?? 300}
-                    height={image.height ?? 300}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </button>
-            ))}
-          </div>
-        </aside>
-      ) : null}
+      <aside className={cn("relative", stickyHeaderTokens.stickyContent)}>
+        <div className="space-y-3" aria-label="Product image previews">
+          {images.length > 1
+            ? images.map((image, index) => (
+                <button
+                  key={`${image.id}-thumbnail`}
+                  type="button"
+                  onClick={() => scrollToImage(index)}
+                  className={cn(
+                    "bg-muted/40 block w-full overflow-hidden border transition-colors",
+                    activeImageIndex === index
+                      ? "border-foreground"
+                      : "border-border hover:border-foreground/40",
+                  )}
+                  aria-label={`View image ${index + 1}`}
+                  aria-current={activeImageIndex === index ? "true" : undefined}
+                >
+                  <div className="aspect-square w-full">
+                    <Image
+                      src={image.url}
+                      alt={
+                        image.altText ?? `${productTitle} preview ${index + 1}`
+                      }
+                      width={image.width ?? 300}
+                      height={image.height ?? 300}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </button>
+              ))
+            : null}
+        </div>
+      </aside>
 
       <div className="w-full space-y-4 lg:max-w-2xl xl:max-w-3xl xl:space-y-6">
         {images.map((image, index) => (
