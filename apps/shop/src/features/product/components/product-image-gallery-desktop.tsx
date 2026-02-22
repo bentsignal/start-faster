@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
 import type { ProductGalleryImage } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
+import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
 
 interface ProductImageGalleryDesktopProps {
   images: ProductGalleryImage[];
@@ -15,25 +15,8 @@ export function ProductImageGalleryDesktop({
   images,
   productTitle,
 }: ProductImageGalleryDesktopProps) {
-  const imageSectionsRef = useRef<(HTMLElement | null)[]>([]);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  function scrollToImage(index: number) {
-    const targetImage = imageSectionsRef.current[index];
-
-    if (!targetImage) {
-      return;
-    }
-
-    setActiveImageIndex(index);
-
-    const scrollTop = targetImage.getBoundingClientRect().top + window.scrollY;
-
-    window.scrollTo({
-      top: Math.max(scrollTop - 100, 0),
-      behavior: "smooth",
-    });
-  }
+  const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
+    useDesktopProductImageGallery({ imageCount: images.length });
 
   if (images.length === 0) {
     return (
@@ -59,13 +42,15 @@ export function ProductImageGalleryDesktop({
                   type="button"
                   onClick={() => scrollToImage(index)}
                   className={cn(
-                    "bg-muted/40 block w-full overflow-hidden border transition-colors",
-                    activeImageIndex === index
-                      ? "border-foreground"
-                      : "border-border hover:border-foreground/40",
+                    "group bg-muted/30 focus-visible:ring-foreground/60 focus-visible:ring-offset-background block w-full overflow-hidden border-2 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+                    visibleActiveImageIndex === index
+                      ? "border-foreground bg-background dark:bg-zinc-900"
+                      : "border-border/80 hover:border-foreground/60 hover:bg-background/70 dark:border-white/20 dark:hover:border-white/70 dark:hover:bg-white/5",
                   )}
                   aria-label={`View image ${index + 1}`}
-                  aria-current={activeImageIndex === index ? "true" : undefined}
+                  aria-current={
+                    visibleActiveImageIndex === index ? "true" : undefined
+                  }
                 >
                   <div className="aspect-square w-full">
                     <Image
@@ -75,7 +60,12 @@ export function ProductImageGalleryDesktop({
                       }
                       width={image.width ?? 300}
                       height={image.height ?? 300}
-                      className="h-full w-full object-cover"
+                      className={cn(
+                        "h-full w-full object-cover transition-opacity duration-150",
+                        visibleActiveImageIndex === index
+                          ? "opacity-100"
+                          : "opacity-85 group-hover:opacity-100 dark:opacity-65 dark:group-hover:opacity-95",
+                      )}
                     />
                   </div>
                 </button>
@@ -89,7 +79,7 @@ export function ProductImageGalleryDesktop({
           <section
             key={image.id}
             ref={(section) => {
-              imageSectionsRef.current[index] = section;
+              setImageSectionRef(index, section);
             }}
             data-image-index={index}
             className="bg-muted/40 overflow-hidden"
