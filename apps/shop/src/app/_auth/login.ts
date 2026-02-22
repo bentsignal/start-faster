@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { env } from "~/env";
-import { createCustomerLogin } from "~/lib/auth";
+import { createCustomerLogin, isTrustedCustomerAuthRequest } from "~/lib/auth";
 
 export const Route = createFileRoute("/_auth/login")({
   server: {
     handlers: {
-      GET: ({ request }) => {
+      POST: async ({ request }) => {
         const url = new URL(request.url);
         const callbackOrigin = new URL(
           env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI,
@@ -17,11 +17,22 @@ export const Route = createFileRoute("/_auth/login")({
             { status: 400 },
           );
         }
-        const returnTo = url.searchParams.get("returnTo") ?? "/";
+
+        if (!isTrustedCustomerAuthRequest(request)) {
+          return new Response("Invalid auth request origin.", { status: 403 });
+        }
+
+        const formData = await request.formData();
+        const returnTo =
+          typeof formData.get("returnTo") === "string"
+            ? (formData.get("returnTo") as string)
+            : "/";
+
         const { authorizeUrl, oauthCookie } = createCustomerLogin({
           request,
           returnTo,
         });
+
         return new Response(null, {
           status: 302,
           headers: new Headers({

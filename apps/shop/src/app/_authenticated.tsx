@@ -9,8 +9,10 @@ export const Route = createFileRoute("/_authenticated")({
         customer: context.auth.customer,
       };
     }
-    const href = `/login?returnTo=${encodeURIComponent(location.href)}`;
-    throw redirect({ href });
+    throw redirect({
+      to: "/",
+      search: { showLogin: true, returnTo: encodeURIComponent(location.href) },
+    });
   },
 });
 

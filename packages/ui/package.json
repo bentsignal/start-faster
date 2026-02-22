@@ -8,6 +8,8 @@
     "./button": "./src/components/button.tsx",
     "./card": "./src/components/card.tsx",
     "./carousel": "./src/components/carousel.tsx",
+    "./dialog": "./src/components/dialog.tsx",
+    "./drawer": "./src/components/drawer.tsx",
     "./hover-card": "./src/components/hover-card.tsx",
     "./input": "./src/components/input.tsx",
     "./navigation-menu": "./src/components/navigation-menu.tsx",
@@ -32,7 +34,8 @@
     "class-variance-authority": "catalog:",
     "next-themes": "^0.4.6",
     "sonner": "^2.0.7",
-    "tailwind-merge": "catalog:"
+    "tailwind-merge": "catalog:",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",

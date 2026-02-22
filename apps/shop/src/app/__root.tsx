@@ -10,12 +10,14 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { convert } from "great-time";
+import { z } from "zod";
 
 import { Toaster } from "@acme/ui/toaster";
 import { cn } from "@acme/ui/utils";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
+import { LoginModal } from "~/components/auth/login-modal";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
@@ -77,6 +79,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       theme,
     };
   },
+  validateSearch: z.object({
+    showLogin: z.boolean().optional(),
+    returnTo: z.string().optional(),
+  }),
   component: RootComponent,
 });
 
@@ -102,6 +108,7 @@ function RootComponent() {
             initialTheme={context.theme}
           >
             <Header />
+            <LoginModal />
             <Outlet />
             <MailingList />
             <Footer />

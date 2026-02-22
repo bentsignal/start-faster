@@ -14,13 +14,10 @@ function RouteComponent() {
     <div className="flex h-screen flex-col items-center justify-center">
       Hello "/settings/account"!
       {customer.email}
-      <Button
-        render={(props) => (
-          <a href="/logout" {...props}>
-            Logout
-          </a>
-        )}
-      />
+      <form method="post" action="/logout">
+        <input type="hidden" name="returnTo" value="/" />
+        <Button type="submit">Logout</Button>
+      </form>
     </div>
   );
 }
