@@ -5,9 +5,10 @@ export const Route = createFileRoute("/_authenticated/settings/account")({
 });
 
 function RouteComponent() {
+  const auth = Route.useRouteContext({ select: (context) => context.auth });
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      Hello "/settings/account"!
+      Hello "/settings/account"! {auth.customer?.email}
     </div>
   );
 }

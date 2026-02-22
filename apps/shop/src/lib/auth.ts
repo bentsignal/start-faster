@@ -2,7 +2,6 @@ import { createHash, randomBytes } from "node:crypto";
 import {
   deleteCookie,
   getCookie,
-  setCookie,
 } from "@tanstack/react-start/server";
 
 import { env } from "~/env";
@@ -45,9 +44,55 @@ interface OAuthTokenResponse {
 const cookieBaseOptions = {
   httpOnly: true as const,
   sameSite: "lax" as const,
-  secure: env.VITE_NODE_ENV === "production",
   path: "/",
 };
+
+function isSecureRequest(request: Request): boolean {
+  const url = new URL(request.url);
+  if (url.protocol === "https:") {
+    return true;
+  }
+  return request.headers.get("x-forwarded-proto") === "https";
+}
+
+function serializeCookie(params: {
+  name: string;
+  value: string;
+  maxAge: number;
+  secure: boolean;
+}): string {
+  const parts = [
+    `${params.name}=${params.value}`,
+    `Max-Age=${params.maxAge}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+  ];
+  if (params.secure) {
+    parts.push("Secure");
+  }
+  return parts.join("; ");
+}
+
+function parseCookieHeader(header: string | null): Record<string, string> {
+  if (!header) {
+    return {};
+  }
+  return header
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce<Record<string, string>>((acc, part) => {
+      const index = part.indexOf("=");
+      if (index <= 0) {
+        return acc;
+      }
+      const key = part.slice(0, index).trim();
+      const value = part.slice(index + 1).trim();
+      acc[key] = value;
+      return acc;
+    }, {});
+}
 
 function toBase64Url(input: Buffer | string): string {
   const value = Buffer.isBuffer(input) ? input : Buffer.from(input);
@@ -125,20 +170,44 @@ function getScopes(): string {
   return env.SHOPIFY_CUSTOMER_ACCOUNT_SCOPES ?? "openid email";
 }
 
-export function createCustomerLoginUrl(returnTo: string): string {
+export function normalizeCustomerReturnTo(returnTo: string): string {
+  const value = returnTo.trim();
+  if (!value) {
+    return "/";
+  }
+  if (value.startsWith("/") && !value.startsWith("//")) {
+    return value;
+  }
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return "/";
+    }
+    return `${parsed.pathname}${parsed.search}${parsed.hash}` || "/";
+  } catch {
+    return "/";
+  }
+}
+
+export function createCustomerLogin(params: {
+  request: Request;
+  returnTo: string;
+}): { authorizeUrl: string; oauthCookie: string } {
   const state = createState();
   const codeVerifier = createCodeVerifier();
   const codeChallenge = createCodeChallenge(codeVerifier);
-  const nextReturnTo = returnTo.startsWith("/") ? returnTo : "/";
+  const nextReturnTo = normalizeCustomerReturnTo(params.returnTo);
   const oauthState: CustomerOAuthState = {
     state,
     codeVerifier,
     returnTo: nextReturnTo,
   };
-
-  setCookie(customerOAuthCookieName, encodeJson(oauthState), {
-    ...cookieBaseOptions,
+  const secure = isSecureRequest(params.request);
+  const oauthCookie = serializeCookie({
+    name: customerOAuthCookieName,
+    value: encodeJson(oauthState),
     maxAge: 60 * 10,
+    secure,
   });
 
   const authorizeUrl = new URL(
@@ -158,14 +227,19 @@ export function createCustomerLoginUrl(returnTo: string): string {
   authorizeUrl.searchParams.set("code_challenge", codeChallenge);
   authorizeUrl.searchParams.set("code_challenge_method", "S256");
 
-  return authorizeUrl.toString();
+  return {
+    authorizeUrl: authorizeUrl.toString(),
+    oauthCookie,
+  };
 }
 
 export async function handleCustomerAuthCallback(params: {
+  request: Request;
   code: string;
   state: string;
-}): Promise<string> {
-  const stateCookieValue = getCookie(customerOAuthCookieName);
+}): Promise<{ returnTo: string; clearOAuthCookie: string; sessionCookie: string }> {
+  const cookies = parseCookieHeader(params.request.headers.get("cookie"));
+  const stateCookieValue = cookies[customerOAuthCookieName] ?? null;
   const stateCookie = stateCookieValue
     ? decodeJson<CustomerOAuthState>(stateCookieValue)
     : null;
@@ -173,8 +247,13 @@ export async function handleCustomerAuthCallback(params: {
   if (stateCookie?.state !== params.state) {
     throw new Error("Invalid Shopify customer auth state.");
   }
-
-  deleteCookie(customerOAuthCookieName, cookieBaseOptions);
+  const secure = isSecureRequest(params.request);
+  const clearOAuthCookie = serializeCookie({
+    name: customerOAuthCookieName,
+    value: "",
+    maxAge: 0,
+    secure,
+  });
 
   const body = new URLSearchParams({
     grant_type: "authorization_code",
@@ -211,18 +290,45 @@ export async function handleCustomerAuthCallback(params: {
     expiresAt,
     customer,
   };
-
-  setCookie(customerSessionCookieName, encodeJson(session), {
-    ...cookieBaseOptions,
+  const sessionCookie = serializeCookie({
+    name: customerSessionCookieName,
+    value: encodeJson(session),
     maxAge: 60 * 60 * 24 * 30,
+    secure,
   });
 
-  return stateCookie.returnTo;
+  return {
+    returnTo: stateCookie.returnTo,
+    clearOAuthCookie,
+    sessionCookie,
+  };
 }
 
 export function clearCustomerSession() {
-  deleteCookie(customerSessionCookieName, cookieBaseOptions);
-  deleteCookie(customerOAuthCookieName, cookieBaseOptions);
+  const options = {
+    ...cookieBaseOptions,
+    secure: env.VITE_NODE_ENV === "production",
+  };
+  deleteCookie(customerSessionCookieName, options);
+  deleteCookie(customerOAuthCookieName, options);
+}
+
+export function createCustomerLogoutCookies(request: Request): string[] {
+  const secure = isSecureRequest(request);
+  return [
+    serializeCookie({
+      name: customerSessionCookieName,
+      value: "",
+      maxAge: 0,
+      secure,
+    }),
+    serializeCookie({
+      name: customerOAuthCookieName,
+      value: "",
+      maxAge: 0,
+      secure,
+    }),
+  ];
 }
 
 function readSession(): CustomerAuthSession | null {

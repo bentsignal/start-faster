@@ -10,6 +10,10 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    allowedHosts:
+      process.env.NODE_ENV === "development"
+        ? ["unshapeable-mortally-gracia.ngrok-free.dev"]
+        : undefined,
   },
   plugins: [
     devtools({

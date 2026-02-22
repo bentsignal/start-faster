@@ -1,33 +1,11 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-import {
-  createCustomerLoginUrl,
-  getShopifyCustomerAuthState,
-} from "~/lib/auth";
+import { getShopifyCustomerAuthState } from "~/lib/auth";
 
 const getCustomerAuthState = createServerFn({ method: "GET" }).handler(() => {
   return getShopifyCustomerAuthState();
 });
-
-const getCustomerLoginUrl = createServerFn({ method: "GET" })
-  .inputValidator((value: unknown) => {
-    if (
-      typeof value !== "object" ||
-      value === null ||
-      !("returnTo" in value) ||
-      typeof value.returnTo !== "string"
-    ) {
-      throw new Error("Expected a returnTo string.");
-    }
-
-    return {
-      returnTo: value.returnTo,
-    };
-  })
-  .handler(({ data }) => {
-    return createCustomerLoginUrl(data.returnTo);
-  });
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
@@ -37,12 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
       return;
     }
 
-    const returnTo = location.href;
-    const href = await getCustomerLoginUrl({
-      data: {
-        returnTo,
-      },
-    });
+    const href = `/auth/login?returnTo=${encodeURIComponent(location.href)}`;
 
     throw redirect({ href });
   },

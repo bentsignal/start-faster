@@ -16,8 +16,7 @@ import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopItemRouteImport } from './app/shop/$item'
 import { Route as AuthLogoutRouteImport } from './app/auth/logout'
 import { Route as AuthLoginRouteImport } from './app/auth/login'
-import { Route as AuthenticatedSettingsRouteRouteImport } from './app/_authenticated/settings/route'
-import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings/account'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings.account'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -53,24 +52,17 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSettingsRouteRoute =
-  AuthenticatedSettingsRouteRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedSettingsAccountRoute =
   AuthenticatedSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+    id: '/settings/account',
+    path: '/settings/account',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
@@ -80,7 +72,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
@@ -92,7 +83,6 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
@@ -104,7 +94,6 @@ export interface FileRouteTypes {
     | '/'
     | '/shop'
     | '/callback'
-    | '/settings'
     | '/auth/login'
     | '/auth/logout'
     | '/shop/$item'
@@ -114,7 +103,6 @@ export interface FileRouteTypes {
     | '/'
     | '/shop'
     | '/callback'
-    | '/settings'
     | '/auth/login'
     | '/auth/logout'
     | '/shop/$item'
@@ -125,7 +113,6 @@ export interface FileRouteTypes {
     | '/shop'
     | '/_authenticated'
     | '/callback'
-    | '/_authenticated/settings'
     | '/auth/login'
     | '/auth/logout'
     | '/shop/$item'
@@ -192,19 +179,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/settings/account': {
       id: '/_authenticated/settings/account'
-      path: '/account'
+      path: '/settings/account'
       fullPath: '/settings/account'
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
@@ -221,26 +201,12 @@ const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
   ShopRouteRouteChildren,
 )
 
-interface AuthenticatedSettingsRouteRouteChildren {
+interface AuthenticatedRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
 }
 
-const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
-  {
-    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
-  }
-
-const AuthenticatedSettingsRouteRouteWithChildren =
-  AuthenticatedSettingsRouteRoute._addFileChildren(
-    AuthenticatedSettingsRouteRouteChildren,
-  )
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
-}
-
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
