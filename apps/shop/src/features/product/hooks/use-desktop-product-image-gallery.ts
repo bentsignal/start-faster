@@ -27,7 +27,9 @@ export function useDesktopProductImageGallery({
 
   useEffect(() => {
     activeImageIndexRef.current =
-      imageCount > 0 ? Math.min(activeImageIndexRef.current, imageCount - 1) : 0;
+      imageCount > 0
+        ? Math.min(activeImageIndexRef.current, imageCount - 1)
+        : 0;
   }, [imageCount]);
 
   useEffect(() => {
@@ -81,7 +83,8 @@ export function useDesktopProductImageGallery({
       return;
     }
 
-    const headerElement = document.querySelector<HTMLElement>("[data-site-header]");
+    const headerElement =
+      document.querySelector<HTMLElement>("[data-site-header]");
     const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
     const intersectionRatios = new Map<number, number>();
 

@@ -1,115 +1,84 @@
-import { Button } from "@acme/ui/button";
-import { Input } from "@acme/ui/input";
-import { Separator } from "@acme/ui/separator";
+const footerLinks = [
+  {
+    title: "Customer Service",
+    links: [
+      "Contact Us",
+      "FAQs",
+      "Shipping Information",
+      "Returns & Exchanges",
+    ],
+  },
+  {
+    title: "About Us",
+    links: ["Our Story", "Sustainability", "Store Locations", "Careers"],
+  },
+  {
+    title: "Resources",
+    links: ["Style Blog", "Lookbook", "Size Guide", "Gift Cards"],
+  },
+] as const;
 
 export function Footer() {
   return (
-    <footer className="bg-muted py-12">
+    <footer className="border-border border-t pt-14 pb-10">
       <div className="mx-auto max-w-5xl px-6">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
+          {footerLinks.map((section) => (
+            <div key={section.title}>
+              <h3 className="mb-4 text-sm font-medium">{section.title}</h3>
+              <ul className="space-y-2.5">
+                {section.links.map((link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
           <div>
-            <h3 className="text-muted-foreground mb-4 text-lg font-semibold">
-              Customer Service
-            </h3>
-            <ul className="text-muted-foreground space-y-2">
+            <h3 className="mb-4 text-sm font-medium">Connect With Us</h3>
+            <ul className="space-y-2.5">
               <li>
-                <a href="#" className="hover:text-primary">
-                  Contact Us
+                <a
+                  href="#"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  Instagram
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary">
-                  FAQs
+                <a
+                  href="#"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  X (Twitter)
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary">
-                  Shipping Information
+                <a
+                  href="#"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  TikTok
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary">
-                  Returns &amp; Exchanges
+                <a
+                  href="#"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  Pinterest
                 </a>
               </li>
             </ul>
-          </div>
-          <div>
-            <h3 className="text-muted-foreground mb-4 text-lg font-semibold">
-              About Us
-            </h3>
-            <ul className="text-muted-foreground space-y-2">
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Our Story
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Sustainability
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Store Locations
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Careers
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-muted-foreground mb-4 text-lg font-semibold">
-              Resources
-            </h3>
-            <ul className="text-muted-foreground space-y-2">
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Style Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Lookbook
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Size Guide
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary">
-                  Gift Cards
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-muted-foreground mb-4 text-lg font-semibold">
-              Connect With Us
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Sign up for style tips, exclusive offers, and more.
-            </p>
-            <form
-              className="border-input focus-within:border-ring focus-within:ring-ring/50 flex w-full max-w-72 rounded-4xl border transition-colors focus-within:ring-[3px]"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <Input
-                type="email"
-                placeholder="Your email"
-                className="rounded-r-none border-0 focus-visible:border-transparent focus-visible:ring-0"
-              />
-              <Button className="rounded-l-none">Subscribe</Button>
-            </form>
           </div>
         </div>
-        <Separator className="my-8" />
-        <div className="text-muted-foreground text-center">
+        <div className="text-muted-foreground mt-14 text-center text-xs">
           <p>
             &copy; {new Date().getFullYear()} Start Faster. All Rights Reserved.
           </p>
