@@ -12,11 +12,11 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
     const auth = await getCustomerAuthState();
     if (auth.isSignedIn) {
-      return;
+      return {
+        verifiedAuth: auth,
+      };
     }
-
-    const href = `/auth/login?returnTo=${encodeURIComponent(location.href)}`;
-
+    const href = `/login?returnTo=${encodeURIComponent(location.href)}`;
     throw redirect({ href });
   },
 });

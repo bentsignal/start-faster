@@ -5,7 +5,7 @@ import {
   normalizeCustomerReturnTo,
 } from "~/lib/auth";
 
-export const Route = createFileRoute("/auth/logout")({
+export const Route = createFileRoute("/_auth/logout")({
   server: {
     handlers: {
       GET: ({ request }) => {

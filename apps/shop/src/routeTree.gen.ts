@@ -14,8 +14,8 @@ import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopItemRouteImport } from './app/shop/$item'
-import { Route as AuthLogoutRouteImport } from './app/auth/logout'
-import { Route as AuthLoginRouteImport } from './app/auth/login'
+import { Route as AuthLogoutRouteImport } from './app/_auth/logout'
+import { Route as AuthLoginRouteImport } from './app/_auth/login'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings.account'
 
 const CallbackRoute = CallbackRouteImport.update({
@@ -43,13 +43,13 @@ const ShopItemRoute = ShopItemRouteImport.update({
   getParentRoute: () => ShopRouteRoute,
 } as any)
 const AuthLogoutRoute = AuthLogoutRouteImport.update({
-  id: '/auth/logout',
-  path: '/auth/logout',
+  id: '/_auth/logout',
+  path: '/logout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
+  id: '/_auth/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsAccountRoute =
@@ -63,8 +63,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/logout': typeof AuthLogoutRoute
+  '/login': typeof AuthLoginRoute
+  '/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -72,8 +72,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/logout': typeof AuthLogoutRoute
+  '/login': typeof AuthLoginRoute
+  '/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -83,8 +83,8 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/logout': typeof AuthLogoutRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/logout': typeof AuthLogoutRoute
   '/shop/$item': typeof ShopItemRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
@@ -94,8 +94,8 @@ export interface FileRouteTypes {
     | '/'
     | '/shop'
     | '/callback'
-    | '/auth/login'
-    | '/auth/logout'
+    | '/login'
+    | '/logout'
     | '/shop/$item'
     | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
@@ -103,8 +103,8 @@ export interface FileRouteTypes {
     | '/'
     | '/shop'
     | '/callback'
-    | '/auth/login'
-    | '/auth/logout'
+    | '/login'
+    | '/logout'
     | '/shop/$item'
     | '/settings/account'
   id:
@@ -113,8 +113,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/_authenticated'
     | '/callback'
-    | '/auth/login'
-    | '/auth/logout'
+    | '/_auth/login'
+    | '/_auth/logout'
     | '/shop/$item'
     | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
@@ -165,17 +165,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopItemRouteImport
       parentRoute: typeof ShopRouteRoute
     }
-    '/auth/logout': {
-      id: '/auth/logout'
-      path: '/auth/logout'
-      fullPath: '/auth/logout'
+    '/_auth/logout': {
+      id: '/_auth/logout'
+      path: '/logout'
+      fullPath: '/logout'
       preLoaderRoute: typeof AuthLogoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }

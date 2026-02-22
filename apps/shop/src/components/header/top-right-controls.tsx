@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -12,17 +12,39 @@ import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
 import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
+const rootRoute = getRouteApi("__root__");
+
+function AccountIcon() {
+  return (
+    <>
+      <User className="h-6 w-6" strokeWidth={1.5} />
+      <span className="sr-only">Account</span>
+    </>
+  );
+}
+
 export function TopRightControls() {
+  const isSignedIn = rootRoute.useRouteContext({
+    select: (context) => context.auth.isSignedIn,
+  });
+
+  const loginHref = `/login?returnTo=${encodeURIComponent("/settings/account")}`;
+
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
-      <Link
-        to="/settings/account"
-        className="hover:text-primary transition-colors"
-        preload={false}
-      >
-        <User className="h-6 w-6" strokeWidth={1.5} />
-        <span className="sr-only">Account</span>
-      </Link>
+      {isSignedIn ? (
+        <Link
+          to="/settings/account"
+          className="hover:text-primary transition-colors"
+          preload={false}
+        >
+          <AccountIcon />
+        </Link>
+      ) : (
+        <a href={loginHref} className="hover:text-primary transition-colors">
+          <AccountIcon />
+        </a>
+      )}
       <button
         type="button"
         className="hover:text-primary relative flex items-center transition-colors"

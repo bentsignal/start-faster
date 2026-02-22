@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { env } from "~/env";
 import { createCustomerLogin } from "~/lib/auth";
 
-export const Route = createFileRoute("/auth/login")({
+export const Route = createFileRoute("/_auth/login")({
   server: {
     handlers: {
       GET: ({ request }) => {

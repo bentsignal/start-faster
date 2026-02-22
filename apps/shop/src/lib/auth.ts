@@ -12,10 +12,17 @@ export interface ShopifyCustomerIdentity {
   name: string | null;
 }
 
-export interface ShopifyCustomerAuthState {
-  isSignedIn: boolean;
-  customer: ShopifyCustomerIdentity | null;
-}
+export type ShopifyCustomerAuthState =
+  | {
+      isSignedIn: false;
+      accessToken: null;
+      customer: null;
+    }
+  | {
+      isSignedIn: true;
+      accessToken: string;
+      customer: ShopifyCustomerIdentity;
+    };
 
 interface CustomerOAuthState {
   state: string;
@@ -345,6 +352,7 @@ export function getShopifyCustomerAuthState(): ShopifyCustomerAuthState {
   if (!session) {
     return {
       isSignedIn: false,
+      accessToken: null,
       customer: null,
     };
   }
@@ -352,11 +360,21 @@ export function getShopifyCustomerAuthState(): ShopifyCustomerAuthState {
     clearCustomerSession();
     return {
       isSignedIn: false,
+      accessToken: null,
+      customer: null,
+    };
+  }
+  if (!session.customer) {
+    clearCustomerSession();
+    return {
+      isSignedIn: false,
+      accessToken: null,
       customer: null,
     };
   }
   return {
     isSignedIn: true,
+    accessToken: session.accessToken,
     customer: session.customer,
   };
 }
