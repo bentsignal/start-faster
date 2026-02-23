@@ -1,130 +1,151 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 
-## Project Overview
+## Repository Summary
 
-This is a **Turborepo monorepo** containing a TanStack Start storefront app for a shopify backend.
+- Monorepo managed with Turborepo + pnpm workspaces.
+- Main app: `apps/shop` (TanStack Start + React 19 + Tailwind v4).
+- Shared packages: `packages/shopify`, `packages/ui`.
+- Shared tooling: `tooling/eslint`, `tooling/prettier`, `tooling/typescript`.
+- React Compiler is enabled; avoid manual `useMemo`/`useCallback` unless clearly needed.
 
-## Key Tech Stack
+## Environment and Package Manager
 
-- React 19 (react compiler enabled)
-- TanStack Start (Vite + TanStack Router) for web
-- Tailwind CSS v4
-- Shopify Storefront API
-- Shopify Customer Account OAuth
-- Rostra for state management
+- Node: `>=22.12.0`
+- pnpm: `9.15.4`
+- Package manager command prefix: `pnpm`
 
-**_IMPORTANT_** Since the react compiler is enabled, you usually don't need to manually memoize components with useMemo and functions with useCallback.
+## High-Signal Commands
 
-## Commands
+### Monorepo-wide
 
-This project uses pnpm for package management.
+- Build all: `pnpm build`
+- Lint all: `pnpm lint`
+- Lint all (fix): `pnpm lint:fix`
+- Typecheck all: `pnpm typecheck`
+- Format check all: `pnpm format`
+- Format all (write): `pnpm format:fix`
+- Workspace dependency policy check: `pnpm lint:ws`
 
-```bash
-# Development
-pnpm dev                # Run all apps in watch mode, you should ***NEVER*** do this without asking the user, since the dev server is usually already running
+### Scoped by workspace/package
 
-# Code quality
-pnpm lint               # Lint all packages
-pnpm lint:fix           # Lint and fix
-pnpm format             # Check formatting
-pnpm format:fix         # Fix formatting
-pnpm typecheck          # TypeScript check across monorepo
+- Run any script in one package: `pnpm --filter <pkg> run <script>`
+- Build only shop app: `pnpm --filter @acme/shop run build`
+- Lint only shop app: `pnpm --filter @acme/shop run lint`
+- Typecheck only shop app: `pnpm --filter @acme/shop run typecheck`
+- Build Shopify package (also runs GraphQL codegen): `pnpm --filter @acme/shopify run build`
+- Lint UI package: `pnpm --filter @acme/ui run lint`
 
-# Adding components
-pnpm ui-add             # Interactive shadcn/ui component installer, components from here can be used in the web app, but NOT in the expo react native app
+### Development / preview
 
-```
+- Full repo dev watch: `pnpm dev`
+- Important: do not start `pnpm dev` unless explicitly asked (a dev server may already be running).
+- Shop app only dev: `pnpm --filter @acme/shop run dev`
+- Shop app preview: `pnpm --filter @acme/shop run preview`
 
-To run a command for a specific app or package, use `--filter <target-name>`
+## Required Validation After Changes
 
-### Examples
+Choose based on change type:
 
-- Installing a dependency in the shop app: `pnpm i zustand --filter @acme/shop`
-- Running lint on the Shopify package: `pnpm run lint --filter @acme/shopify`
+- Most code changes: `pnpm lint` and `pnpm typecheck`
+- Code or markdown edits: `pnpm format:fix`. Run this last after lint and typecheck
+- Shopify GraphQL operation changes: `pnpm --filter @acme/shopify run build`
 
-Below are some commands you should run after making changes for the user. You don't have to run all of them every time, it depends on the types of changes you make.
+Before finishing, report what you ran and whether it passed.
 
-1. `pnpm run lint`: If you make changes to pretty much any file, you should make sure linting is still passing.
-2. `pnpm run typecheck`: If you make any changes to typescript files, make sure to run this.
-3. `pnpm run format:fix`: If you make changes to any code or .md files, you should run this to make sure the changes are formatted properly.
+## Code Style and Conventions
 
-Make sure that any commands you choose to run are passing before completing your work.
+### Formatting
 
-## Directory structure
+- Prettier is authoritative (`@acme/prettier-config`).
+- Use trailing commas and semicolons as formatted by Prettier.
+- Tailwind class sorting is automatic (`prettier-plugin-tailwindcss`).
+- Do not hand-sort imports; import sorting is automated by Prettier plugin.
 
-```text
-.github
-  └─ workflows
-        └─ CI with pnpm cache setup
-.vscode
-  └─ Recommended extensions and settings for VSCode users
-apps
-  └─ shop
-      ├─ TanStack Start (Vite + TanStack Router)
-      ├─ React 19 (react compiler enabled)
-      └─ Tailwind CSS v4
-packages
-  ├─ shopify
-  │   └─ Shared Shopify GraphQL operations and generated types.
-  └─ ui
-      └─ Components from shadcn registries.
-tooling
-  ├─ eslint
-  │   └─ shared, fine-grained, eslint presets
-  ├─ prettier
-  │   └─ shared prettier configuration
-  ├─ tailwind
-  │   └─ shared tailwind theme and configuration
-  └─ typescript
-      └─ shared tsconfig you can extend from
-```
+### Imports
 
-### UI
+- Prefer `import type` for type-only imports.
+- Keep import groups in configured order:
+  1. type imports
+  2. React / TanStack / third-party
+  3. `@acme/*`
+  4. app alias imports (`~/...`)
+  5. relative imports (`../`, `./`)
+- In `apps/shop`, prefer `~/` alias over deep relative paths.
+- In shared packages, use local relative paths unless exporting across packages.
 
-ShadCN components are stored in the UI package found at `packages/ui`
+### TypeScript
 
-Usage in apps:
+- `strict` mode is on; keep code fully type-safe.
+- Avoid `any`; avoid `unknown` + narrowing as well.
+- Avoid non-null assertions (`!`); lint disallows them.
+- Handle optional/nullable values explicitly (no unsafe assumptions).
+- Use discriminated unions for state where appropriate (existing auth code is a good model).
 
-```tsx
-import { Button } from "@acme/ui";
-```
+### React / UI
 
-### Shopify Data Layer (packages/shopify)
+- Function components + hooks, no class components.
+- Do not over-memoize; React Compiler is enabled.
+- Keep components focused and composable; extract logic into hooks/stores when it grows.
+- Use shared UI from `@acme/ui` before creating one-off primitives.
+- Use `cn() from `@acme/ui` to merge classnames when necessary.
 
-Uses **Shopify Storefront API** with shared GraphQL operations and generated types.
+### State Management
 
-- `src/product/get-product.ts` - Product-by-handle query.
-- `src/product/get-products-by-collection.ts` - Collection products query.
-- `src/generated/` - Generated Shopify schema/types. Do not edit generated files manually.
+- Repo uses Rostra (`createStore`) patterns.
+- Store pattern to follow:
+  - internal hook function (`useInternalStore`)
+  - exported `Store` provider + `useStore` hook alias
+- Keep store state serializable unless refs are required (see search store input ref).
 
-API usage in apps:
+### Naming and File Conventions
 
-```typescript
-import { getProduct } from "@acme/shopify/product";
+- Files: kebab-case (for example `top-right-controls.tsx`, `get-product.ts`).
+- React components: PascalCase function names.
+- Hooks: `use-*.ts` filenames and `useXxx` function names.
+- Route files follow TanStack Start conventions (e.g. `__root.tsx`, `$item.tsx`, `_authenticated.tsx`).
+- Prefer clear, domain-based names over generic names like `data`/`utils`.
 
-import { shopify } from "~/lib/shopify";
+### Error Handling and Control Flow
 
-const response = await shopify.request(getProduct, {
-  variables: { handle: "my-product-handle" },
-});
-```
-
-After making changes in to the graphQL queries in the shopify package, you will need to run the following command to generate new types: `pnpm run build --filter @acme/shopify`.
-
-### Authentication
-
-Uses Shopify Customer Account OAuth flow:
-
-- **Server auth utilities**: `apps/shop/src/lib/auth.ts`
-- **Auth routes**: `apps/shop/src/app/auth/login.ts`, `apps/shop/src/app/callback.ts`, `apps/shop/src/app/auth/logout.ts`
-
-Auth should typically be handled through the Auth Store.
+- Prefer early returns to reduce nesting.
+- Throw `Error` objects (or subclasses) when throwing is required.
+- Do not swallow errors silently; either handle with fallback or rethrow with context.
+- Validate external inputs (URL params, env, API payloads) before use.
+- Preserve secure defaults (for auth/cookies/redirects, follow existing `apps/shop/src/lib/auth.ts`).
 
 ### Environment Variables
 
-Shop and Shopify workflows depend on environment variables defined in:
+- Never access `process.env` directly in app/package runtime code.
+- Use validated env from `apps/shop/src/env.ts` (`import { env } from "~/env"`).
+- ESLint enforces restricted env access outside `env.ts`.
 
-- Shop app runtime/env validation: `./apps/shop/src/env.ts`
-- Shopify codegen and package scripts: `./packages/shopify/.graphqlrc.ts` and `./packages/shopify/package.json`
+### Generated Files
+
+- Do not manually edit generated artifacts:
+  - `apps/shop/src/routeTree.gen.ts`
+  - `packages/shopify/src/storefront/_generated/**`
+  - `packages/shopify/src/customer/_generated/**`
+- Regenerate via scripts when source inputs change.
+
+## Directory Map
+
+- `apps/shop`: storefront app (TanStack Start).
+- `packages/shopify`: Shopify GraphQL operations + generated types.
+- `packages/ui`: shared UI components.
+- `tooling/eslint`: flat ESLint configs (`base`, `react`, `nextjs`).
+- `tooling/prettier`: shared Prettier config + import order rules.
+- `tooling/typescript`: base and compiled package tsconfig presets.
+
+## Agent Operating Rules
+
+- Prefer minimal, targeted changes.
+- Respect existing architecture and naming before introducing new patterns.
+- Avoid editing unrelated files.
+- If you touch TypeScript or TSX, run typecheck, lint, and format:fix for affected scope.
+- If you change GraphQL queries in `packages/shopify`, run package build/codegen.
+
+## Rules and Skills
+
+- Skills can be found in `.agents/skills`
