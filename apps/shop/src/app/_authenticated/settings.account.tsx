@@ -7,13 +7,11 @@ export const Route = createFileRoute("/_authenticated/settings/account")({
 });
 
 function RouteComponent() {
-  const customer = Route.useRouteContext({
-    select: (context) => context.customer,
-  });
+  const context = Route.useRouteContext();
+  console.log(context);
   return (
     <div className="flex h-screen flex-col items-center justify-center">
       Hello "/settings/account"!
-      {customer.email}
       <form method="post" action="/logout">
         <input type="hidden" name="returnTo" value="/" />
         <Button type="submit">Logout</Button>

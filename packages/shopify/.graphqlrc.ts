@@ -1,9 +1,23 @@
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import type { IGraphQLConfig } from "graphql-config";
-import { ApiType, shopifyApiProject } from "@shopify/api-codegen-preset";
+import {
+  ApiType,
+  pluckConfig,
+  preset,
+  shopifyApiProject,
+} from "@shopify/api-codegen-preset";
 
-const storefrontTypesOutputPath = "./src/generated/storefront.types.d.ts";
+import { API_VERSION } from "./src";
 
-const storefrontScalarMappings = {
+const storefrontTypesOutputPath =
+  "./src/storefront/_generated/storefront.types.d.ts";
+const customerTypesOutputPath = "./src/customer/_generated/customer.types.d.ts";
+const customerSchemaOutputPath = `./src/customer/_generated/customer-${API_VERSION}.schema.json`;
+const customerGeneratedOutputPath =
+  "./src/customer/_generated/customer.generated.d.ts";
+
+const scalars = {
   Color: "string",
   DateTime: "string",
   Decimal: "number",
@@ -16,10 +30,18 @@ const storefrontScalarMappings = {
 
 const storefrontProject = shopifyApiProject({
   apiType: ApiType.Storefront,
-  apiVersion: "2025-10",
-  documents: ["./src/**/*.{ts,tsx}"],
-  outputDir: "./src/generated",
+  apiVersion: API_VERSION,
+  documents: ["./src/storefront/**/*.{ts,tsx}"],
+  outputDir: "./src/storefront/_generated",
 });
+const storefrontTypesOutput =
+  storefrontProject.extensions?.codegen?.generates?.[storefrontTypesOutputPath];
+
+const require = createRequire(import.meta.url);
+const customerSchemaPath = join(
+  dirname(require.resolve("@shopify/hydrogen")),
+  "customer-account.schema.json",
+);
 
 type CodegenOutputConfig = {
   config?: {
@@ -28,12 +50,9 @@ type CodegenOutputConfig = {
   };
 };
 
-const storefrontTypesOutput =
-  storefrontProject.extensions?.codegen?.generates?.[storefrontTypesOutputPath];
-
 const config: IGraphQLConfig = {
   projects: {
-    default: {
+    storefront: {
       ...storefrontProject,
       extensions: {
         ...storefrontProject.extensions,
@@ -46,8 +65,41 @@ const config: IGraphQLConfig = {
               config: {
                 ...(storefrontTypesOutput as CodegenOutputConfig)?.config,
                 defaultScalarType: "unknown",
-                scalars: storefrontScalarMappings,
+                scalars: scalars,
               },
+            },
+          },
+        },
+      },
+    },
+    customer: {
+      schema: customerSchemaPath,
+      documents: ["./src/customer/**/*.{ts,tsx}"],
+      extensions: {
+        codegen: {
+          pluckConfig,
+          generates: {
+            [customerSchemaOutputPath]: {
+              schema: customerSchemaPath,
+              plugins: ["introspection"],
+              config: {
+                minify: true,
+              },
+            },
+            [customerTypesOutputPath]: {
+              plugins: ["typescript"],
+              config: {
+                defaultScalarType: "unknown",
+                scalars: scalars,
+              },
+            },
+            [customerGeneratedOutputPath]: {
+              preset,
+              presetConfig: {
+                apiType: ApiType.Customer,
+              },
+              schema: customerSchemaPath,
+              documents: ["./src/customer/**/*.{ts,tsx}"],
             },
           },
         },

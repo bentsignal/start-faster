@@ -8,5 +8,9 @@
     }
   },
   "include": [".graphqlrc.ts", "*.ts", "src"],
-  "exclude": ["node_modules", "src/generated/**"]
+  "exclude": [
+    "node_modules",
+    "src/storefront/_generated/**",
+    "src/customer/_generated/**"
+  ]
 }

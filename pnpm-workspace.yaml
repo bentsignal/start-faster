@@ -5,6 +5,7 @@ packages:
 
 catalog:
   "@eslint/js": ^9.38.0
+  "@shopify/hydrogen": ^2026.1.0
   "@shopify/storefront-api-client": ^1.0.9
   "@tailwindcss/postcss": ^4.1.16
   "@tailwindcss/vite": ^4.1.16

@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { env } from "~/env";
-import { createCustomerLogin, isTrustedCustomerAuthRequest } from "~/lib/auth";
+import {
+  appendPendingSessionCookie,
+  createHydrogenCustomerAuthContext,
+  isTrustedCustomerAuthRequest,
+} from "~/lib/auth";
 
 export const Route = createFileRoute("/_auth/login")({
   server: {
@@ -24,19 +28,13 @@ export const Route = createFileRoute("/_auth/login")({
           typeof formData.get("returnTo") === "string"
             ? (formData.get("returnTo") as string)
             : "/";
-
-        const { authorizeUrl, oauthCookie } = createCustomerLogin({
-          request,
-          returnTo,
-        });
-
-        return new Response(null, {
-          status: 302,
-          headers: new Headers({
-            location: authorizeUrl,
-            "set-cookie": oauthCookie,
-          }),
-        });
+        const { customerAccount, session } =
+          await createHydrogenCustomerAuthContext({
+            request,
+            returnTo,
+          });
+        const response = await customerAccount.login();
+        return appendPendingSessionCookie(response, session);
       },
     },
   },

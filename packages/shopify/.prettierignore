@@ -1,1 +1,3 @@
-src/generated/**
+src/storefront/_generated/**
+src/customer/_generated/**
+dist/**

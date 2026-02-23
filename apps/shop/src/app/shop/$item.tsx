@@ -2,8 +2,8 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod/v4";
 
-import type { ProductByHandleQueryVariables } from "@acme/shopify/generated";
-import { getProduct } from "@acme/shopify/product";
+import type { ProductByHandleQueryVariables } from "@acme/shopify/storefront/generated";
+import { getProduct } from "@acme/shopify/storefront/product";
 
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
 import { ProductImageGallery } from "~/features/product/components/product-image-gallery";

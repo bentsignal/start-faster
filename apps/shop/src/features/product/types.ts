@@ -1,4 +1,4 @@
-import type { ProductByHandleQuery } from "@acme/shopify/generated";
+import type { ProductByHandleQuery } from "@acme/shopify/storefront/generated";
 
 export type Product = NonNullable<ProductByHandleQuery["product"]>;
 

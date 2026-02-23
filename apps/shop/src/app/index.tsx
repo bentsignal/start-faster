@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-import type { GetQueryVariables } from "@acme/shopify/generated";
-import { getProductsByCollection } from "@acme/shopify/product";
+import type { GetQueryVariables } from "@acme/shopify/storefront/generated";
+import { getProductsByCollection } from "@acme/shopify/storefront/product";
 
 import { shopify } from "~/lib/shopify";
 
