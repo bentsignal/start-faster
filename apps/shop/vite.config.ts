@@ -6,15 +6,18 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig(async () => {
-  await import("./src/env");
+export default defineConfig(async ({ mode }) => {
+  const { env } = await import("./src/env");
+  const isDevelopment =
+    mode === "development" || env.VITE_NODE_ENV === "development";
+
   return {
     server: {
       port: 3000,
       host: true,
       allowedHosts:
-        process.env.NODE_ENV === "development"
-          ? ["unshapeable-mortally-gracia.ngrok-free.dev"]
+        isDevelopment && env.VITE_DEV_ALLOWED_HOST
+          ? [env.VITE_DEV_ALLOWED_HOST]
           : undefined,
     },
     plugins: [

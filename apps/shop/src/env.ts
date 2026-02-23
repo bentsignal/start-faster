@@ -24,6 +24,7 @@ export const env = createEnv({
   },
   client: {
     VITE_NODE_ENV: z.enum(["development", "production"]).default("production"),
+    VITE_DEV_ALLOWED_HOST: z.string().optional(),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,
