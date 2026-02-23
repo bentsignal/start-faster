@@ -13,7 +13,6 @@ function RouteComponent() {
     <div className="flex h-screen flex-col items-center justify-center">
       Hello "/settings/account"!
       <form method="post" action="/logout">
-        <input type="hidden" name="returnTo" value="/" />
         <Button type="submit">Logout</Button>
       </form>
     </div>
