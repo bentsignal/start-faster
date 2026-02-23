@@ -11,7 +11,6 @@ const runtimeEnv =
 export const env = createEnv({
   clientPrefix: "VITE_",
   server: {
-    IMPORTANT_VARIABLE: z.string().min(1),
     SHOPIFY_STORE_DOMAIN: z.string().min(1),
     SHOPIFY_SHOP_ID: z.string().min(1),
     SHOPIFY_STOREFRONT_PRIVATE_TOKEN: z.string().min(1),
