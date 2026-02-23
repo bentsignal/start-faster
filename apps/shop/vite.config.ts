@@ -6,30 +6,33 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig({
-  server: {
-    port: 3000,
-    host: true,
-    allowedHosts:
-      process.env.NODE_ENV === "development"
-        ? ["unshapeable-mortally-gracia.ngrok-free.dev"]
-        : undefined,
-  },
-  plugins: [
-    devtools({
-      consolePiping: { enabled: false },
-    }),
-    tailwindcss(),
-    tsconfigPaths(),
-    tanstackStart({
-      srcDirectory: "src",
-      router: { routesDirectory: "app" },
-    }),
-    viteReact({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
-    }),
-    nitro(),
-  ],
+export default defineConfig(async () => {
+  await import("./src/env");
+  return {
+    server: {
+      port: 3000,
+      host: true,
+      allowedHosts:
+        process.env.NODE_ENV === "development"
+          ? ["unshapeable-mortally-gracia.ngrok-free.dev"]
+          : undefined,
+    },
+    plugins: [
+      devtools({
+        consolePiping: { enabled: false },
+      }),
+      tailwindcss(),
+      tsconfigPaths(),
+      tanstackStart({
+        srcDirectory: "src",
+        router: { routesDirectory: "app" },
+      }),
+      viteReact({
+        babel: {
+          plugins: ["babel-plugin-react-compiler"],
+        },
+      }),
+      nitro(),
+    ],
+  };
 });
