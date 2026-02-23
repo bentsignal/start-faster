@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import type { HydrogenSession } from "@shopify/hydrogen";
 import {
   clearSession,
@@ -58,42 +57,12 @@ function shouldUseSecureCookies(request: Request): boolean {
   return isSecureRequest(request);
 }
 
-function normalizeSessionPassword(value: string): string {
-  if (value.length >= 32) {
-    return value;
-  }
-  return createHash("sha256").update(value).digest("hex");
-}
-
-function getSessionPassword(): string {
-  const fallback = `${env.SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID}:${env.SHOPIFY_STORE_DOMAIN}`;
-  return normalizeSessionPassword(
-    env.SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET ?? fallback,
-  );
-}
-
-function resolveShopId(): string {
-  if (env.SHOPIFY_SHOP_ID) {
-    return env.SHOPIFY_SHOP_ID;
-  }
-  const endpoint = new URL(env.SHOPIFY_CUSTOMER_ACCOUNT_AUTHORIZATION_ENDPOINT);
-  const segments = endpoint.pathname.split("/").filter(Boolean);
-  const authIndex = segments.indexOf("authentication");
-  if (authIndex >= 0) {
-    const next = segments[authIndex + 1];
-    if (next) {
-      return next;
-    }
-  }
-  throw new Error("Unable to resolve Shopify shop id.");
-}
-
 async function createHydrogenSessionAdapter(
   request: Request,
 ): Promise<SessionAdapter> {
   const config = {
     name: "shopify_customer_session",
-    password: getSessionPassword(),
+    password: env.SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET,
     maxAge: 60 * 60 * 24 * 30,
     cookie: {
       httpOnly: true,
@@ -166,7 +135,7 @@ export async function createHydrogenCustomerAuthContext(params: {
     request: requestForAuth,
     session: session as unknown as HydrogenSession,
     customerAccountId: env.SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID,
-    shopId: resolveShopId(),
+    shopId: env.SHOPIFY_SHOP_ID,
     loginPath: "/login",
     authorizePath: "/callback",
     defaultRedirectPath: "/",
@@ -271,7 +240,6 @@ export async function getShopifyCustomerAuthState(): Promise<ShopifyCustomerAuth
       customer: null,
     };
   }
-
   const result = (await customerAccount.query(getCustomerIdentity)) as {
     data?: GetCustomerIdentityQuery | null;
   };
