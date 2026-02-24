@@ -5,6 +5,10 @@ export const getProduct = `#graphql
       title
       handle
       description
+      options {
+        name
+        values
+      }
       images(first: 50) {
         nodes {
           id
@@ -22,6 +26,21 @@ export const getProduct = `#graphql
         minVariantPrice {
           amount
           currencyCode
+        }
+      }
+      variants(first: 100) {
+        nodes {
+          id
+          title
+          availableForSale
+          price {
+            amount
+            currencyCode
+          }
+          selectedOptions {
+            name
+            value
+          }
         }
       }
     }

@@ -7,17 +7,12 @@ import {
   CarouselItem,
 } from "@acme/ui/carousel";
 
-import type { ProductGalleryImage } from "~/features/product/types";
+import type { ProductGalleryImage } from "../types";
+import { useProductStore } from "~/features/product/store";
 
-interface ProductImageGalleryMobileProps {
-  images: ProductGalleryImage[];
-  productTitle: string;
-}
+export function ProductImageGalleryMobile() {
+  const images = useProductStore((store) => store.galleryImages);
 
-export function ProductImageGalleryMobile({
-  images,
-  productTitle,
-}: ProductImageGalleryMobileProps) {
   if (images.length === 0) {
     return <div className="bg-muted h-[min(75vh,640px)] w-full lg:hidden" />;
   }
@@ -27,21 +22,35 @@ export function ProductImageGalleryMobile({
       <Carousel>
         <CarouselContent className="ml-0">
           {images.map((image, index) => (
-            <CarouselItem key={image.id} className="pl-0">
-              <div className="bg-muted/40 aspect-square w-full overflow-hidden">
-                <Image
-                  src={image.url}
-                  alt={image.altText ?? `${productTitle} image ${index + 1}`}
-                  width={image.width ?? 1200}
-                  height={image.height ?? 1200}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-            </CarouselItem>
+            <MobileImageSlide key={image.id} image={image} index={index} />
           ))}
         </CarouselContent>
         <CarouselDots className="mt-5" fallbackDotCount={images.length} />
       </Carousel>
     </div>
+  );
+}
+
+function MobileImageSlide({
+  image,
+  index,
+}: {
+  image: ProductGalleryImage;
+  index: number;
+}) {
+  const productTitle = useProductStore((store) => store.product.title);
+
+  return (
+    <CarouselItem className="pl-0">
+      <div className="bg-muted/40 aspect-square w-full overflow-hidden">
+        <Image
+          src={image.url}
+          alt={image.altText ?? `${productTitle} image ${index + 1}`}
+          width={image.width ?? 1200}
+          height={image.height ?? 1200}
+          className="h-full w-full object-contain"
+        />
+      </div>
+    </CarouselItem>
   );
 }
