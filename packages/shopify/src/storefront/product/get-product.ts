@@ -33,6 +33,13 @@ export const getProduct = `#graphql
           id
           title
           availableForSale
+          image {
+            id
+            url
+            altText
+            width
+            height
+          }
           price {
             amount
             currencyCode

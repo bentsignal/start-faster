@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { createStore } from "rostra";
 
 import type { Product } from "./types";
-import { getProductGalleryImages } from "~/features/product/lib/gallery-images";
+import {
+  getProductGalleryImages,
+  getVariantImageIndex,
+} from "~/features/product/lib/gallery-images";
 
 interface ProductStoreProps {
   handle: string;
   product: Product;
   initialVariantId?: string;
+  initialVariantImageFocusMode: "reorder" | "scroll";
   onVariantIdChange: (variantId: string) => void;
 }
 
@@ -63,11 +67,17 @@ function useInternalStore({
   handle,
   product,
   initialVariantId,
+  initialVariantImageFocusMode,
   onVariantIdChange,
 }: ProductStoreProps) {
+  const [initialVariantIdOnLoad] = useState(initialVariantId);
   const [selectedVariantId, setSelectedVariantId] = useState<
     string | undefined
   >(initialVariantId);
+  const [variantImageScrollRequest, setVariantImageScrollRequest] = useState<{
+    id: number;
+    variantId: string;
+  } | null>(null);
 
   useEffect(() => {
     setSelectedVariantId(initialVariantId);
@@ -95,11 +105,73 @@ function useInternalStore({
     [selectedPrice.amount, selectedPrice.currencyCode],
   );
 
-  const galleryImages = useMemo(
+  const baseGalleryImages = useMemo(
     () => getProductGalleryImages(product),
     [product],
   );
+  const galleryImages = useMemo(() => {
+    if (
+      initialVariantIdOnLoad === undefined ||
+      initialVariantImageFocusMode === "scroll"
+    ) {
+      return baseGalleryImages;
+    }
+
+    const initialVariant =
+      variants.find((variant) => variant.id === initialVariantIdOnLoad) ?? null;
+    const variantImageIndex = getVariantImageIndex({
+      images: baseGalleryImages,
+      variant: initialVariant,
+    });
+
+    if (variantImageIndex === null || variantImageIndex === 0) {
+      return baseGalleryImages;
+    }
+
+    const variantImage = baseGalleryImages[variantImageIndex];
+
+    if (variantImage === undefined) {
+      return baseGalleryImages;
+    }
+
+    return [
+      variantImage,
+      ...baseGalleryImages.filter((_, index) => index !== variantImageIndex),
+    ];
+  }, [
+    baseGalleryImages,
+    initialVariantIdOnLoad,
+    initialVariantImageFocusMode,
+    variants,
+  ]);
   const options = useMemo(() => getOrderedProductOptions(product), [product]);
+  const selectedVariantImageIndex = useMemo(
+    () =>
+      getVariantImageIndex({ images: galleryImages, variant: selectedVariant }),
+    [galleryImages, selectedVariant],
+  );
+  const variantImageScrollIndex = useMemo(() => {
+    if (variantImageScrollRequest === null) {
+      return null;
+    }
+
+    const targetVariant =
+      variants.find(
+        (variant) => variant.id === variantImageScrollRequest.variantId,
+      ) ?? null;
+
+    return getVariantImageIndex({
+      images: galleryImages,
+      variant: targetVariant,
+    });
+  }, [galleryImages, variantImageScrollRequest, variants]);
+
+  function requestVariantImageScroll(variantId: string) {
+    setVariantImageScrollRequest((previousRequest) => ({
+      id: (previousRequest?.id ?? 0) + 1,
+      variantId,
+    }));
+  }
 
   function setVariantById(variantId: string) {
     const nextVariant = variants.find((variant) => variant.id === variantId);
@@ -109,6 +181,11 @@ function useInternalStore({
     }
 
     setSelectedVariantId(nextVariant.id);
+
+    if (nextVariant.id !== selectedVariant?.id) {
+      requestVariantImageScroll(nextVariant.id);
+    }
+
     onVariantIdChange(nextVariant.id);
   }
 
@@ -130,6 +207,11 @@ function useInternalStore({
       ) ?? selectedVariant;
 
     setSelectedVariantId(nextVariant.id);
+
+    if (nextVariant.id !== selectedVariant.id) {
+      requestVariantImageScroll(nextVariant.id);
+    }
+
     onVariantIdChange(nextVariant.id);
   }
 
@@ -138,9 +220,13 @@ function useInternalStore({
     product,
     options,
     galleryImages,
+    selectedVariantImageIndex,
     price,
     selectedVariant,
     selectedOptions,
+    variantImageScrollIndex,
+    variantImageScrollRequestId: variantImageScrollRequest?.id ?? 0,
+    initialVariantImageFocusMode,
     selectOption,
     setVariantById,
   };

@@ -31,3 +31,67 @@ export function getProductGalleryImages(
 
   return [];
 }
+
+function normalizeToken(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function getVariantImageMatchTokens(
+  productVariant: Product["variants"]["nodes"][number],
+) {
+  const colorOption = productVariant.selectedOptions.find((selectedOption) =>
+    selectedOption.name.toLowerCase().includes("color"),
+  );
+  const colorToken = colorOption ? normalizeToken(colorOption.value) : null;
+
+  if (colorToken) {
+    return [colorToken];
+  }
+
+  const fallbackTokens = productVariant.selectedOptions
+    .map((selectedOption) => normalizeToken(selectedOption.value))
+    .filter((token) => token.length >= 3);
+
+  return fallbackTokens.length > 0
+    ? fallbackTokens
+    : [normalizeToken(productVariant.title)];
+}
+
+export function getVariantImageIndex({
+  images,
+  variant,
+}: {
+  images: ProductGalleryImage[];
+  variant: Product["variants"]["nodes"][number] | null;
+}) {
+  if (variant === null) {
+    return null;
+  }
+
+  if (variant.image) {
+    const variantImageIndex = images.findIndex((image) => {
+      if (image.id === variant.image?.id) {
+        return true;
+      }
+
+      return image.url === variant.image?.url;
+    });
+
+    if (variantImageIndex >= 0) {
+      return variantImageIndex;
+    }
+  }
+
+  const matchTokens = getVariantImageMatchTokens(variant);
+
+  for (const [index, image] of images.entries()) {
+    const searchableText = `${image.altText ?? ""} ${image.url}`.toLowerCase();
+    const isMatch = matchTokens.some((token) => searchableText.includes(token));
+
+    if (isMatch) {
+      return index;
+    }
+  }
+
+  return null;
+}

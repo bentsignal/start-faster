@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseDesktopProductImageGalleryOptions {
   imageCount: number;
@@ -158,11 +158,14 @@ export function useDesktopProductImageGallery({
     };
   }, [imageCount]);
 
-  function setImageSectionRef(index: number, section: HTMLElement | null) {
-    imageSectionsRef.current[index] = section;
-  }
+  const setImageSectionRef = useCallback(
+    (index: number, section: HTMLElement | null) => {
+      imageSectionsRef.current[index] = section;
+    },
+    [],
+  );
 
-  function scrollToImage(index: number) {
+  const scrollToImage = useCallback((index: number) => {
     const targetImage = imageSectionsRef.current[index];
 
     if (!targetImage) {
@@ -189,7 +192,7 @@ export function useDesktopProductImageGallery({
       top: Math.max(scrollTop - 100, 0),
       behavior: "smooth",
     });
-  }
+  }, []);
 
   return {
     visibleActiveImageIndex,

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
@@ -8,8 +9,45 @@ import { useProductStore } from "~/features/product/store";
 
 export function ProductImageGalleryDesktop() {
   const images = useProductStore((store) => store.galleryImages);
+  const selectedVariantImageIndex = useProductStore(
+    (store) => store.selectedVariantImageIndex,
+  );
+  const variantImageScrollIndex = useProductStore(
+    (store) => store.variantImageScrollIndex,
+  );
+  const variantImageScrollRequestId = useProductStore(
+    (store) => store.variantImageScrollRequestId,
+  );
+  const initialVariantImageFocusMode = useProductStore(
+    (store) => store.initialVariantImageFocusMode,
+  );
   const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
     useDesktopProductImageGallery({ imageCount: images.length });
+  const hasAutoFocusedSelectedVariantImageRef = useRef(false);
+
+  useEffect(() => {
+    if (hasAutoFocusedSelectedVariantImageRef.current) {
+      return;
+    }
+
+    hasAutoFocusedSelectedVariantImageRef.current = true;
+
+    if (
+      initialVariantImageFocusMode === "scroll" &&
+      selectedVariantImageIndex !== null &&
+      selectedVariantImageIndex > 0
+    ) {
+      scrollToImage(selectedVariantImageIndex);
+    }
+  }, [initialVariantImageFocusMode, scrollToImage, selectedVariantImageIndex]);
+
+  useEffect(() => {
+    if (variantImageScrollRequestId === 0 || variantImageScrollIndex === null) {
+      return;
+    }
+
+    scrollToImage(variantImageScrollIndex);
+  }, [scrollToImage, variantImageScrollIndex, variantImageScrollRequestId]);
 
   if (images.length === 0) {
     return (
