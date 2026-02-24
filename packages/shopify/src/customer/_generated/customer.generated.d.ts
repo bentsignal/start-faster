@@ -17,8 +17,8 @@ interface GeneratedQueryTypes {
 
 interface GeneratedMutationTypes {
 }
-declare module '@shopify/customer-api-client' {
-  type InputMaybe<T> = CustomerTypes.InputMaybe<T>;
-  interface CustomerQueries extends GeneratedQueryTypes {}
-  interface CustomerMutations extends GeneratedMutationTypes {}
+
+declare module '@shopify/hydrogen' {
+  interface CustomerAccountQueries extends GeneratedQueryTypes {}
+  interface CustomerAccountMutations extends GeneratedMutationTypes {}
 }

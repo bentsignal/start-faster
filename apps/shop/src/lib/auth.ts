@@ -240,21 +240,11 @@ export async function getShopifyCustomerAuthState(): Promise<ShopifyCustomerAuth
       customer: null,
     };
   }
-  const result = (await customerAccount.query(getCustomerIdentity)) as {
-    data?: GetCustomerIdentityQuery | null;
-  };
-  const customer = result.data?.customer;
-  if (!customer) {
-    return {
-      isSignedIn: false,
-      accessToken: null,
-      customer: null,
-    };
-  }
+  const { data } = await customerAccount.query(getCustomerIdentity);
 
   return {
     isSignedIn: true,
     accessToken,
-    customer: toIdentity(customer),
+    customer: toIdentity(data.customer),
   };
 }

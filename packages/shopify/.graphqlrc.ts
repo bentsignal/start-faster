@@ -1,19 +1,16 @@
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
 import type { IGraphQLConfig } from "graphql-config";
+import { ApiType, shopifyApiProject } from "@shopify/api-codegen-preset";
 import {
-  ApiType,
+  getSchema,
+  preset as hydrogenPreset,
   pluckConfig,
-  preset,
-  shopifyApiProject,
-} from "@shopify/api-codegen-preset";
+} from "@shopify/hydrogen-codegen";
 
 import { API_VERSION } from "./src";
 
 const storefrontTypesOutputPath =
   "./src/storefront/_generated/storefront.types.d.ts";
 const customerTypesOutputPath = "./src/customer/_generated/customer.types.d.ts";
-const customerSchemaOutputPath = `./src/customer/_generated/customer-${API_VERSION}.schema.json`;
 const customerGeneratedOutputPath =
   "./src/customer/_generated/customer.generated.d.ts";
 
@@ -37,12 +34,6 @@ const storefrontProject = shopifyApiProject({
 const storefrontTypesOutput =
   storefrontProject.extensions?.codegen?.generates?.[storefrontTypesOutputPath];
 
-const require = createRequire(import.meta.url);
-const customerSchemaPath = join(
-  dirname(require.resolve("@shopify/hydrogen")),
-  "customer-account.schema.json",
-);
-
 type CodegenOutputConfig = {
   config?: {
     defaultScalarType?: string;
@@ -54,6 +45,7 @@ const config: IGraphQLConfig = {
   projects: {
     storefront: {
       ...storefrontProject,
+      schema: getSchema("storefront"),
       extensions: {
         ...storefrontProject.extensions,
         codegen: {
@@ -73,19 +65,12 @@ const config: IGraphQLConfig = {
       },
     },
     customer: {
-      schema: customerSchemaPath,
+      schema: getSchema("customer-account"),
       documents: ["./src/customer/**/*.{ts,tsx}"],
       extensions: {
         codegen: {
           pluckConfig,
           generates: {
-            [customerSchemaOutputPath]: {
-              schema: customerSchemaPath,
-              plugins: ["introspection"],
-              config: {
-                minify: true,
-              },
-            },
             [customerTypesOutputPath]: {
               plugins: ["typescript"],
               config: {
@@ -94,11 +79,13 @@ const config: IGraphQLConfig = {
               },
             },
             [customerGeneratedOutputPath]: {
-              preset,
+              preset: hydrogenPreset,
               presetConfig: {
-                apiType: ApiType.Customer,
+                importTypes: {
+                  namespace: "CustomerTypes",
+                  from: "./customer.types.d.ts",
+                },
               },
-              schema: customerSchemaPath,
               documents: ["./src/customer/**/*.{ts,tsx}"],
             },
           },

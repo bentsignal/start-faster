@@ -35,7 +35,7 @@
     "@acme/tsconfig": "workspace:*",
     "@graphql-codegen/cli": "^5.0.7",
     "@shopify/api-codegen-preset": "^1.2.0",
-    "@types/node": "^25.2.3",
+    "@types/node": "catalog:",
     "concurrently": "^9.2.1",
     "eslint": "catalog:",
     "graphql-config": "^5.1.5",
@@ -44,6 +44,7 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
+    "@shopify/hydrogen-codegen": "^0.3.3",
     "graphql": "^16.12.0"
   }
 }
