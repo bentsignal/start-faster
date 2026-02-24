@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
+  appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
   isTrustedCustomerAuthRequest,
 } from "~/lib/auth";
@@ -17,13 +18,15 @@ export const Route = createFileRoute("/_auth/logout")({
           "/",
           requestUrl.origin,
         ).toString();
-        const { customerAccount } = await createHydrogenCustomerAuthContext({
-          request,
-          returnTo: "/",
-        });
-        return customerAccount.logout({
+        const { customerAccount, session } =
+          await createHydrogenCustomerAuthContext({
+            request,
+            returnTo: "/",
+          });
+        const response = await customerAccount.logout({
           postLogoutRedirectUri,
         });
+        return appendPendingSessionCookie(response, session);
       },
     },
   },

@@ -5,13 +5,12 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ location, context }) => {
     if (context.auth.isSignedIn) {
       return {
-        accessToken: context.auth.accessToken,
         customer: context.auth.customer,
       };
     }
     throw redirect({
       to: "/",
-      search: { showLogin: true, returnTo: encodeURIComponent(location.href) },
+      search: { showLogin: true, returnTo: location.href },
     });
   },
 });

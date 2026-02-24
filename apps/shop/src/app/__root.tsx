@@ -63,7 +63,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       context.queryClient.fetchQuery({
         queryKey: ["shopify-auth"],
         queryFn: fetchShopifyAuth,
-        staleTime: convert(5, "minutes", "to ms"),
+        staleTime: convert(50, "minutes", "to ms"),
         gcTime: Infinity,
       }),
       context.queryClient.fetchQuery({

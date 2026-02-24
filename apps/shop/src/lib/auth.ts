@@ -13,36 +13,7 @@ import { getCustomerIdentity } from "@acme/shopify/customer/account";
 
 import { env } from "~/env";
 
-export interface ShopifyCustomerIdentity {
-  sub: string | null;
-  email: string | null;
-  name: string | null;
-}
-
-export type ShopifyCustomerAuthState =
-  | {
-      isSignedIn: false;
-      accessToken: null;
-      customer: null;
-    }
-  | {
-      isSignedIn: true;
-      accessToken: string;
-      customer: ShopifyCustomerIdentity;
-    };
-
-type SessionValue = Record<string, unknown>;
-
-interface SessionAdapter {
-  isPending: boolean;
-  get: (key: string) => unknown;
-  set: (key: string, value: unknown) => void;
-  unset: (key: string) => void;
-  commit: () => Promise<string>;
-  destroy: () => Promise<string>;
-}
-
-function isSecureRequest(request: Request): boolean {
+function isSecureRequest(request: Request) {
   const url = new URL(request.url);
   if (url.protocol === "https:") {
     return true;
@@ -50,7 +21,7 @@ function isSecureRequest(request: Request): boolean {
   return request.headers.get("x-forwarded-proto") === "https";
 }
 
-function shouldUseSecureCookies(request: Request): boolean {
+function shouldUseSecureCookies(request: Request) {
   if (env.VITE_NODE_ENV === "production") {
     return true;
   }
@@ -59,7 +30,7 @@ function shouldUseSecureCookies(request: Request): boolean {
 
 async function createHydrogenSessionAdapter(
   request: Request,
-): Promise<SessionAdapter> {
+): Promise<HydrogenSession> {
   const config = {
     name: "shopify_customer_session",
     password: env.SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET,
@@ -72,18 +43,18 @@ async function createHydrogenSessionAdapter(
     },
   } as const;
 
-  const session = await getSession<SessionValue>(config);
-  const data: SessionValue = { ...session.data };
+  const session = await getSession<Record<string, unknown>>(config);
+  const data = { ...session.data };
   let pending = false;
 
   return {
     get isPending() {
       return pending;
     },
-    set isPending(next: boolean) {
+    set isPending(next) {
       pending = next;
     },
-    get(key) {
+    get<Key extends string>(key: Key): ReturnType<HydrogenSession["get"]> {
       return data[key];
     },
     set(key, value) {
@@ -104,10 +75,10 @@ async function createHydrogenSessionAdapter(
       pending = false;
       return getResponseHeader("set-cookie") ?? "";
     },
-  };
+  } satisfies HydrogenSession;
 }
 
-function withReturnTo(request: Request, returnTo: string): Request {
+function withReturnTo(request: Request, returnTo: string) {
   const url = new URL(request.url);
   url.searchParams.set("return_to", normalizeCustomerReturnTo(returnTo));
   return new Request(url.toString(), {
@@ -116,24 +87,18 @@ function withReturnTo(request: Request, returnTo: string): Request {
   });
 }
 
-interface AuthClientContext {
-  session: SessionAdapter;
-  customerAccount: ReturnType<typeof createCustomerAccountClient>;
-}
-
 export async function createHydrogenCustomerAuthContext(params: {
   request: Request;
   returnTo?: string;
-}): Promise<AuthClientContext> {
-  const requestForAuth =
-    typeof params.returnTo === "string"
-      ? withReturnTo(params.request, params.returnTo)
-      : params.request;
+}) {
+  const requestForAuth = params.returnTo
+    ? withReturnTo(params.request, params.returnTo)
+    : params.request;
 
   const session = await createHydrogenSessionAdapter(params.request);
   const customerAccount = createCustomerAccountClient({
     request: requestForAuth,
-    session: session as unknown as HydrogenSession,
+    session: session,
     customerAccountId: env.SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID,
     shopId: env.SHOPIFY_SHOP_ID,
     loginPath: "/login",
@@ -149,8 +114,8 @@ export async function createHydrogenCustomerAuthContext(params: {
 
 export async function appendPendingSessionCookie(
   response: Response,
-  session: SessionAdapter,
-): Promise<Response> {
+  session: HydrogenSession,
+) {
   if (!session.isPending) {
     return response;
   }
@@ -167,7 +132,7 @@ export async function appendPendingSessionCookie(
   });
 }
 
-export function normalizeCustomerReturnTo(returnTo: string): string {
+export function normalizeCustomerReturnTo(returnTo: string) {
   const value = returnTo.trim();
   if (!value) {
     return "/";
@@ -180,13 +145,21 @@ export function normalizeCustomerReturnTo(returnTo: string): string {
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return "/";
     }
-    return `${parsed.pathname}${parsed.search}${parsed.hash}` || "/";
+    const normalizedPath = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    if (
+      !normalizedPath ||
+      !normalizedPath.startsWith("/") ||
+      normalizedPath.startsWith("//")
+    ) {
+      return "/";
+    }
+    return normalizedPath;
   } catch {
     return "/";
   }
 }
 
-export function isTrustedCustomerAuthRequest(request: Request): boolean {
+export function isTrustedCustomerAuthRequest(request: Request) {
   const expectedOrigin = new URL(env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI)
     .origin;
   const origin = request.headers.get("origin");
@@ -204,9 +177,7 @@ export function isTrustedCustomerAuthRequest(request: Request): boolean {
   }
 }
 
-function toIdentity(
-  customer: GetCustomerIdentityQuery["customer"],
-): ShopifyCustomerIdentity {
+function toIdentity(customer: GetCustomerIdentityQuery["customer"]) {
   const name = [customer.firstName, customer.lastName]
     .filter((value): value is string => Boolean(value))
     .join(" ")
@@ -218,7 +189,7 @@ function toIdentity(
   };
 }
 
-export async function getShopifyCustomerAuthState(): Promise<ShopifyCustomerAuthState> {
+export async function getShopifyCustomerAuthState() {
   const request = getRequest();
   const { customerAccount } = await createHydrogenCustomerAuthContext({
     request,
@@ -227,24 +198,21 @@ export async function getShopifyCustomerAuthState(): Promise<ShopifyCustomerAuth
   if (!isSignedIn) {
     return {
       isSignedIn: false,
-      accessToken: null,
       customer: null,
-    };
+    } as const;
   }
 
   const accessToken = await customerAccount.getAccessToken();
   if (!accessToken) {
     return {
       isSignedIn: false,
-      accessToken: null,
       customer: null,
-    };
+    } as const;
   }
   const { data } = await customerAccount.query(getCustomerIdentity);
 
   return {
     isSignedIn: true,
-    accessToken,
     customer: toIdentity(data.customer),
-  };
+  } as const;
 }
