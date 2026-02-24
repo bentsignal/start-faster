@@ -4,8 +4,8 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 
 ## Repository Summary
 
-- Monorepo managed with Turbo Repo
-- This project is a storefront that is built on top of Shopify Headless.
+- Turborepo monorepo.
+- Storefront build on Shopify headless.
 
 ## Commands
 
@@ -21,7 +21,7 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 ### Development / preview
 
 - Full repo dev watch: `pnpm dev`
-- Important: do not run `pnpm dev` unless explicitly asked (a dev server may already be running).
+- Do not run `pnpm dev` unless explicitly asked (a dev server may already be running).
 - Shop app only dev: `pnpm --filter @acme/shop run dev`
 - Shop app preview: `pnpm --filter @acme/shop run preview`
 
@@ -51,10 +51,11 @@ Before finishing, report what you ran and whether it passed.
 - Avoid non-null assertions.
 - Handle optional/nullable values explicitly (no unsafe assumptions).
 - Use discriminated unions where appropriate.
+- Avoid explicitly defined return types.
 
 ### React / UI
 
-- **Important**: Do not over-memoize; React Compiler is enabled.
+- Do not over-memoize; React Compiler is enabled.
 - Keep components focused and composable; extract logic into hooks/stores when it grows.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
@@ -82,13 +83,5 @@ Before finishing, report what you ran and whether it passed.
 ### Environment Variables
 
 - Never access `process.env` directly in app runtime code.
-- Use validated env from `apps/shop/src/env.ts` (`import { env } from "~/env"`).
+- Use validated env from `apps/shop/src/env.ts`
 - ESLint enforces restricted env access outside `env.ts`.
-
-### Generated Files
-
-- Do not manually edit generated artifacts:
-  - `apps/shop/src/routeTree.gen.ts`
-  - `packages/shopify/src/storefront/_generated/**`
-  - `packages/shopify/src/customer/_generated/**`
-- Regenerate via scripts when source inputs change.

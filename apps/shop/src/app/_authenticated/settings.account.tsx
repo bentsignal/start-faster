@@ -7,11 +7,12 @@ export const Route = createFileRoute("/_authenticated/settings/account")({
 });
 
 function RouteComponent() {
-  const context = Route.useRouteContext();
-  console.log(context);
+  const name = Route.useRouteContext({
+    select: (context) => context.customer.name,
+  });
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      Hello "/settings/account"!
+      Hello {name ?? "Guest"}!
       <form method="post" action="/logout">
         <Button type="submit">Logout</Button>
       </form>
