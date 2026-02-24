@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { env } from "~/env";
 import {
   appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
@@ -13,11 +14,8 @@ export const Route = createFileRoute("/_auth/logout")({
         if (!isTrustedCustomerAuthRequest(request)) {
           return new Response("Invalid auth request origin.", { status: 403 });
         }
-        const requestUrl = new URL(request.url);
-        const postLogoutRedirectUri = new URL(
-          "/",
-          requestUrl.origin,
-        ).toString();
+        const postLogoutRedirectUri =
+          env.SHOPIFY_CUSTOMER_ACCOUNT_LOGOUT_REDIRECT_URI;
         const { customerAccount, session } =
           await createHydrogenCustomerAuthContext({
             request,

@@ -32,7 +32,7 @@ async function createHydrogenSessionAdapter(
   request: Request,
 ): Promise<HydrogenSession> {
   const config = {
-    name: "shopify_customer_session",
+    name: "__Host-shopify_customer_session",
     password: env.SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET,
     maxAge: 60 * 60 * 24 * 30,
     cookie: {
