@@ -13,6 +13,7 @@ import {
   markVariantSelectionIntent,
 } from "~/features/product/lib/variant-navigation-intent";
 import { ProductStore } from "~/features/product/store";
+import { useIsMobile } from "~/hooks/use-is-mobile";
 import { shopify } from "~/lib/shopify";
 
 const getProductFn = createServerFn({ method: "GET" })
@@ -48,13 +49,13 @@ function ProductPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const product = Route.useLoaderData();
-  const initialVariantImageFocusMode: "reorder" | "scroll" =
-    consumeVariantSelectionIntent({
-      handle: item,
-      variantId: search.variant,
-    })
-      ? "scroll"
-      : "reorder";
+  const isMobile = useIsMobile();
+  const initialVariantImageFocusMode = consumeVariantSelectionIntent({
+    handle: item,
+    variantId: search.variant,
+  })
+    ? "scroll"
+    : "reorder";
 
   function handleVariantIdChange(variantId: string) {
     markVariantSelectionIntent({
@@ -69,6 +70,7 @@ function ProductPage() {
         variant: variantId,
       }),
       replace: true,
+      resetScroll: isMobile === false,
     });
   }
 
