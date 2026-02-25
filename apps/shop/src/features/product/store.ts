@@ -4,31 +4,33 @@ import { createStore } from "rostra";
 import type { Product } from "./types";
 import { useProductGalleryImages } from "~/features/product/hooks/use-product-gallery-images";
 import { useProductOptions } from "~/features/product/hooks/use-product-options";
-import { useProductRouteVariant } from "~/features/product/hooks/use-product-route-variant";
 import { useProductVariantActions } from "~/features/product/hooks/use-product-variant-actions";
 import { useSelectedProductVariant } from "~/features/product/hooks/use-selected-product-variant";
 import { formatPrice } from "~/features/product/lib/price";
 
-function useInternalStore({ product }: { product: Product }) {
-  const { variantId, onVariantIdChange } = useProductRouteVariant();
+interface ProductStoreProps {
+  product: Product;
+  variant?: string;
+}
+
+function useInternalStore({ product, variant }: ProductStoreProps) {
   const variants = product.variants.nodes;
   const options = useProductOptions(product);
   const { selectedVariant, selectedOptions, setSelectedVariantId } =
     useSelectedProductVariant({
       variants,
-      initialVariantId: variantId,
+      initialVariantId: variant,
     });
   const galleryImages = useProductGalleryImages({
     product,
     variants,
-    initialVariantId: variantId,
+    initialVariantId: variant,
   });
   const { selectOption } = useProductVariantActions({
     variants,
     selectedVariant,
     selectedOptions,
     setSelectedVariantId,
-    onVariantIdChange,
   });
 
   const selectedPrice =

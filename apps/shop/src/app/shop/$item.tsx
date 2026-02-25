@@ -40,12 +40,11 @@ export const Route = createFileRoute("/shop/$item")({
 });
 
 function ProductPage() {
-  const { item } = Route.useParams();
   const product = Route.useLoaderData();
   const variant = Route.useSearch({ select: (search) => search.variant });
 
   return (
-    <ProductStore key={`${item}:${variant ?? ""}`} product={product}>
+    <ProductStore key={variant} variant={variant} product={product}>
       <main className="mx-auto w-full max-w-[1700px] lg:px-8 xl:px-12">
         <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch lg:gap-10 xl:gap-16">
           <section className="lg:py-14">
