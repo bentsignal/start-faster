@@ -16,8 +16,8 @@ export function ProductDetailsPanel() {
         <div className={cn(stickyHeaderTokens.stickyContent)}>
           <ProductHandle />
           <ProductTitle />
-          <ProductPrice />
           <ProductOptionSelector />
+          <ProductPrice />
           <ProductActions />
 
           <div className="bg-border mb-8 h-px" />

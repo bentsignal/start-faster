@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "react";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
 import { stickyHeaderTokens } from "~/components/header/header";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
+import {
+  useDesktopVariantImageScroll,
+  useInitialDesktopVariantImageFocus,
+} from "~/features/product/hooks/use-desktop-product-image-gallery-focus";
 import { useProductStore } from "~/features/product/store";
 import { useIsMobile } from "~/hooks/use-is-mobile";
 
@@ -25,49 +28,19 @@ export function ProductImageGalleryDesktop() {
   );
   const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
     useDesktopProductImageGallery({ imageCount: images.length });
-  const hasAutoFocusedSelectedVariantImageRef = useRef(false);
 
-  useEffect(() => {
-    if (isMobile) {
-      return;
-    }
-
-    if (hasAutoFocusedSelectedVariantImageRef.current) {
-      return;
-    }
-
-    hasAutoFocusedSelectedVariantImageRef.current = true;
-
-    if (
-      initialVariantImageFocusMode === "scroll" &&
-      selectedVariantImageIndex !== null &&
-      selectedVariantImageIndex > 0
-    ) {
-      scrollToImage(selectedVariantImageIndex);
-    }
-  }, [
+  useInitialDesktopVariantImageFocus({
     isMobile,
     initialVariantImageFocusMode,
-    scrollToImage,
     selectedVariantImageIndex,
-  ]);
-
-  useEffect(() => {
-    if (isMobile) {
-      return;
-    }
-
-    if (variantImageScrollRequestId === 0 || variantImageScrollIndex === null) {
-      return;
-    }
-
-    scrollToImage(variantImageScrollIndex);
-  }, [
-    isMobile,
     scrollToImage,
+  });
+  useDesktopVariantImageScroll({
+    isMobile,
     variantImageScrollIndex,
     variantImageScrollRequestId,
-  ]);
+    scrollToImage,
+  });
 
   if (images.length === 0) {
     return (

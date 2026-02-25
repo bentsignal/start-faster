@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod/v4";
 
@@ -8,12 +8,7 @@ import { getProduct } from "@acme/shopify/storefront/product";
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
-import {
-  consumeVariantSelectionIntent,
-  markVariantSelectionIntent,
-} from "~/features/product/lib/variant-navigation-intent";
 import { ProductStore } from "~/features/product/store";
-import { useIsMobile } from "~/hooks/use-is-mobile";
 import { shopify } from "~/lib/shopify";
 
 const getProductFn = createServerFn({ method: "GET" })
@@ -46,42 +41,14 @@ export const Route = createFileRoute("/shop/$item")({
 
 function ProductPage() {
   const { item } = Route.useParams();
-  const search = Route.useSearch();
-  const navigate = useNavigate();
   const product = Route.useLoaderData();
-  const isMobile = useIsMobile();
-  const initialVariantImageFocusMode = consumeVariantSelectionIntent({
-    handle: item,
-    variantId: search.variant,
-  })
-    ? "scroll"
-    : "reorder";
-
-  function handleVariantIdChange(variantId: string) {
-    markVariantSelectionIntent({
-      handle: item,
-      variantId,
-    });
-
-    void navigate({
-      to: ".",
-      search: (previousSearch) => ({
-        ...previousSearch,
-        variant: variantId,
-      }),
-      replace: true,
-      resetScroll: isMobile === false,
-    });
-  }
+  const variant = Route.useSearch({ select: (search) => search.variant });
 
   return (
     <ProductStore
-      key={`${item}:${search.variant ?? ""}`}
+      key={`${item}:${variant ?? ""}`}
       handle={item}
       product={product}
-      initialVariantId={search.variant}
-      initialVariantImageFocusMode={initialVariantImageFocusMode}
-      onVariantIdChange={handleVariantIdChange}
     >
       <main className="mx-auto w-full max-w-[1700px] lg:px-8 xl:px-12">
         <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch lg:gap-10 xl:gap-16">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Image } from "@unpic/react";
 
 import type { CarouselApi } from "@acme/ui/carousel";
@@ -10,6 +10,10 @@ import {
 } from "@acme/ui/carousel";
 
 import type { ProductGalleryImage } from "../types";
+import {
+  useInitialMobileVariantImageFocus,
+  useMobileVariantImageScroll,
+} from "~/features/product/hooks/use-mobile-product-image-gallery-focus";
 import { useProductStore } from "~/features/product/store";
 
 export function ProductImageGalleryMobile() {
@@ -27,35 +31,17 @@ export function ProductImageGalleryMobile() {
     (store) => store.initialVariantImageFocusMode,
   );
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
-  const hasAutoFocusedSelectedVariantImageRef = useRef(false);
 
-  useEffect(() => {
-    if (carouselApi === null || hasAutoFocusedSelectedVariantImageRef.current) {
-      return;
-    }
-
-    hasAutoFocusedSelectedVariantImageRef.current = true;
-
-    if (
-      initialVariantImageFocusMode === "scroll" &&
-      selectedVariantImageIndex !== null &&
-      selectedVariantImageIndex > 0
-    ) {
-      carouselApi.scrollTo(selectedVariantImageIndex);
-    }
-  }, [carouselApi, initialVariantImageFocusMode, selectedVariantImageIndex]);
-
-  useEffect(() => {
-    if (
-      carouselApi === null ||
-      variantImageScrollRequestId === 0 ||
-      variantImageScrollIndex === null
-    ) {
-      return;
-    }
-
-    carouselApi.scrollTo(variantImageScrollIndex);
-  }, [carouselApi, variantImageScrollIndex, variantImageScrollRequestId]);
+  useInitialMobileVariantImageFocus({
+    carouselApi,
+    initialVariantImageFocusMode,
+    selectedVariantImageIndex,
+  });
+  useMobileVariantImageScroll({
+    carouselApi,
+    variantImageScrollIndex,
+    variantImageScrollRequestId,
+  });
 
   if (images.length === 0) {
     return <div className="bg-muted h-[min(75vh,640px)] w-full lg:hidden" />;
