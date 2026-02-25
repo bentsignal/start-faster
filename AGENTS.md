@@ -51,7 +51,7 @@ Before finishing, report what you ran and whether it passed.
 - Avoid non-null assertions.
 - Handle optional/nullable values explicitly (no unsafe assumptions).
 - Use discriminated unions where appropriate.
-- For functions, prefer type inference over explicitly defined return types, use `as const` where appropriate.
+- Prefer type inference over explicitly defined types, use `as const` where appropriate.
 
 ### React / UI
 
