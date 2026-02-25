@@ -5,6 +5,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@acme/ui/navigation-menu";
+import { cn } from "@acme/ui/utils";
 
 import { navItems } from "~/components/header/nav-data";
 
@@ -35,13 +36,13 @@ export function HorizontalMenu() {
             {navItems.map((item) => (
               <NavigationMenuItem key={item.label}>
                 <NavigationMenuTrigger
-                  className={
+                  className={cn(
                     item.label === "Sale"
                       ? "rounded-none bg-transparent text-red-400 hover:bg-transparent hover:text-red-500 data-open:bg-transparent data-open:text-red-500"
-                      : "text-muted-foreground hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent"
-                  }
+                      : "text-muted-foreground hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent",
+                  )}
                 >
-                  <item.icon className="mr-2 h-4 w-4" />
+                  {/* <item.icon className="mr-2 h-4 w-4" /> */}
                   {item.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="p-0!">

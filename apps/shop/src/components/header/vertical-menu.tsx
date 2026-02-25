@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Image } from "@unpic/react";
-import { Info, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import {
   Accordion,
@@ -66,7 +66,7 @@ export function VerticalMenu() {
               <AccordionItem key={item.label} value={item.label}>
                 <AccordionTrigger>
                   <div className="flex items-center gap-2">
-                    <item.icon className="text-primary h-4 w-4" />
+                    {/* <item.icon className="text-primary h-4 w-4" /> */}
                     <span className="text-muted-foreground">{item.label}</span>
                   </div>
                 </AccordionTrigger>
@@ -90,7 +90,7 @@ export function VerticalMenu() {
             <AccordionItem value="secondary">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Info className="text-primary h-4 w-4" />
+                  {/* <Info className="text-primary h-4 w-4" /> */}
                   <span className="text-muted-foreground">Resources</span>
                 </div>
               </AccordionTrigger>
