@@ -30,7 +30,7 @@ export function ProductDetailsPanel() {
 }
 
 function ProductHandle() {
-  const handle = useProductStore((store) => store.handle);
+  const handle = useProductStore((store) => store.product.handle);
 
   return (
     <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">

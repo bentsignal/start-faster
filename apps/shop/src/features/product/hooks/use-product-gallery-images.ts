@@ -10,14 +10,12 @@ interface UseProductGalleryImagesArgs {
   product: Product;
   variants: Product["variants"]["nodes"];
   initialVariantId?: string;
-  initialVariantImageFocusMode: "reorder" | "scroll";
 }
 
 export function useProductGalleryImages({
   product,
   variants,
   initialVariantId,
-  initialVariantImageFocusMode,
 }: UseProductGalleryImagesArgs) {
   const [initialVariantIdOnLoad] = useState(initialVariantId);
   const baseGalleryImages = useMemo(
@@ -26,10 +24,7 @@ export function useProductGalleryImages({
   );
 
   return useMemo(() => {
-    if (
-      initialVariantIdOnLoad === undefined ||
-      initialVariantImageFocusMode === "scroll"
-    ) {
+    if (initialVariantIdOnLoad === undefined) {
       return baseGalleryImages;
     }
 
@@ -54,10 +49,5 @@ export function useProductGalleryImages({
       variantImage,
       ...baseGalleryImages.filter((_, index) => index !== variantImageIndex),
     ];
-  }, [
-    baseGalleryImages,
-    initialVariantIdOnLoad,
-    initialVariantImageFocusMode,
-    variants,
-  ]);
+  }, [baseGalleryImages, initialVariantIdOnLoad, variants]);
 }

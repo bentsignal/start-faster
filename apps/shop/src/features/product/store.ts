@@ -7,23 +7,10 @@ import { useProductOptions } from "~/features/product/hooks/use-product-options"
 import { useProductRouteVariant } from "~/features/product/hooks/use-product-route-variant";
 import { useProductVariantActions } from "~/features/product/hooks/use-product-variant-actions";
 import { useSelectedProductVariant } from "~/features/product/hooks/use-selected-product-variant";
-import { useVariantImageScroll } from "~/features/product/hooks/use-variant-image-scroll";
+import { formatPrice } from "~/features/product/lib/price";
 
-interface ProductStoreProps {
-  handle: string;
-  product: Product;
-}
-
-function formatPrice(amount: number, currencyCode: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currencyCode,
-  }).format(amount);
-}
-
-function useInternalStore({ handle, product }: ProductStoreProps) {
-  const { variantId, initialVariantImageFocusMode, onVariantIdChange } =
-    useProductRouteVariant();
+function useInternalStore({ product }: { product: Product }) {
+  const { variantId, onVariantIdChange } = useProductRouteVariant();
   const variants = product.variants.nodes;
   const options = useProductOptions(product);
   const { selectedVariant, selectedOptions, setSelectedVariantId } =
@@ -35,18 +22,8 @@ function useInternalStore({ handle, product }: ProductStoreProps) {
     product,
     variants,
     initialVariantId: variantId,
-    initialVariantImageFocusMode,
   });
-  const {
-    selectedVariantImageIndex,
-    variantImageScrollIndex,
-    variantImageScrollRequestId,
-  } = useVariantImageScroll({
-    galleryImages,
-    variants,
-    selectedVariant,
-  });
-  const { selectOption, setVariantById } = useProductVariantActions({
+  const { selectOption } = useProductVariantActions({
     variants,
     selectedVariant,
     selectedOptions,
@@ -61,21 +38,17 @@ function useInternalStore({ handle, product }: ProductStoreProps) {
     [selectedPrice.amount, selectedPrice.currencyCode],
   );
 
-  return {
-    handle,
+  const storeValue = {
     product,
     options,
     galleryImages,
-    selectedVariantImageIndex,
     price,
     selectedVariant,
     selectedOptions,
-    variantImageScrollIndex,
-    variantImageScrollRequestId,
-    initialVariantImageFocusMode,
     selectOption,
-    setVariantById,
   };
+
+  return storeValue;
 }
 
 const { Store: ProductStore, useStore: useProductStore } =

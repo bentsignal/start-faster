@@ -4,43 +4,12 @@ import { cn } from "@acme/ui/utils";
 
 import { stickyHeaderTokens } from "~/components/header/header";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
-import {
-  useDesktopVariantImageScroll,
-  useInitialDesktopVariantImageFocus,
-} from "~/features/product/hooks/use-desktop-product-image-gallery-focus";
 import { useProductStore } from "~/features/product/store";
-import { useIsMobile } from "~/hooks/use-is-mobile";
 
 export function ProductImageGalleryDesktop() {
-  const isMobile = useIsMobile();
   const images = useProductStore((store) => store.galleryImages);
-  const selectedVariantImageIndex = useProductStore(
-    (store) => store.selectedVariantImageIndex,
-  );
-  const variantImageScrollIndex = useProductStore(
-    (store) => store.variantImageScrollIndex,
-  );
-  const variantImageScrollRequestId = useProductStore(
-    (store) => store.variantImageScrollRequestId,
-  );
-  const initialVariantImageFocusMode = useProductStore(
-    (store) => store.initialVariantImageFocusMode,
-  );
   const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
     useDesktopProductImageGallery({ imageCount: images.length });
-
-  useInitialDesktopVariantImageFocus({
-    isMobile,
-    initialVariantImageFocusMode,
-    selectedVariantImageIndex,
-    scrollToImage,
-  });
-  useDesktopVariantImageScroll({
-    isMobile,
-    variantImageScrollIndex,
-    variantImageScrollRequestId,
-    scrollToImage,
-  });
 
   if (images.length === 0) {
     return (

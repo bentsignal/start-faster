@@ -15,17 +15,6 @@ export function useProductVariantActions({
   setSelectedVariantId,
   onVariantIdChange,
 }: UseProductVariantActionsArgs) {
-  function setVariantById(variantId: string) {
-    const nextVariant = variants.find((variant) => variant.id === variantId);
-
-    if (nextVariant === undefined) {
-      return;
-    }
-
-    setSelectedVariantId(nextVariant.id);
-    onVariantIdChange(nextVariant.id);
-  }
-
   function selectOption(optionName: string, optionValue: string) {
     if (selectedVariant === null) {
       return;
@@ -49,6 +38,5 @@ export function useProductVariantActions({
 
   return {
     selectOption,
-    setVariantById,
   };
 }

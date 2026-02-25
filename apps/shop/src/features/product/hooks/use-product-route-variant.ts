@@ -9,7 +9,6 @@ export function useProductRouteVariant() {
   });
   const navigate = useNavigate({ from: "/shop/$item" });
   const isMobile = useIsMobile();
-  const initialVariantImageFocusMode = "reorder" as const;
 
   function onVariantIdChange(nextVariantId: string) {
     void navigate({
@@ -18,14 +17,12 @@ export function useProductRouteVariant() {
         ...previousSearch,
         variant: nextVariantId,
       }),
-      replace: true,
       resetScroll: isMobile === false,
     });
   }
 
   return {
     variantId,
-    initialVariantImageFocusMode,
     onVariantIdChange,
   };
 }
