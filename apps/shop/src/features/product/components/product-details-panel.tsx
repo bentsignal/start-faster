@@ -107,7 +107,9 @@ function ProductActions() {
   return (
     <div className="mb-8 flex flex-col gap-2">
       <Button disabled={isUnavailable}>Add to Cart</Button>
-      <Button variant="secondary">Buy Now</Button>
+      <Button disabled={isUnavailable} variant="secondary">
+        Buy Now
+      </Button>
     </div>
   );
 }

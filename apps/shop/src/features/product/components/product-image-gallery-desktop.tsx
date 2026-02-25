@@ -41,7 +41,7 @@ export function ProductImageGalleryDesktop() {
 
       <div className="w-full space-y-4 lg:max-w-2xl xl:max-w-3xl xl:space-y-6">
         {images.map((image, index) => (
-          <GalleryImageSection
+          <GalleryImage
             key={image.id}
             imageIndex={index}
             setImageSectionRef={setImageSectionRef}
@@ -99,7 +99,7 @@ function GalleryThumbnail({
   );
 }
 
-function GalleryImageSection({
+function GalleryImage({
   imageIndex,
   setImageSectionRef,
 }: {
