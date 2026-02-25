@@ -46,6 +46,7 @@ export function TopRightControls() {
           }}
           className="hover:text-primary transition-colors"
           preload={false}
+          resetScroll={false}
         >
           <AccountIcon />
         </Link>

@@ -103,6 +103,7 @@ export function LoginModal() {
     if (!open) {
       void navigate({
         to: ".",
+        resetScroll: false,
       });
     }
   }
