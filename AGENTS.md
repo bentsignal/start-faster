@@ -29,7 +29,7 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 
 Choose based on change type:
 
-- Most code changes: `pnpm lint` and `pnpm typecheck`
+- Code changes: `pnpm lint` and `pnpm typecheck`
 - Code or markdown edits: `pnpm format:fix`. Run this last after lint and typecheck.
 - Shopify GraphQL operation changes: `pnpm --filter @acme/shopify run build`
 
