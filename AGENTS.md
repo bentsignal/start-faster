@@ -7,24 +7,6 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 - Turborepo monorepo.
 - Storefront build on Shopify headless.
 
-## Commands
-
-### Scoped by workspace/package
-
-- Run any script in one package: `pnpm --filter <pkg> run <script>`
-- Build only shop app: `pnpm --filter @acme/shop run build`
-- Lint only shop app: `pnpm --filter @acme/shop run lint`
-- Typecheck only shop app: `pnpm --filter @acme/shop run typecheck`
-- Build Shopify package (runs GraphQL codegen): `pnpm --filter @acme/shopify run build`
-- Lint UI package: `pnpm --filter @acme/ui run lint`
-
-### Development / preview
-
-- Full repo dev watch: `pnpm dev`
-- Do not run `pnpm dev` unless explicitly asked (a dev server may already be running).
-- Shop app only dev: `pnpm --filter @acme/shop run dev`
-- Shop app preview: `pnpm --filter @acme/shop run preview`
-
 ## Required Validation After Changes
 
 Choose based on change type:
@@ -34,6 +16,12 @@ Choose based on change type:
 - Shopify GraphQL operation changes: `pnpm --filter @acme/shopify run build`
 
 Before finishing, report what you ran and whether it passed.
+
+## Architecture
+
+### GraphQL
+
+All GraphQL queries and mutations should be written in `@packages/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use generics of narrowing to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
 
 ## Code Style and Conventions
 
@@ -45,17 +33,14 @@ Before finishing, report what you ran and whether it passed.
 
 ### TypeScript
 
-- `strict` mode is on; keep code fully type-safe.
 - Avoid `any`;
 - Avoid `unknown` + narrowing.
-- Avoid non-null assertions.
-- Handle optional/nullable values explicitly (no unsafe assumptions).
 - Use discriminated unions where appropriate.
 - Prefer type inference over explicitly defined types, use `as const` where appropriate.
 
 ### React / UI
 
-- Do not over-memoize; React Compiler is enabled.
+- Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
 - Keep components focused and composable; extract logic into hooks/stores when it grows.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
@@ -66,7 +51,6 @@ Before finishing, report what you ran and whether it passed.
 - Store pattern to follow:
   - internal hook function (`useInternalStore`)
   - exported `Store` provider + `useStore` hook alias
-- Keep store state serializable unless refs are required.
 
 ### Naming and File Conventions
 
