@@ -1,24 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import type { Product } from "~/features/product/types";
 
 interface UseSelectedProductVariantArgs {
   variants: Product["variants"]["nodes"];
-  initialVariantId?: string;
+  variantId?: string;
 }
 
 export function useSelectedProductVariant({
   variants,
-  initialVariantId,
+  variantId,
 }: UseSelectedProductVariantArgs) {
-  const [selectedVariantId, setSelectedVariantId] = useState<
-    string | undefined
-  >(initialVariantId);
-
-  useEffect(() => {
-    setSelectedVariantId(initialVariantId);
-  }, [initialVariantId]);
-
   const defaultVariant = useMemo(
     () =>
       variants.find((variant) => variant.availableForSale) ??
@@ -28,9 +20,8 @@ export function useSelectedProductVariant({
   );
   const selectedVariant = useMemo(
     () =>
-      variants.find((variant) => variant.id === selectedVariantId) ??
-      defaultVariant,
-    [defaultVariant, selectedVariantId, variants],
+      variants.find((variant) => variant.id === variantId) ?? defaultVariant,
+    [defaultVariant, variantId, variants],
   );
   const selectedOptions = useMemo(
     () =>
@@ -47,6 +38,5 @@ export function useSelectedProductVariant({
   return {
     selectedVariant,
     selectedOptions,
-    setSelectedVariantId,
   };
 }

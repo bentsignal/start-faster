@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import type { Product } from "~/features/product/types";
 import {
@@ -9,27 +9,26 @@ import {
 interface UseProductGalleryImagesArgs {
   product: Product;
   variants: Product["variants"]["nodes"];
-  initialVariantId?: string;
+  selectedVariantId?: string;
 }
 
 export function useProductGalleryImages({
   product,
   variants,
-  initialVariantId,
+  selectedVariantId,
 }: UseProductGalleryImagesArgs) {
-  const [initialVariantIdOnLoad] = useState(initialVariantId);
   const baseGalleryImages = useMemo(
     () => getProductGalleryImages(product),
     [product],
   );
 
   return useMemo(() => {
-    if (initialVariantIdOnLoad === undefined) {
+    if (selectedVariantId === undefined) {
       return baseGalleryImages;
     }
 
     const initialVariant =
-      variants.find((variant) => variant.id === initialVariantIdOnLoad) ?? null;
+      variants.find((variant) => variant.id === selectedVariantId) ?? null;
     const variantImageIndex = getVariantImageIndex({
       images: baseGalleryImages,
       variant: initialVariant,
@@ -49,5 +48,5 @@ export function useProductGalleryImages({
       variantImage,
       ...baseGalleryImages.filter((_, index) => index !== variantImageIndex),
     ];
-  }, [baseGalleryImages, initialVariantIdOnLoad, variants]);
+  }, [baseGalleryImages, selectedVariantId, variants]);
 }

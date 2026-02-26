@@ -12,14 +12,12 @@ interface UseProductVariantActionsArgs {
   variants: Product["variants"]["nodes"];
   selectedVariant: Product["variants"]["nodes"][number] | null;
   selectedOptions: Record<string, string>;
-  setSelectedVariantId: (variantId: string) => void;
 }
 
 export function useProductVariantActions({
   variants,
   selectedVariant,
   selectedOptions,
-  setSelectedVariantId,
 }: UseProductVariantActionsArgs) {
   const navigate = useNavigate({ from: "/shop/$item" });
   const isMobile = useIsMobile();
@@ -59,7 +57,10 @@ export function useProductVariantActions({
         ),
       ) ?? selectedVariant;
 
-    setSelectedVariantId(nextVariant.id);
+    if (nextVariant.id === selectedVariant.id) {
+      return;
+    }
+
     void navigate({
       to: ".",
       search: (previousSearch) => ({

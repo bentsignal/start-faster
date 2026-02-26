@@ -2,20 +2,42 @@ import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
+import type { ProductGalleryImage } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
 import { useProductStore } from "~/features/product/store";
 
 export function ProductImageGalleryDesktop() {
   const images = useProductStore((store) => store.galleryImages);
-  const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
-    useDesktopProductImageGallery({ imageCount: images.length });
+  const productTitle = useProductStore((store) => store.product.title);
+  const imageOrderKey = images.map((image) => image.id).join("|");
 
   if (images.length === 0) {
     return (
       <div className="bg-muted hidden h-[min(82vh,920px)] w-full lg:block" />
     );
   }
+
+  return (
+    <DesktopGalleryContent
+      key={imageOrderKey}
+      images={images}
+      productTitle={productTitle}
+    />
+  );
+}
+
+function DesktopGalleryContent({
+  images,
+  productTitle,
+}: {
+  images: ProductGalleryImage[];
+  productTitle: string;
+}) {
+  const { visibleActiveImageIndex, setImageSectionRef, scrollToImage } =
+    useDesktopProductImageGallery({
+      imageCount: images.length,
+    });
 
   return (
     <div
@@ -31,8 +53,10 @@ export function ProductImageGalleryDesktop() {
           {images.map((image, index) => (
             <GalleryThumbnail
               key={`${image.id}-thumbnail`}
+              image={image}
               imageIndex={index}
               isActive={visibleActiveImageIndex === index}
+              productTitle={productTitle}
               onSelect={scrollToImage}
             />
           ))}
@@ -43,7 +67,9 @@ export function ProductImageGalleryDesktop() {
         {images.map((image, index) => (
           <GalleryImage
             key={image.id}
+            image={image}
             imageIndex={index}
+            productTitle={productTitle}
             setImageSectionRef={setImageSectionRef}
           />
         ))}
@@ -53,21 +79,18 @@ export function ProductImageGalleryDesktop() {
 }
 
 function GalleryThumbnail({
+  image,
   imageIndex,
   isActive,
+  productTitle,
   onSelect,
 }: {
+  image: ProductGalleryImage;
   imageIndex: number;
   isActive: boolean;
+  productTitle: string;
   onSelect: (index: number) => void;
 }) {
-  const image = useProductStore((store) => store.galleryImages[imageIndex]);
-  const productTitle = useProductStore((store) => store.product.title);
-
-  if (image === undefined) {
-    return null;
-  }
-
   return (
     <button
       type="button"
@@ -100,19 +123,16 @@ function GalleryThumbnail({
 }
 
 function GalleryImage({
+  image,
   imageIndex,
+  productTitle,
   setImageSectionRef,
 }: {
+  image: ProductGalleryImage;
   imageIndex: number;
+  productTitle: string;
   setImageSectionRef: (index: number, section: HTMLElement | null) => void;
 }) {
-  const image = useProductStore((store) => store.galleryImages[imageIndex]);
-  const productTitle = useProductStore((store) => store.product.title);
-
-  if (image === undefined) {
-    return null;
-  }
-
   return (
     <section
       ref={(section) => {

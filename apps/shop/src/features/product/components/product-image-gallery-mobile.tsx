@@ -12,6 +12,7 @@ import { useProductStore } from "~/features/product/store";
 
 export function ProductImageGalleryMobile() {
   const images = useProductStore((store) => store.galleryImages);
+  const imageOrderKey = images.map((image) => image.id).join("|");
 
   if (images.length === 0) {
     return <div className="bg-muted h-[min(75vh,640px)] w-full lg:hidden" />;
@@ -19,7 +20,7 @@ export function ProductImageGalleryMobile() {
 
   return (
     <div className="px-4 pb-6 sm:px-8 lg:hidden">
-      <Carousel>
+      <Carousel key={imageOrderKey}>
         <CarouselContent className="ml-0">
           {images.map((image, index) => (
             <MobileImageSlide key={image.id} image={image} index={index} />

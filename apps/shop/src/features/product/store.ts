@@ -16,21 +16,19 @@ interface ProductStoreProps {
 function useInternalStore({ product, variant }: ProductStoreProps) {
   const variants = product.variants.nodes;
   const options = useProductOptions(product);
-  const { selectedVariant, selectedOptions, setSelectedVariantId } =
-    useSelectedProductVariant({
-      variants,
-      initialVariantId: variant,
-    });
+  const { selectedVariant, selectedOptions } = useSelectedProductVariant({
+    variants,
+    variantId: variant,
+  });
   const galleryImages = useProductGalleryImages({
     product,
     variants,
-    initialVariantId: variant,
+    selectedVariantId: selectedVariant?.id,
   });
   const { selectOption, buyNow, isBuyingNow } = useProductVariantActions({
     variants,
     selectedVariant,
     selectedOptions,
-    setSelectedVariantId,
   });
 
   const selectedPrice =
