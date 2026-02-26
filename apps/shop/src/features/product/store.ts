@@ -26,7 +26,7 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
     variants,
     initialVariantId: variant,
   });
-  const { selectOption } = useProductVariantActions({
+  const { selectOption, buyNow, isBuyingNow } = useProductVariantActions({
     variants,
     selectedVariant,
     selectedOptions,
@@ -48,6 +48,8 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
     selectedVariant,
     selectedOptions,
     selectOption,
+    buyNow,
+    isBuyingNow,
   };
 
   return storeValue;

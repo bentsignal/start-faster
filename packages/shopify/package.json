@@ -5,6 +5,7 @@
   "exports": {
     "./storefront/types": "./src/storefront/_generated/storefront.types.d.ts",
     "./storefront/generated": "./src/storefront/_generated/storefront.generated.d.ts",
+    "./storefront/cart": "./src/storefront/cart/index.ts",
     "./storefront/product": "./src/storefront/product/index.ts",
     "./customer/generated": "./src/customer/_generated/customer.generated.d.ts",
     "./customer/types": "./src/customer/_generated/customer.types.d.ts",

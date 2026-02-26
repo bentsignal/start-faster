@@ -3,6 +3,21 @@
 /* eslint-disable */
 import type * as StorefrontTypes from './storefront.types.d.ts';
 
+export type CartLinesAddForCheckoutMutationVariables = StorefrontTypes.Exact<{
+  cartId: StorefrontTypes.Scalars['ID']['input'];
+  lines: Array<StorefrontTypes.CartLineInput> | StorefrontTypes.CartLineInput;
+}>;
+
+
+export type CartLinesAddForCheckoutMutation = { cartLinesAdd?: StorefrontTypes.Maybe<{ cart?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Cart, 'id' | 'checkoutUrl'>> }> };
+
+export type CartCreateForCheckoutMutationVariables = StorefrontTypes.Exact<{
+  lines?: StorefrontTypes.InputMaybe<Array<StorefrontTypes.CartLineInput> | StorefrontTypes.CartLineInput>;
+}>;
+
+
+export type CartCreateForCheckoutMutation = { cartCreate?: StorefrontTypes.Maybe<{ cart?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Cart, 'id' | 'checkoutUrl'>> }> };
+
 export type ProductByHandleQueryVariables = StorefrontTypes.Exact<{
   handle: StorefrontTypes.Scalars['String']['input'];
 }>;
@@ -33,6 +48,8 @@ interface GeneratedQueryTypes {
 }
 
 interface GeneratedMutationTypes {
+  "#graphql\n  mutation CartLinesAddForCheckout($cartId: ID!, $lines: [CartLineInput!]!) {\n    cartLinesAdd(cartId: $cartId, lines: $lines) {\n      cart {\n        id\n        checkoutUrl\n      }\n    }\n  }\n": {return: CartLinesAddForCheckoutMutation, variables: CartLinesAddForCheckoutMutationVariables},
+  "#graphql\n  mutation CartCreateForCheckout($lines: [CartLineInput!]) {\n    cartCreate(input: { lines: $lines }) {\n      cart {\n        id\n        checkoutUrl\n      }\n    }\n  }\n": {return: CartCreateForCheckoutMutation, variables: CartCreateForCheckoutMutationVariables},
 }
 declare module '@shopify/storefront-api-client' {
   type InputMaybe<T> = StorefrontTypes.InputMaybe<T>;
