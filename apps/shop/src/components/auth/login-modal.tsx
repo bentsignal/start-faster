@@ -103,6 +103,11 @@ export function LoginModal() {
     if (!open) {
       void navigate({
         to: ".",
+        search: (previousSearch) => ({
+          ...previousSearch,
+          showLogin: false,
+          returnTo: undefined,
+        }),
         resetScroll: false,
       });
     }

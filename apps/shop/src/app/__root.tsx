@@ -22,6 +22,9 @@ import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
 import { env } from "~/env";
+import { CartSheet } from "~/features/cart/components/cart-sheet";
+import { getCartQuantityFromCookie } from "~/features/cart/server/cart-quantity";
+import { CartStore } from "~/features/cart/store";
 import { ThemeStore } from "~/features/theme/store";
 import { getTheme } from "~/features/theme/utils";
 import { getShopifyCustomerAuthState } from "~/lib/auth";
@@ -59,7 +62,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const [auth, theme] = await Promise.all([
+    const [auth, theme, cartQuantity] = await Promise.all([
       context.queryClient.fetchQuery({
         queryKey: ["shopify-auth"],
         queryFn: fetchShopifyAuth,
@@ -72,11 +75,18 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         staleTime: Infinity,
         gcTime: Infinity,
       }),
+      context.queryClient.fetchQuery({
+        queryKey: ["cart-quantity"],
+        queryFn: getCartQuantityFromCookie,
+        staleTime: Infinity,
+        gcTime: Infinity,
+      }),
     ]);
 
     return {
       auth,
       theme,
+      cartQuantity,
     };
   },
   validateSearch: z.object({
@@ -101,30 +111,33 @@ function RootComponent() {
         )}
       >
         <QueryClientProvider client={context.queryClient}>
-          <ThemeStore
-            attribute="class"
-            defaultTheme="dark"
-            disableTransitionOnChange
-            initialTheme={context.theme}
-          >
-            <Header />
-            <LoginModal />
-            <Outlet />
-            <MailingList />
-            <Footer />
-            <TanStackDevtools
-              config={{
-                position: "bottom-right",
-              }}
-              plugins={[
-                {
-                  name: "react-router",
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-              ]}
-            />
-            <Toaster />
-          </ThemeStore>
+          <CartStore initialCartQuantity={context.cartQuantity}>
+            <ThemeStore
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+              initialTheme={context.theme}
+            >
+              <Header />
+              <CartSheet />
+              <LoginModal />
+              <Outlet />
+              <MailingList />
+              <Footer />
+              <TanStackDevtools
+                config={{
+                  position: "bottom-right",
+                }}
+                plugins={[
+                  {
+                    name: "react-router",
+                    render: <TanStackRouterDevtoolsPanel />,
+                  },
+                ]}
+              />
+              <Toaster />
+            </ThemeStore>
+          </CartStore>
           <Scripts />
         </QueryClientProvider>
       </body>

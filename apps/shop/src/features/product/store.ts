@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { createStore } from "rostra";
 
 import type { Product } from "./types";
@@ -25,18 +24,18 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
     variants,
     selectedVariantId: selectedVariant?.id,
   });
-  const { selectOption, buyNow, isBuyingNow } = useProductVariantActions({
-    variants,
-    selectedVariant,
-    selectedOptions,
-  });
+  const { selectOption, addToCart, wasAddedToCart, buyNow, isBuyingNow } =
+    useProductVariantActions({
+      variants,
+      productTitle: product.title,
+      productHandle: product.handle,
+      selectedVariant,
+      selectedOptions,
+    });
 
   const selectedPrice =
     selectedVariant?.price ?? product.priceRange.minVariantPrice;
-  const price = useMemo(
-    () => formatPrice(selectedPrice.amount, selectedPrice.currencyCode),
-    [selectedPrice.amount, selectedPrice.currencyCode],
-  );
+  const price = formatPrice(selectedPrice.amount, selectedPrice.currencyCode);
 
   const storeValue = {
     product,
@@ -46,6 +45,8 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
     selectedVariant,
     selectedOptions,
     selectOption,
+    addToCart,
+    wasAddedToCart,
     buyNow,
     isBuyingNow,
   };

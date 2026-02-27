@@ -10,6 +10,8 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
+import { useCartQuantity } from "~/features/cart/hooks/use-cart";
+import { useCartStore } from "~/features/cart/store";
 import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
 function AccountIcon() {
@@ -26,6 +28,8 @@ export function TopRightControls() {
     from: "__root__",
     select: (context) => context.auth.isSignedIn,
   });
+  const totalQuantity = useCartQuantity();
+  const openCart = useCartStore((store) => store.openCart);
 
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
@@ -40,10 +44,11 @@ export function TopRightControls() {
       ) : (
         <Link
           to="."
-          search={{
+          search={(previousSearch) => ({
+            ...previousSearch,
             showLogin: true,
             returnTo: "/settings/account",
-          }}
+          })}
           className="hover:text-primary transition-colors"
           preload={false}
           resetScroll={false}
@@ -53,12 +58,17 @@ export function TopRightControls() {
       )}
       <button
         type="button"
-        className="hover:text-primary relative flex items-center transition-colors"
+        className="hover:text-primary relative flex items-center transition-colors hover:cursor-pointer"
+        onClick={openCart}
       >
         <ShoppingCart className="h-6 w-6" strokeWidth={1.5} />
-        <div className="bg-primary absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full">
-          <span className="text-background text-[10px]">1</span>
-        </div>
+        {totalQuantity > 0 ? (
+          <div className="bg-primary absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1">
+            <span className="text-background text-[10px] leading-none tabular-nums">
+              {totalQuantity > 99 ? "99+" : totalQuantity}
+            </span>
+          </div>
+        ) : null}
         <span className="sr-only">Cart</span>
       </button>
       <HoverCard>

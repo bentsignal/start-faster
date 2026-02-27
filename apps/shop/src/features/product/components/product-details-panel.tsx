@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
@@ -103,6 +103,8 @@ function ProductOptionSelector() {
 
 function ProductActions() {
   const selectedVariant = useProductStore((store) => store.selectedVariant);
+  const addToCart = useProductStore((store) => store.addToCart);
+  const wasAddedToCart = useProductStore((store) => store.wasAddedToCart);
   const buyNow = useProductStore((store) => store.buyNow);
   const isBuyingNow = useProductStore((store) => store.isBuyingNow);
   const isUnavailable =
@@ -110,13 +112,24 @@ function ProductActions() {
 
   return (
     <div className="mb-8 flex flex-col gap-2">
-      <Button disabled={isUnavailable}>Add to Cart</Button>
+      <Button
+        disabled={isUnavailable}
+        variant="default"
+        onClick={addToCart}
+        className={cn(
+          wasAddedToCart
+            ? "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-green-950 dark:hover:bg-green-400"
+            : undefined,
+        )}
+      >
+        {wasAddedToCart ? "Added to Cart" : "Add to Cart"}
+      </Button>
       <Button
         disabled={isUnavailable || isBuyingNow}
         variant="secondary"
         onClick={buyNow}
       >
-        {isBuyingNow ? <Loader2 className="size-4 animate-spin" /> : "Buy Now"}
+        {isBuyingNow ? <Loader className="size-4 animate-spin" /> : "Buy Now"}
       </Button>
     </div>
   );
