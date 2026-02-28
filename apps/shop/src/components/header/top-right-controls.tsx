@@ -64,7 +64,7 @@ export function TopRightControls() {
         <ShoppingCart className="h-6 w-6" strokeWidth={1.5} />
         {totalQuantity > 0 ? (
           <div className="bg-primary absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1">
-            <span className="text-background text-[10px] leading-none tabular-nums">
+            <span className="text-primary-foreground text-[10px] leading-none tabular-nums">
               {totalQuantity > 99 ? "99+" : totalQuantity}
             </span>
           </div>
