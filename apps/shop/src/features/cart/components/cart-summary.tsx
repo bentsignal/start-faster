@@ -50,14 +50,14 @@ export function CartSummary({
 
   return (
     <footer className="border-t p-4 sm:p-6">
-      <div className="mb-3 flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Total</span>
         <span className="font-medium tabular-nums">{totalLabel}</span>
       </div>
       <Button
         type="button"
         size="lg"
-        className="w-full rounded-md"
+        className="my-3 w-full rounded-md"
         disabled={canCheckout === false}
         onClick={() => {
           void goToCheckout();
@@ -69,7 +69,7 @@ export function CartSummary({
           "Go to Checkout"
         )}
       </Button>
-      <p className="text-muted-foreground mt-2 text-xs">
+      <p className="text-muted-foreground text-xs">
         Taxes and shipping are calculated at checkout.
       </p>
     </footer>
