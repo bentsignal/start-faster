@@ -12,7 +12,10 @@ import {
   getStoredCartId,
   getStoredCartQuantity,
 } from "~/features/cart/lib/cart-id";
-import { cartQueries } from "~/features/cart/lib/cart-queries";
+import {
+  cartMutationKeys,
+  cartQueries,
+} from "~/features/cart/lib/cart-queries";
 import { updateCartLineFn } from "~/features/cart/server/manage-cart";
 
 interface CartStoreProps {
@@ -67,7 +70,7 @@ function useInternalStore({
   }, [applyServerCart, cartId, queryClient]);
 
   const updateLineMutation = useMutation({
-    mutationKey: ["cart", "line", "update"],
+    mutationKey: cartMutationKeys.lineUpdate,
     mutationFn: async (variables: {
       cartId: string;
       lineId: string;

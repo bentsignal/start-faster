@@ -4,7 +4,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@acme/ui/toaster";
 
 import type { Cart, OptimisticCartLineDraft } from "~/features/cart/types";
-import { cartQueries } from "~/features/cart/lib/cart-queries";
+import {
+  cartMutationKeys,
+  cartQueries,
+} from "~/features/cart/lib/cart-queries";
 import {
   applyOptimisticAdd,
   applyOptimisticRemove,
@@ -30,7 +33,7 @@ export function useCartLineMutations({
   const queryClient = useQueryClient();
 
   const addLineMutation = useMutation({
-    mutationKey: ["cart", "line", "add"],
+    mutationKey: cartMutationKeys.lineAdd,
     mutationFn: async (variables: {
       cartId?: string;
       merchandiseId: string;
@@ -49,7 +52,9 @@ export function useCartLineMutations({
       const activeQueryKey = cartQueries.detail(
         variables.cartId ?? null,
       ).queryKey;
-      await queryClient.cancelQueries({ queryKey: cartQueries.all().queryKey });
+      await queryClient.cancelQueries({
+        queryKey: cartQueries.detailAll().queryKey,
+      });
       const previousCart =
         queryClient.getQueryData<Cart | null>(activeQueryKey) ?? null;
       const optimisticCart = applyOptimisticAdd(
@@ -63,6 +68,7 @@ export function useCartLineMutations({
       return {
         previousCart,
         queryKey: activeQueryKey,
+        previousCartId: variables.cartId ?? null,
       };
     },
     onError: async (_error, _variables, context) => {
@@ -76,7 +82,10 @@ export function useCartLineMutations({
       const previousQueryKey = context.queryKey;
       const nextQueryKey = cartQueries.detail(nextCart.id).queryKey;
       queryClient.setQueryData(nextQueryKey, nextCart);
-      if (previousQueryKey[1] !== nextQueryKey[1]) {
+      if (
+        context.previousCartId !== null &&
+        context.previousCartId !== nextCart.id
+      ) {
         queryClient.removeQueries({
           queryKey: previousQueryKey,
           exact: true,
@@ -87,7 +96,7 @@ export function useCartLineMutations({
   });
 
   const removeLineMutation = useMutation({
-    mutationKey: ["cart", "line", "remove"],
+    mutationKey: cartMutationKeys.lineRemove,
     mutationFn: async (variables: { cartId: string; lineId: string }) => {
       return removeCartLineFn({
         data: {
@@ -99,7 +108,9 @@ export function useCartLineMutations({
     onMutate: async ({ lineId, cartId: activeCartId }) => {
       clearLineIntent(lineId);
       const activeQueryKey = cartQueries.detail(activeCartId).queryKey;
-      await queryClient.cancelQueries({ queryKey: cartQueries.all().queryKey });
+      await queryClient.cancelQueries({
+        queryKey: cartQueries.detailAll().queryKey,
+      });
       const previousCart =
         queryClient.getQueryData<Cart | null>(activeQueryKey) ?? null;
       queryClient.setQueryData(

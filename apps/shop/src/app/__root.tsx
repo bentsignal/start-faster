@@ -23,7 +23,6 @@ import { LoginModal } from "~/features/auth/components/login-modal";
 import { getAuthState } from "~/features/auth/server/get-auth-state";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
-import { getCartFromCookie } from "~/features/cart/server/cart-cookie";
 import { CartStore } from "~/features/cart/store";
 import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
@@ -66,10 +65,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         gcTime: Infinity,
       }),
       context.queryClient.fetchQuery({
-        queryKey: ["cart"],
-        queryFn: getCartFromCookie,
-        staleTime: Infinity,
-        gcTime: Infinity,
+        ...cartQueries.cookie(),
       }),
     ]);
 
