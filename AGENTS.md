@@ -5,7 +5,8 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 ## Repository Summary
 
 - Turborepo monorepo.
-- Storefront build on Shopify headless.
+- Storefront built on Shopify headless.
+- Greenfield project, prefer ambitious overhauls when necessary to lay solid foundation.
 
 ## Required Validation After Changes
 
@@ -40,7 +41,7 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 
 ### React / UI
 
-- Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
+- **_IMPORTANT_**: Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
 - Keep components focused and composable; extract logic into hooks/stores when it grows.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
@@ -69,3 +70,9 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 - Never access `process.env` directly in app runtime code.
 - Use validated env from `apps/shop/src/env.ts`
 - ESLint enforces restricted env access outside `env.ts`.
+
+### Data flow
+
+- Never perform queries or mutations inside useEffect. Data fetching should not rely on react's render behavior
+- Data loading should be done in route loaders when appropriate, or through tanstack query when done in components
+- Mutations should use tanstack query's useMutation and should always be driven by user events.
