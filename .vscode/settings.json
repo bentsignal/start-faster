@@ -34,5 +34,14 @@
     "ListFooterComponentClassName",
     "ListHeaderComponentClassName"
   ],
-  "tailwindCSS.classFunctions": ["useResolveClassNames"]
+  "tailwindCSS.classFunctions": ["useResolveClassNames"],
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.env": true,
+    "**/*.schema.json": true,
+    "pnpm-lock.yaml": true,
+    "**/_generated/*.types.d.ts": true
+  }
 }
