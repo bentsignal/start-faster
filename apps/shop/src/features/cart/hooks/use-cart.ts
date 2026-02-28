@@ -32,7 +32,7 @@ export function useUpdateCartLine() {
   const clearLineIntent = useCartStore((store) => store.clearLineIntent);
   const flushPending = useCartStore((store) => store.flushPending);
   const lineSyncStatusById = useCartStore((store) => store.lineSyncStatusById);
-  const hasPendingSync = useCartStore((store) => store.hasPendingSync);
+  const hasPendingSync = useCartStore((store) => store.hasPendingCartSync);
 
   return {
     changeLineQuantity: (args: { lineId: string; delta: number }) => {

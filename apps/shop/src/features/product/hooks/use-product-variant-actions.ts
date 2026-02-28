@@ -116,7 +116,7 @@ export function useProductVariantActions({
     addToCartFeedbackTimeoutId.current = window.setTimeout(() => {
       setWasAddedToCart(false);
       addToCartFeedbackTimeoutId.current = null;
-    }, 2_000);
+    }, 500);
 
     const variantImage = selectedVariant.image ?? null;
 
@@ -143,7 +143,7 @@ export function useProductVariantActions({
         selectedOptions: selectedVariant.selectedOptions,
       },
     });
-    openCartWithDelay(500);
+    openCartWithDelay(250);
   }
 
   return {

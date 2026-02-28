@@ -151,7 +151,7 @@ export function applyOptimisticAdd(
 
   return recalculateCart({
     ...cart,
-    lines: [...cart.lines, createOptimisticLine(draft)],
+    lines: [createOptimisticLine(draft), ...cart.lines],
   });
 }
 

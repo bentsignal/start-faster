@@ -28,22 +28,26 @@ export function CartSummary({
     cart !== null && cart.totalQuantity > 0 && cart.checkoutUrl.length > 0;
 
   const goToCheckout = async () => {
+    if (navigatingToCheckout) {
+      return;
+    }
+
     if (canCheckout === false) {
       return;
     }
 
+    setNavigatingToCheckout(true);
+
     const didFlush = await flushPendingCartUpdates({
-      timeoutMs: 3000,
+      timeoutMs: 8000,
     });
     if (didFlush === false) {
-      toast.error("Your cart is still syncing. Please try checkout again.");
+      setNavigatingToCheckout(false);
+      toast.error(
+        "We're having trouble updating your cart. Please refresh and try again.",
+      );
       return;
     }
-
-    setNavigatingToCheckout(true);
-    setTimeout(() => {
-      setNavigatingToCheckout(false);
-    }, 5000);
 
     window.location.assign(cart.checkoutUrl);
   };

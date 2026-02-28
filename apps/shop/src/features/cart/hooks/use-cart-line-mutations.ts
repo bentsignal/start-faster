@@ -22,6 +22,8 @@ interface UseCartLineMutationsArgs {
   applyServerCart: (nextCart: Cart) => void;
   refreshCart: () => Promise<void>;
   clearLineIntent: (lineId: string) => void;
+  markLinePendingRemoval: (lineId: string) => void;
+  clearPendingRemoval: (lineId: string) => void;
 }
 
 export function useCartLineMutations({
@@ -29,6 +31,8 @@ export function useCartLineMutations({
   applyServerCart,
   refreshCart,
   clearLineIntent,
+  markLinePendingRemoval,
+  clearPendingRemoval,
 }: UseCartLineMutationsArgs) {
   const queryClient = useQueryClient();
 
@@ -107,6 +111,7 @@ export function useCartLineMutations({
     },
     onMutate: async ({ lineId, cartId: activeCartId }) => {
       clearLineIntent(lineId);
+      markLinePendingRemoval(lineId);
       const activeQueryKey = cartQueries.detail(activeCartId).queryKey;
       await queryClient.cancelQueries({
         queryKey: cartQueries.detailAll().queryKey,
@@ -123,14 +128,16 @@ export function useCartLineMutations({
         queryKey: activeQueryKey,
       };
     },
-    onError: async (_error, _variables, context) => {
+    onError: async (_error, variables, context) => {
+      clearPendingRemoval(variables.lineId);
       if (context !== undefined) {
         queryClient.setQueryData(context.queryKey, context.previousCart);
       }
       toast.error("Unable to remove this item from your cart.");
       await refreshCart();
     },
-    onSuccess: (nextCart) => {
+    onSuccess: (nextCart, variables) => {
+      clearPendingRemoval(variables.lineId);
       applyServerCart(nextCart);
     },
   });
@@ -165,5 +172,6 @@ export function useCartLineMutations({
   return {
     addLine,
     removeLine,
+    hasPendingRemoveSync: removeLineMutation.isPending,
   };
 }

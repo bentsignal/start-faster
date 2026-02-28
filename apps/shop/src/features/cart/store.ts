@@ -7,7 +7,7 @@ import type { Cart } from "~/features/cart/types";
 import { useCartLineMutations } from "~/features/cart/hooks/use-cart-line-mutations";
 import { useCartLineSync } from "~/features/cart/hooks/use-cart-line-sync";
 import { useCartPersistence } from "~/features/cart/hooks/use-cart-persistence";
-import { applyPendingLineQuantities } from "~/features/cart/lib/cart-display";
+import { applyPendingCartIntents } from "~/features/cart/lib/cart-display";
 import {
   getStoredCartId,
   getStoredCartQuantity,
@@ -22,6 +22,8 @@ interface CartStoreProps {
   initialCart?: CartCookieState;
 }
 
+const CHECKOUT_SYNC_POLL_INTERVAL_MS = 50;
+
 function useInternalStore({
   initialCart = { id: null, quantity: 0 },
 }: CartStoreProps) {
@@ -33,26 +35,73 @@ function useInternalStore({
     getStoredCartQuantity() || initialCart.quantity,
   );
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [pendingRemovedLineIds, setPendingRemovedLineIds] = useState<
+    Set<string>
+  >(new Set());
 
   const openTimerIdRef = useRef<number | null>(null);
+  const pendingQuantityByLineIdRef = useRef<Record<string, number>>({});
+  const pendingRemovedLineIdsRef = useRef<Set<string>>(new Set());
+  const hasPendingRemoveSyncRef = useRef(false);
+
+  const markLinePendingRemoval = useCallback((lineId: string) => {
+    setPendingRemovedLineIds((previousRemovedLineIds) => {
+      if (previousRemovedLineIds.has(lineId)) {
+        return previousRemovedLineIds;
+      }
+      const nextRemovedLineIds = new Set(previousRemovedLineIds);
+      nextRemovedLineIds.add(lineId);
+      return nextRemovedLineIds;
+    });
+  }, []);
+
+  const clearPendingRemoval = useCallback((lineId: string) => {
+    setPendingRemovedLineIds((previousRemovedLineIds) => {
+      if (previousRemovedLineIds.has(lineId) === false) {
+        return previousRemovedLineIds;
+      }
+      const nextRemovedLineIds = new Set(previousRemovedLineIds);
+      nextRemovedLineIds.delete(lineId);
+      return nextRemovedLineIds;
+    });
+  }, []);
+
+  const clearAllPendingRemovals = useCallback(() => {
+    setPendingRemovedLineIds((previousRemovedLineIds) => {
+      if (previousRemovedLineIds.size === 0) {
+        return previousRemovedLineIds;
+      }
+      return new Set();
+    });
+  }, []);
+
+  const reconcileCart = useCallback((nextCart: Cart) => {
+    return applyPendingCartIntents(
+      nextCart,
+      pendingQuantityByLineIdRef.current,
+      pendingRemovedLineIdsRef.current,
+    );
+  }, []);
 
   const applyServerCart = useCallback(
     (nextCart: Cart) => {
       const previousCartId = cartId;
-      const nextQueryKey = cartQueries.detail(nextCart.id).queryKey;
-      queryClient.setQueryData(nextQueryKey, nextCart);
+      const reconciledCart = reconcileCart(nextCart) ?? nextCart;
+      const nextQueryKey = cartQueries.detail(reconciledCart.id).queryKey;
+      queryClient.setQueryData(nextQueryKey, reconciledCart);
 
-      if (previousCartId !== null && previousCartId !== nextCart.id) {
+      if (previousCartId !== null && previousCartId !== reconciledCart.id) {
+        clearAllPendingRemovals();
         queryClient.removeQueries({
           queryKey: cartQueries.detail(previousCartId).queryKey,
           exact: true,
         });
       }
 
-      setCartId(nextCart.id);
-      setStoredQuantity(nextCart.totalQuantity);
+      setCartId(reconciledCart.id);
+      setStoredQuantity(reconciledCart.totalQuantity);
     },
-    [cartId, queryClient],
+    [cartId, clearAllPendingRemovals, queryClient, reconcileCart],
   );
 
   const refreshCart = useCallback(async () => {
@@ -62,12 +111,13 @@ function useInternalStore({
 
     const nextCart = await queryClient.fetchQuery(cartQueries.detail(cartId));
     if (nextCart === null) {
+      clearAllPendingRemovals();
       setCartId(null);
       setStoredQuantity(0);
       return;
     }
     applyServerCart(nextCart);
-  }, [applyServerCart, cartId, queryClient]);
+  }, [applyServerCart, cartId, clearAllPendingRemovals, queryClient]);
 
   const updateLineMutation = useMutation({
     mutationKey: cartMutationKeys.lineUpdate,
@@ -110,15 +160,35 @@ function useInternalStore({
     flushPending,
     resetSyncState,
   } = sync;
-  const { addLine, removeLine } = useCartLineMutations({
+  const { addLine, removeLine, hasPendingRemoveSync } = useCartLineMutations({
     cartId,
     applyServerCart,
     refreshCart,
     clearLineIntent,
+    markLinePendingRemoval,
+    clearPendingRemoval,
   });
+
+  useEffect(() => {
+    pendingQuantityByLineIdRef.current = pendingQuantityByLineId;
+  }, [pendingQuantityByLineId]);
+
+  useEffect(() => {
+    pendingRemovedLineIdsRef.current = pendingRemovedLineIds;
+  }, [pendingRemovedLineIds]);
+
+  useEffect(() => {
+    hasPendingRemoveSyncRef.current = hasPendingRemoveSync;
+  }, [hasPendingRemoveSync]);
+
   const displayCart = useMemo(
-    () => applyPendingLineQuantities(serverCart, pendingQuantityByLineId),
-    [pendingQuantityByLineId, serverCart],
+    () =>
+      applyPendingCartIntents(
+        serverCart,
+        pendingQuantityByLineId,
+        pendingRemovedLineIds,
+      ),
+    [pendingQuantityByLineId, pendingRemovedLineIds, serverCart],
   );
   const cartQuantity = useMemo(() => {
     if (displayCart !== null) {
@@ -148,6 +218,34 @@ function useInternalStore({
       }, delayMs);
     },
     [setCartOpen],
+  );
+
+  const flushPendingCartUpdates = useCallback(
+    async (options?: { timeoutMs?: number }) => {
+      const timeoutMs = options?.timeoutMs;
+      const didFlushLineSync = await flushPending({
+        timeoutMs,
+      });
+      if (didFlushLineSync === false) {
+        return false;
+      }
+
+      const deadline = Date.now() + (timeoutMs ?? 8000);
+      while (Date.now() < deadline) {
+        if (
+          pendingRemovedLineIdsRef.current.size === 0 &&
+          hasPendingRemoveSyncRef.current === false
+        ) {
+          return true;
+        }
+        await new Promise((resolve) => {
+          window.setTimeout(resolve, CHECKOUT_SYNC_POLL_INTERVAL_MS);
+        });
+      }
+
+      return false;
+    },
+    [flushPending],
   );
 
   useCartPersistence({
@@ -181,6 +279,7 @@ function useInternalStore({
         return;
       }
       resetSyncState();
+      clearAllPendingRemovals();
       setCartId((currentCartId) => {
         if (currentCartId !== cartId) {
           return currentCartId;
@@ -189,14 +288,14 @@ function useInternalStore({
       });
       setStoredQuantity(0);
     });
-  }, [cartId, cartQuery.data, cartQuery.status, queryClient, resetSyncState]);
-
-  useEffect(() => {
-    if (cartId !== null) {
-      return;
-    }
-    resetSyncState();
-  }, [cartId, resetSyncState]);
+  }, [
+    cartId,
+    cartQuery.data,
+    cartQuery.status,
+    clearAllPendingRemovals,
+    queryClient,
+    resetSyncState,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -206,13 +305,17 @@ function useInternalStore({
     };
   }, []);
 
+  const hasPendingCartSync =
+    hasPendingSync || hasPendingRemoveSync || pendingRemovedLineIds.size > 0;
+
   return {
     cartId,
     cart: displayCart,
     cartQuantity,
     lineSyncStatusById,
     hasPendingSync,
-    isPending: hasPendingSync,
+    hasPendingCartSync,
+    isPending: hasPendingCartSync,
     isCartOpen,
     isCartLoading: cartQuery.isLoading,
     setCartOpen,
@@ -226,7 +329,7 @@ function useInternalStore({
     clearLineIntent,
     retryLineNow,
     retryFailedNow,
-    flushPending,
+    flushPending: flushPendingCartUpdates,
   };
 }
 
