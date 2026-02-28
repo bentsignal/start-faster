@@ -76,3 +76,7 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 - Never perform queries or mutations inside useEffect. Data fetching should not rely on react's render behavior
 - Data loading should be done in route loaders when appropriate, or through tanstack query when done in components
 - Mutations should use tanstack query's useMutation and should always be driven by user events.
+
+### Testing
+
+- Currently no testing solution is in place. Do not write any tests or attempt to run them.
