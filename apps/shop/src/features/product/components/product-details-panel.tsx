@@ -113,14 +113,9 @@ function ProductActions() {
   return (
     <div className="mb-8 flex flex-col gap-2">
       <Button
-        disabled={isUnavailable}
+        disabled={isUnavailable || wasAddedToCart}
         variant="default"
         onClick={addToCart}
-        className={cn(
-          wasAddedToCart
-            ? "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-green-950 dark:hover:bg-green-400"
-            : undefined,
-        )}
       >
         {wasAddedToCart ? "Added to Cart" : "Add to Cart"}
       </Button>
