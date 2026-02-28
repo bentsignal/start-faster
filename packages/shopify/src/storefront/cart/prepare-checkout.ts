@@ -4,6 +4,7 @@ export const cartLinesAddForCheckout = `#graphql
       cart {
         id
         checkoutUrl
+        totalQuantity
       }
     }
   }
@@ -15,6 +16,7 @@ export const cartCreateForCheckout = `#graphql
       cart {
         id
         checkoutUrl
+        totalQuantity
       }
     }
   }

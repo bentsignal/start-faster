@@ -6,7 +6,11 @@ import { toast } from "@acme/ui/toaster";
 
 import type { Product } from "~/features/product/types";
 import { useAddCartLine } from "~/features/cart/hooks/use-cart";
-import { getStoredCartId, setStoredCartId } from "~/features/cart/lib/cart-id";
+import {
+  getStoredCartId,
+  setStoredCartId,
+  setStoredCartQuantity,
+} from "~/features/cart/lib/cart-id";
 import { prepareCheckoutFn } from "~/features/cart/server/prepare-checkout";
 import { useCartStore } from "~/features/cart/store";
 import { useIsMobile } from "~/hooks/use-is-mobile";
@@ -44,6 +48,7 @@ export function useProductVariantActions({
     },
     onSuccess: (nextCheckout) => {
       setStoredCartId(nextCheckout.id);
+      setStoredCartQuantity(nextCheckout.totalQuantity);
       window.location.assign(nextCheckout.checkoutUrl);
     },
     onError: () => {
