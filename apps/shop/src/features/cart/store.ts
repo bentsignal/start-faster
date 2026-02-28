@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createStore } from "rostra";
 
+import type { CartCookieState } from "~/features/cart/server/cart-cookie";
 import type { Cart } from "~/features/cart/types";
 import { useCartLineMutations } from "~/features/cart/hooks/use-cart-line-mutations";
 import { useCartLineSync } from "~/features/cart/hooks/use-cart-line-sync";
@@ -15,20 +16,18 @@ import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { updateCartLineFn } from "~/features/cart/server/manage-cart";
 
 interface CartStoreProps {
-  initialCartQuantity?: number;
-  initialCartId?: string | null;
+  initialCart?: CartCookieState;
 }
 
 function useInternalStore({
-  initialCartQuantity = 0,
-  initialCartId = null,
+  initialCart = { id: null, quantity: 0 },
 }: CartStoreProps) {
   const queryClient = useQueryClient();
   const [cartId, setCartId] = useState(
-    initialCartId ?? getStoredCartId() ?? null,
+    initialCart.id ?? getStoredCartId() ?? null,
   );
   const [storedQuantity, setStoredQuantity] = useState(
-    getStoredCartQuantity() || initialCartQuantity,
+    getStoredCartQuantity() || initialCart.quantity,
   );
   const [isCartOpen, setIsCartOpen] = useState(false);
 

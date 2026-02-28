@@ -23,8 +23,7 @@ import { MailingList } from "~/components/mailing-list";
 import { env } from "~/env";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
-import { getCartIdFromCookie } from "~/features/cart/server/cart-id";
-import { getCartQuantityFromCookie } from "~/features/cart/server/cart-quantity";
+import { getCartFromCookie } from "~/features/cart/server/cart-cookie";
 import { CartStore } from "~/features/cart/store";
 import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
@@ -58,7 +57,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const [auth, theme, cartQuantity, cartId] = await Promise.all([
+    const [auth, theme, cart] = await Promise.all([
       context.queryClient.fetchQuery({
         queryKey: ["shopify-auth"],
         queryFn: fetchShopifyAuth,
@@ -72,14 +71,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         gcTime: Infinity,
       }),
       context.queryClient.fetchQuery({
-        queryKey: ["cart-quantity"],
-        queryFn: getCartQuantityFromCookie,
-        staleTime: Infinity,
-        gcTime: Infinity,
-      }),
-      context.queryClient.fetchQuery({
-        queryKey: ["cart-id"],
-        queryFn: getCartIdFromCookie,
+        queryKey: ["cart"],
+        queryFn: getCartFromCookie,
         staleTime: Infinity,
         gcTime: Infinity,
       }),
@@ -88,15 +81,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     return {
       auth,
       theme,
-      cartQuantity,
-      cartId,
+      cart,
     };
   },
   loader: async ({ context }) => {
-    const cartId = await getCartIdFromCookie();
-    if (cartId !== null) {
+    if (context.cart.id !== null) {
       await context.queryClient.fetchQuery({
-        ...cartQueries.detail(cartId),
+        ...cartQueries.detail(context.cart.id),
       });
     }
   },
@@ -122,10 +113,7 @@ function RootComponent() {
         )}
       >
         <QueryClientProvider client={context.queryClient}>
-          <CartStore
-            initialCartQuantity={context.cartQuantity}
-            initialCartId={context.cartId}
-          >
+          <CartStore initialCart={context.cart}>
             <ThemeStore
               attribute="class"
               defaultTheme="dark"
