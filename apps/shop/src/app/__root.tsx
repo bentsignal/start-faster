@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie } from "@tanstack/react-start/server";
 import { convert } from "great-time";
 import { z } from "zod";
 
@@ -23,16 +22,13 @@ import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
 import { env } from "~/env";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
+import { cartQueries } from "~/features/cart/lib/cart-queries";
+import { getCartIdFromCookie } from "~/features/cart/server/cart-id";
 import { getCartQuantityFromCookie } from "~/features/cart/server/cart-quantity";
 import { CartStore } from "~/features/cart/store";
+import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
-import { getTheme } from "~/features/theme/utils";
 import { getShopifyCustomerAuthState } from "~/lib/auth";
-
-const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
-  const themeCookie = getCookie("theme");
-  return getTheme(themeCookie);
-});
 
 const fetchShopifyAuth = createServerFn({ method: "GET" }).handler(() => {
   return getShopifyCustomerAuthState();
@@ -62,7 +58,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const [auth, theme, cartQuantity] = await Promise.all([
+    const [auth, theme, cartQuantity, cartId] = await Promise.all([
       context.queryClient.fetchQuery({
         queryKey: ["shopify-auth"],
         queryFn: fetchShopifyAuth,
@@ -81,13 +77,28 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         staleTime: Infinity,
         gcTime: Infinity,
       }),
+      context.queryClient.fetchQuery({
+        queryKey: ["cart-id"],
+        queryFn: getCartIdFromCookie,
+        staleTime: Infinity,
+        gcTime: Infinity,
+      }),
     ]);
 
     return {
       auth,
       theme,
       cartQuantity,
+      cartId,
     };
+  },
+  loader: async ({ context }) => {
+    const cartId = await getCartIdFromCookie();
+    if (cartId !== null) {
+      await context.queryClient.fetchQuery({
+        ...cartQueries.detail(cartId),
+      });
+    }
   },
   validateSearch: z.object({
     showLogin: z.boolean().optional(),
@@ -111,7 +122,10 @@ function RootComponent() {
         )}
       >
         <QueryClientProvider client={context.queryClient}>
-          <CartStore initialCartQuantity={context.cartQuantity}>
+          <CartStore
+            initialCartQuantity={context.cartQuantity}
+            initialCartId={context.cartId}
+          >
             <ThemeStore
               attribute="class"
               defaultTheme="dark"

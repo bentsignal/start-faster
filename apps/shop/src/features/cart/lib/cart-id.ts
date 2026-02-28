@@ -1,4 +1,5 @@
 export const CART_QUANTITY_COOKIE_KEY = "shopify-cart-quantity";
+export const CART_ID_COOKIE_KEY = "shopify-cart-id";
 const SHOPIFY_CART_ID_KEY = "shopify-cart-id";
 const CART_STORAGE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
@@ -33,7 +34,16 @@ export function getStoredCartId() {
   }
 
   const cartId = window.localStorage.getItem(SHOPIFY_CART_ID_KEY);
-  return cartId !== null && cartId.length > 0 ? cartId : undefined;
+  if (cartId !== null && cartId.length > 0) {
+    return cartId;
+  }
+
+  const cookieCartId = getClientCookie(CART_ID_COOKIE_KEY);
+  if (cookieCartId !== undefined && cookieCartId.length > 0) {
+    return cookieCartId;
+  }
+
+  return undefined;
 }
 
 export function setStoredCartId(cartId: string) {
@@ -42,6 +52,7 @@ export function setStoredCartId(cartId: string) {
   }
 
   window.localStorage.setItem(SHOPIFY_CART_ID_KEY, cartId);
+  document.cookie = `${CART_ID_COOKIE_KEY}=${encodeURIComponent(cartId)}; path=/; max-age=${CART_STORAGE_MAX_AGE_SECONDS}; samesite=lax`;
 }
 
 export function clearStoredCartId() {
@@ -50,6 +61,7 @@ export function clearStoredCartId() {
   }
 
   window.localStorage.removeItem(SHOPIFY_CART_ID_KEY);
+  document.cookie = `${CART_ID_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
 }
 
 export function getStoredCartQuantity() {
