@@ -1,20 +1,12 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createStore } from "rostra";
 
 import type { Cart } from "~/features/cart/types";
-import {
-  cartDomainReducer,
-  createInitialCartDomainState,
-} from "~/features/cart/domain/cart-domain-reducer";
-import {
-  selectCartQuantity,
-  selectDisplayCart,
-  selectHasPendingSync,
-} from "~/features/cart/domain/cart-domain-selectors";
-import { useCartActions } from "~/features/cart/domain/use-cart-actions";
-import { useCartPersistence } from "~/features/cart/domain/use-cart-persistence";
-import { useCartSync } from "~/features/cart/domain/use-cart-sync";
+import { useCartLineMutations } from "~/features/cart/hooks/use-cart-line-mutations";
+import { useCartLineSync } from "~/features/cart/hooks/use-cart-line-sync";
+import { useCartPersistence } from "~/features/cart/hooks/use-cart-persistence";
+import { applyPendingLineQuantities } from "~/features/cart/lib/cart-display";
 import {
   getStoredCartId,
   getStoredCartQuantity,
@@ -32,16 +24,49 @@ function useInternalStore({
   initialCartId = null,
 }: CartStoreProps) {
   const queryClient = useQueryClient();
-  const [state, dispatch] = useReducer(
-    cartDomainReducer,
-    {
-      cartId: initialCartId ?? getStoredCartId() ?? null,
-      storedQuantity: getStoredCartQuantity() || initialCartQuantity,
-    },
-    createInitialCartDomainState,
+  const [cartId, setCartId] = useState(
+    initialCartId ?? getStoredCartId() ?? null,
   );
+  const [storedQuantity, setStoredQuantity] = useState(
+    getStoredCartQuantity() || initialCartQuantity,
+  );
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const openTimerIdRef = useRef<number | null>(null);
+
+  const applyServerCart = useCallback(
+    (nextCart: Cart) => {
+      const previousCartId = cartId;
+      const nextQueryKey = cartQueries.detail(nextCart.id).queryKey;
+      queryClient.setQueryData(nextQueryKey, nextCart);
+
+      if (previousCartId !== null && previousCartId !== nextCart.id) {
+        queryClient.removeQueries({
+          queryKey: cartQueries.detail(previousCartId).queryKey,
+          exact: true,
+        });
+      }
+
+      setCartId(nextCart.id);
+      setStoredQuantity(nextCart.totalQuantity);
+    },
+    [cartId, queryClient],
+  );
+
+  const refreshCart = useCallback(async () => {
+    if (cartId === null) {
+      return;
+    }
+
+    const nextCart = await queryClient.fetchQuery(cartQueries.detail(cartId));
+    if (nextCart === null) {
+      setCartId(null);
+      setStoredQuantity(0);
+      return;
+    }
+    applyServerCart(nextCart);
+  }, [applyServerCart, cartId, queryClient]);
+
   const updateLineMutation = useMutation({
     mutationKey: ["cart", "line", "update"],
     mutationFn: async (variables: {
@@ -60,23 +85,48 @@ function useInternalStore({
   });
 
   const cartQuery = useQuery({
-    ...cartQueries.detail(state.cartId),
-    enabled: state.cartId !== null,
+    ...cartQueries.detail(cartId),
+    enabled: cartId !== null,
   });
 
   const serverCart = cartQuery.data ?? null;
+  const sync = useCartLineSync({
+    cartId,
+    serverCart,
+    applyServerCart,
+    executeUpdateLine: updateLineMutation.mutateAsync,
+  });
+  const {
+    pendingQuantityByLineId,
+    lineSyncStatusById,
+    hasPendingSync,
+    setLineQuantity,
+    changeLineQuantity,
+    clearLineIntent,
+    retryLineNow,
+    retryFailedNow,
+    flushPending,
+    resetSyncState,
+  } = sync;
+  const { addLine, removeLine } = useCartLineMutations({
+    cartId,
+    applyServerCart,
+    refreshCart,
+    clearLineIntent,
+  });
   const displayCart = useMemo(
-    () => selectDisplayCart(state, serverCart),
-    [serverCart, state],
+    () => applyPendingLineQuantities(serverCart, pendingQuantityByLineId),
+    [pendingQuantityByLineId, serverCart],
   );
-  const cartQuantity = useMemo(
-    () => selectCartQuantity(state, displayCart),
-    [displayCart, state],
-  );
-  const hasPendingSync = useMemo(() => selectHasPendingSync(state), [state]);
+  const cartQuantity = useMemo(() => {
+    if (displayCart !== null) {
+      return displayCart.totalQuantity;
+    }
+    return storedQuantity;
+  }, [displayCart, storedQuantity]);
 
   const setCartOpen = useCallback((open: boolean) => {
-    dispatch({ type: "set-cart-open", open });
+    setIsCartOpen(open);
   }, []);
 
   const openCartWithDelay = useCallback(
@@ -98,52 +148,13 @@ function useInternalStore({
     [setCartOpen],
   );
 
-  const applyServerCart = useCallback(
-    (nextCart: Cart) => {
-      const previousCartId = state.cartId;
-      const nextKey = cartQueries.detail(nextCart.id).queryKey;
-      queryClient.setQueryData(nextKey, nextCart);
-
-      if (previousCartId !== null && previousCartId !== nextCart.id) {
-        queryClient.removeQueries({
-          queryKey: cartQueries.detail(previousCartId).queryKey,
-          exact: true,
-        });
-      }
-
-      dispatch({ type: "set-cart-id", cartId: nextCart.id });
-      dispatch({
-        type: "set-stored-quantity",
-        quantity: nextCart.totalQuantity,
-      });
-    },
-    [queryClient, state.cartId],
-  );
-
-  const sync = useCartSync({
-    state,
-    dispatch,
-    displayCart,
-    applyServerCart,
-    executeUpdateLine: updateLineMutation.mutateAsync,
-  });
-
-  const actions = useCartActions({
-    state,
-    dispatch,
-    setCartOpen,
-    openCartWithDelay,
-    serverCart,
-    sync,
-  });
-
   useCartPersistence({
-    cartId: state.cartId,
+    cartId,
     quantity: cartQuantity,
   });
 
   useEffect(() => {
-    if (state.cartId === null) {
+    if (cartId === null) {
       return;
     }
 
@@ -154,21 +165,36 @@ function useInternalStore({
     if (cartQuery.data !== null) {
       return;
     }
-
-    dispatch({ type: "clear-cart" });
-  }, [cartQuery.data, cartQuery.status, state.cartId]);
-
-  useEffect(() => {
-    if (serverCart === null) {
+    const latestCart = queryClient.getQueryData<Cart | null>(
+      cartQueries.detail(cartId).queryKey,
+    );
+    if (latestCart !== null) {
       return;
     }
-
-    dispatch({ type: "set-cart-id", cartId: serverCart.id });
-    dispatch({
-      type: "set-stored-quantity",
-      quantity: serverCart.totalQuantity,
+    queueMicrotask(() => {
+      const queuedLatestCart = queryClient.getQueryData<Cart | null>(
+        cartQueries.detail(cartId).queryKey,
+      );
+      if (queuedLatestCart !== null) {
+        return;
+      }
+      resetSyncState();
+      setCartId((currentCartId) => {
+        if (currentCartId !== cartId) {
+          return currentCartId;
+        }
+        return null;
+      });
+      setStoredQuantity(0);
     });
-  }, [serverCart]);
+  }, [cartId, cartQuery.data, cartQuery.status, queryClient, resetSyncState]);
+
+  useEffect(() => {
+    if (cartId !== null) {
+      return;
+    }
+    resetSyncState();
+  }, [cartId, resetSyncState]);
 
   useEffect(() => {
     return () => {
@@ -179,26 +205,26 @@ function useInternalStore({
   }, []);
 
   return {
-    cartId: state.cartId,
+    cartId,
     cart: displayCart,
     cartQuantity,
-    lineSyncStatusById: state.lineSyncStatusById,
+    lineSyncStatusById,
     hasPendingSync,
     isPending: hasPendingSync,
-    isCartOpen: state.isCartOpen,
+    isCartOpen,
     isCartLoading: cartQuery.isLoading,
     setCartOpen,
-    openCart: actions.openCart,
-    closeCart: actions.closeCart,
+    openCart: () => setCartOpen(true),
+    closeCart: () => setCartOpen(false),
     openCartWithDelay,
-    addLine: actions.addLine,
-    removeLine: actions.removeLine,
-    setLineQuantity: actions.setLineQuantity,
-    changeLineQuantity: actions.changeLineQuantity,
-    clearLineIntent: actions.clearLineIntent,
-    retryLineNow: actions.retryLineNow,
-    retryFailedNow: actions.retryFailedNow,
-    flushPending: actions.flushPending,
+    addLine,
+    removeLine,
+    setLineQuantity,
+    changeLineQuantity,
+    clearLineIntent,
+    retryLineNow,
+    retryFailedNow,
+    flushPending,
   };
 }
 
