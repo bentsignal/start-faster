@@ -1,7 +1,6 @@
 import type { HydrogenSession } from "@shopify/hydrogen";
 import {
   clearSession,
-  getRequest,
   getResponseHeader,
   getSession,
   updateSession,
@@ -9,7 +8,6 @@ import {
 import { createCustomerAccountClient } from "@shopify/hydrogen";
 
 import type { GetCustomerIdentityQuery } from "@acme/shopify/customer/generated";
-import { getCustomerIdentity } from "@acme/shopify/customer/account";
 
 import { env } from "~/env";
 
@@ -177,7 +175,7 @@ export function isTrustedCustomerAuthRequest(request: Request) {
   }
 }
 
-function toIdentity(customer: GetCustomerIdentityQuery["customer"]) {
+export function toIdentity(customer: GetCustomerIdentityQuery["customer"]) {
   const name = [customer.firstName, customer.lastName]
     .filter((value): value is string => Boolean(value))
     .join(" ")
@@ -187,32 +185,4 @@ function toIdentity(customer: GetCustomerIdentityQuery["customer"]) {
     email: customer.emailAddress?.emailAddress ?? null,
     name: name || null,
   };
-}
-
-export async function getShopifyCustomerAuthState() {
-  const request = getRequest();
-  const { customerAccount } = await createHydrogenCustomerAuthContext({
-    request,
-  });
-  const isSignedIn = await customerAccount.isLoggedIn();
-  if (!isSignedIn) {
-    return {
-      isSignedIn: false,
-      customer: null,
-    } as const;
-  }
-
-  const accessToken = await customerAccount.getAccessToken();
-  if (!accessToken) {
-    return {
-      isSignedIn: false,
-      customer: null,
-    } as const;
-  }
-  const { data } = await customerAccount.query(getCustomerIdentity);
-
-  return {
-    isSignedIn: true,
-    customer: toIdentity(data.customer),
-  } as const;
 }

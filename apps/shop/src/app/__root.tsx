@@ -7,7 +7,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { createServerFn } from "@tanstack/react-start";
 import { convert } from "great-time";
 import { z } from "zod";
 
@@ -16,22 +15,18 @@ import { cn } from "@acme/ui/utils";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
-import { LoginModal } from "~/components/auth/login-modal";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
 import { env } from "~/env";
+import { LoginModal } from "~/features/auth/components/login-modal";
+import { getAuthState } from "~/features/auth/server/get-auth-state";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { getCartFromCookie } from "~/features/cart/server/cart-cookie";
 import { CartStore } from "~/features/cart/store";
 import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
-import { getShopifyCustomerAuthState } from "~/lib/auth";
-
-const fetchShopifyAuth = createServerFn({ method: "GET" }).handler(() => {
-  return getShopifyCustomerAuthState();
-});
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -59,8 +54,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context }) => {
     const [auth, theme, cart] = await Promise.all([
       context.queryClient.fetchQuery({
-        queryKey: ["shopify-auth"],
-        queryFn: fetchShopifyAuth,
+        queryKey: ["auth"],
+        queryFn: getAuthState,
         staleTime: convert(50, "minutes", "to ms"),
         gcTime: Infinity,
       }),
