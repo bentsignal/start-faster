@@ -20,7 +20,6 @@ import { useCartStore } from "~/features/cart/store";
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);
   const setCartOpen = useCartStore((store) => store.setCartOpen);
-  const closeCart = useCartStore((store) => store.closeCart);
   const cartQuery = useCartQuery();
   const updateCartLine = useUpdateCartLine();
   const removeCartLine = useRemoveCartLine();
@@ -77,7 +76,7 @@ export function CartSheet() {
               type="button"
               variant="outline"
               className="mt-4"
-              onClick={closeCart}
+              onClick={() => setCartOpen(false)}
             >
               Continue Shopping
             </Button>

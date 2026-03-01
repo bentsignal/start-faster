@@ -104,7 +104,7 @@ function RootComponent() {
         )}
       >
         <QueryClientProvider client={context.queryClient}>
-          <CartStore initialCart={context.cart}>
+          <CartStore>
             <ThemeStore
               attribute="class"
               defaultTheme="dark"

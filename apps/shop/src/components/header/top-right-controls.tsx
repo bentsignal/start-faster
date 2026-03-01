@@ -29,7 +29,7 @@ export function TopRightControls() {
     select: (context) => context.auth.isSignedIn,
   });
   const totalQuantity = useCartQuantity();
-  const openCart = useCartStore((store) => store.openCart);
+  const setCartOpen = useCartStore((store) => store.setCartOpen);
 
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
@@ -59,7 +59,7 @@ export function TopRightControls() {
       <button
         type="button"
         className="hover:text-primary relative flex items-center transition-colors hover:cursor-pointer"
-        onClick={openCart}
+        onClick={() => setCartOpen(true)}
       >
         <ShoppingCart className="h-6 w-6" strokeWidth={1.5} />
         {totalQuantity > 0 ? (
