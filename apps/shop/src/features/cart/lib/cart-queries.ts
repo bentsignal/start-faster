@@ -31,19 +31,9 @@ export const cartQueries = {
 };
 
 export const cartMutationKeys = {
-  all: [cartQueries.all().queryKey, "mutation"] as const,
-  lineAll: [cartQueries.all().queryKey, "mutation", "line"] as const,
-  lineAdd: [cartQueries.all().queryKey, "mutation", "line", "add"] as const,
-  lineRemove: [
-    cartQueries.all().queryKey,
-    "mutation",
-    "line",
-    "remove",
-  ] as const,
-  lineUpdate: [
-    cartQueries.all().queryKey,
-    "mutation",
-    "line",
-    "update",
-  ] as const,
+  all: ["cart", "mutation"] as const,
+  lineAll: ["cart", "mutation", "line"] as const,
+  lineAdd: ["cart", "mutation", "line", "add"] as const,
+  lineRemove: ["cart", "mutation", "line", "remove"] as const,
+  lineUpdate: ["cart", "mutation", "line", "update"] as const,
 };

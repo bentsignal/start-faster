@@ -45,14 +45,6 @@ export type CartLineSyncStatus =
   | "retrying"
   | "error";
 
-export interface CartLineIntent {
-  desiredQuantity: number;
-  version: number;
-  status: Exclude<CartLineSyncStatus, "idle">;
-  retryCount: number;
-  updatedAt: number;
-}
-
 export interface Cart {
   id: string;
   checkoutUrl: string;

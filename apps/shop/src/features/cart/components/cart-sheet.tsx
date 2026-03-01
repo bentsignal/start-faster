@@ -71,12 +71,12 @@ export function CartSheet() {
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <p className="text-base font-medium">Your cart is empty.</p>
             <p className="text-muted-foreground mt-2 text-sm">
-              Add an item from any product page to get started.
+              Items will appear here after hitting "Add to Cart"
             </p>
             <Button
               type="button"
               variant="outline"
-              className="mt-6"
+              className="mt-4"
               onClick={closeCart}
             >
               Continue Shopping
