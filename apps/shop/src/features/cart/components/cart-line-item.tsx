@@ -26,6 +26,7 @@ export function CartLineItem({
   removeLine,
 }: CartLineItemProps) {
   const selectedOptionsLabel = formatSelectedOptions(line);
+  const merchandiseImage = line.merchandise.image ?? null;
 
   const decrement = () => {
     if (line.quantity <= 1) {
@@ -49,17 +50,15 @@ export function CartLineItem({
 
   return (
     <article className="flex gap-4 border-b py-4">
-      {line.merchandise.image === null ? (
+      {merchandiseImage === null ? (
         <div className="bg-muted h-24 w-20 shrink-0 rounded-md" />
       ) : (
         <div className="h-24 w-20 shrink-0 overflow-hidden rounded-md">
           <Image
-            src={line.merchandise.image.url}
-            alt={
-              line.merchandise.image.altText ?? line.merchandise.product.title
-            }
-            width={line.merchandise.image.width ?? 120}
-            height={line.merchandise.image.height ?? 144}
+            src={merchandiseImage.url}
+            alt={merchandiseImage.altText ?? line.merchandise.product.title}
+            width={merchandiseImage.width ?? 120}
+            height={merchandiseImage.height ?? 144}
             className="h-full w-full object-cover"
           />
         </div>

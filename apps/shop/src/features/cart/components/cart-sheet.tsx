@@ -24,7 +24,7 @@ export function CartSheet() {
   const updateCartLine = useUpdateCartLine();
   const removeCartLine = useRemoveCartLine();
   const cart = cartQuery.data ?? null;
-  const hasItems = (cart?.lines.length ?? 0) > 0;
+  const hasItems = (cart?.lines.nodes.length ?? 0) > 0;
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
@@ -48,7 +48,7 @@ export function CartSheet() {
           <>
             <ScrollArea className="min-h-0 flex-1 px-4 sm:px-6">
               <div className="pb-4">
-                {cart.lines.map((line) => (
+                {cart.lines.nodes.map((line) => (
                   <CartLineItem
                     key={line.id}
                     line={line}

@@ -131,7 +131,7 @@ export function useProductVariantActions({
       optimisticLine: {
         merchandiseId: selectedVariant.id,
         quantity: 1,
-        unitAmount: Number(selectedVariant.price.amount),
+        unitAmount: selectedVariant.price.amount,
         currencyCode: selectedVariant.price.currencyCode,
         variantTitle: selectedVariant.title,
         productTitle,

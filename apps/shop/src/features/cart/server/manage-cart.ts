@@ -33,76 +33,12 @@ interface ShopifyUserError {
 const cartIdSchema = z.string().min(1);
 const quantitySchema = z.number().int().positive();
 
-function normalizeAmount(amount: number | string) {
-  return typeof amount === "number" ? amount : Number(amount);
-}
-
 function normalizeCart(cart: CartSource | null | undefined): Cart | null {
   if (cart === null || cart === undefined) {
     return null;
   }
 
-  const lines = cart.lines.nodes.flatMap((line) => {
-    const merchandise = line.merchandise;
-    const image = merchandise.image;
-
-    return [
-      {
-        id: line.id,
-        quantity: line.quantity,
-        cost: {
-          amountPerQuantity: {
-            amount: normalizeAmount(line.cost.amountPerQuantity.amount),
-            currencyCode: line.cost.amountPerQuantity.currencyCode,
-          },
-          subtotalAmount: {
-            amount: normalizeAmount(line.cost.subtotalAmount.amount),
-            currencyCode: line.cost.subtotalAmount.currencyCode,
-          },
-          totalAmount: {
-            amount: normalizeAmount(line.cost.totalAmount.amount),
-            currencyCode: line.cost.totalAmount.currencyCode,
-          },
-        },
-        merchandise: {
-          id: merchandise.id,
-          title: merchandise.title,
-          image:
-            image === null || image === undefined
-              ? null
-              : {
-                  url: image.url,
-                  altText: image.altText ?? null,
-                  width: image.width ?? null,
-                  height: image.height ?? null,
-                },
-          product: {
-            title: merchandise.product.title,
-            handle: merchandise.product.handle,
-          },
-          selectedOptions: merchandise.selectedOptions.map(
-            (selectedOption) => ({
-              name: selectedOption.name,
-              value: selectedOption.value,
-            }),
-          ),
-        },
-      },
-    ];
-  });
-
-  return {
-    id: cart.id,
-    checkoutUrl: cart.checkoutUrl,
-    totalQuantity: cart.totalQuantity,
-    cost: {
-      totalAmount: {
-        amount: normalizeAmount(cart.cost.totalAmount.amount),
-        currencyCode: cart.cost.totalAmount.currencyCode,
-      },
-    },
-    lines,
-  };
+  return cart;
 }
 
 function getUserErrorMessage(

@@ -17,17 +17,17 @@ function buildLineTotal(unitAmount: number | string, quantity: number) {
 }
 
 function recalculateCart(cart: Cart): Cart {
-  const totalQuantity = cart.lines.reduce(
+  const totalQuantity = cart.lines.nodes.reduce(
     (accumulator, line) => accumulator + line.quantity,
     0,
   );
-  const totalAmount = cart.lines.reduce(
+  const totalAmount = cart.lines.nodes.reduce(
     (accumulator, line) =>
       accumulator + normalizeAmount(line.cost.totalAmount.amount),
     0,
   );
   const currencyCode =
-    cart.lines[0]?.cost.totalAmount.currencyCode ??
+    cart.lines.nodes[0]?.cost.totalAmount.currencyCode ??
     cart.cost.totalAmount.currencyCode;
 
   return {
@@ -86,7 +86,9 @@ function createOptimisticCartFromLine(line: CartLine): Cart {
         currencyCode: line.cost.totalAmount.currencyCode,
       },
     },
-    lines: [line],
+    lines: {
+      nodes: [line],
+    },
   });
 }
 
@@ -106,7 +108,7 @@ export function applyOptimisticAdd(
     return null;
   }
 
-  const existingLine = cart.lines.find(
+  const existingLine = cart.lines.nodes.find(
     (line) => line.merchandise.id === draft?.merchandiseId,
   );
 
@@ -116,7 +118,7 @@ export function applyOptimisticAdd(
       existingLine.cost.amountPerQuantity.amount,
       nextQuantity,
     );
-    const nextLines = cart.lines.map((line) => {
+    const nextLines = cart.lines.nodes.map((line) => {
       if (line.id !== existingLine.id) {
         return line;
       }
@@ -141,7 +143,10 @@ export function applyOptimisticAdd(
 
     return recalculateCart({
       ...cart,
-      lines: nextLines,
+      lines: {
+        ...cart.lines,
+        nodes: nextLines,
+      },
     });
   }
 
@@ -151,7 +156,10 @@ export function applyOptimisticAdd(
 
   return recalculateCart({
     ...cart,
-    lines: [createOptimisticLine(draft), ...cart.lines],
+    lines: {
+      ...cart.lines,
+      nodes: [createOptimisticLine(draft), ...cart.lines.nodes],
+    },
   });
 }
 
@@ -167,11 +175,14 @@ export function applyOptimisticQuantityUpdate(
   if (quantity <= 0) {
     return recalculateCart({
       ...cart,
-      lines: cart.lines.filter((line) => line.id !== lineId),
+      lines: {
+        ...cart.lines,
+        nodes: cart.lines.nodes.filter((line) => line.id !== lineId),
+      },
     });
   }
 
-  const nextLines = cart.lines.map((line) => {
+  const nextLines = cart.lines.nodes.map((line) => {
     if (line.id !== lineId) {
       return line;
     }
@@ -200,7 +211,10 @@ export function applyOptimisticQuantityUpdate(
 
   return recalculateCart({
     ...cart,
-    lines: nextLines,
+    lines: {
+      ...cart.lines,
+      nodes: nextLines,
+    },
   });
 }
 
@@ -211,6 +225,9 @@ export function applyOptimisticRemove(cart: Cart | null, lineId: string) {
 
   return recalculateCart({
     ...cart,
-    lines: cart.lines.filter((line) => line.id !== lineId),
+    lines: {
+      ...cart.lines,
+      nodes: cart.lines.nodes.filter((line) => line.id !== lineId),
+    },
   });
 }

@@ -311,7 +311,7 @@ export function useUpdateCartLine() {
 
   const changeLineQuantity = useCallback(
     (lineId: string, delta: number) => {
-      const cartLine = cart?.lines.find((line) => line.id === lineId);
+      const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
       if (cartLine === undefined || cartId === null) {
         return;
       }

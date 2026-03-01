@@ -1,65 +1,44 @@
-export interface CartMoney {
-  amount: number;
-  currencyCode: string;
-}
+import type {
+  CartByIdQuery,
+  CartCreateForCartMutation,
+  CartLinesAddForCartMutation,
+  CartLinesRemoveForCartMutation,
+  CartLinesUpdateForCartMutation,
+} from "@acme/shopify/storefront/generated";
 
-export interface CartImage {
-  url: string;
-  altText: string | null;
-  width: number | null;
-  height: number | null;
-}
+type CartPayload =
+  | CartByIdQuery["cart"]
+  | NonNullable<CartCreateForCartMutation["cartCreate"]>["cart"]
+  | NonNullable<CartLinesAddForCartMutation["cartLinesAdd"]>["cart"]
+  | NonNullable<CartLinesUpdateForCartMutation["cartLinesUpdate"]>["cart"]
+  | NonNullable<CartLinesRemoveForCartMutation["cartLinesRemove"]>["cart"];
 
-export interface CartSelectedOption {
-  name: string;
-  value: string;
-}
+export type ServerCart = NonNullable<CartPayload>;
 
-export interface CartLineMerchandise {
-  id: string;
-  title: string;
-  image: CartImage | null;
-  product: {
-    title: string;
-    handle: string;
-  };
-  selectedOptions: CartSelectedOption[];
-}
+type ServerCartLine = ServerCart["lines"]["nodes"][number];
 
-export interface CartLine {
-  id: string;
-  quantity: number;
-  cost: {
-    amountPerQuantity: CartMoney;
-    subtotalAmount: CartMoney;
-    totalAmount: CartMoney;
-  };
-  merchandise: CartLineMerchandise;
+export type CartLine = ServerCartLine & {
   isOptimistic?: boolean;
-}
+};
 
-export type CartLineSyncStatus =
-  | "idle"
-  | "queued"
-  | "syncing"
-  | "retrying"
-  | "error";
-
-export interface Cart {
-  id: string;
-  checkoutUrl: string;
-  totalQuantity: number;
-  cost: {
-    totalAmount: CartMoney;
+export type Cart = Omit<ServerCart, "lines"> & {
+  lines: Omit<ServerCart["lines"], "nodes"> & {
+    nodes: CartLine[];
   };
-  lines: CartLine[];
-}
+};
+
+export type CartImage = NonNullable<
+  NonNullable<CartLine["merchandise"]["image"]>
+>;
+
+export type CartSelectedOption =
+  CartLine["merchandise"]["selectedOptions"][number];
 
 export interface OptimisticCartLineDraft {
   merchandiseId: string;
   quantity: number;
-  unitAmount: number;
-  currencyCode: string;
+  unitAmount: CartLine["cost"]["amountPerQuantity"]["amount"];
+  currencyCode: CartLine["cost"]["amountPerQuantity"]["currencyCode"];
   variantTitle: string;
   productTitle: string;
   productHandle: string;
