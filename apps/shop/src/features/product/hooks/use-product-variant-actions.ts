@@ -5,12 +5,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "@acme/ui/toaster";
 
 import type { Product } from "~/features/product/types";
-import { useAddCartLine } from "~/features/cart/hooks/use-cart";
 import {
   getStoredCartId,
   setStoredCartId,
   setStoredCartQuantity,
-} from "~/features/cart/lib/cart-id";
+} from "~/features/cart/lib/cart-storage";
 import { prepareCheckoutFn } from "~/features/cart/server/prepare-checkout";
 import { useCartStore } from "~/features/cart/store";
 import { useIsMobile } from "~/hooks/use-is-mobile";
@@ -33,7 +32,7 @@ export function useProductVariantActions({
   const navigate = useNavigate({ from: "/shop/$item" });
   const isMobile = useIsMobile();
   const openCartWithDelay = useCartStore((store) => store.openCartWithDelay);
-  const addCartLine = useAddCartLine();
+  const addCartLine = useCartStore((store) => store.addLine);
   const [wasAddedToCart, setWasAddedToCart] = useState(false);
   const addToCartFeedbackTimeoutId = useRef<number | null>(null);
   const buyNowMutation = useMutation({

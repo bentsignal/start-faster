@@ -1,93 +1,74 @@
-import { useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { useMutationState, useQuery } from "@tanstack/react-query";
 
-import type { OptimisticCartLineDraft } from "~/features/cart/types";
+import { clearCartStorage } from "~/features/cart/hooks/use-cart-mutations";
 import {
-  useAddCartLineMutation,
-  useRemoveCartLineMutation,
-  useUpdateCartLineMutation,
-} from "~/features/cart/hooks/use-cart-mutations";
-import { cartMutationKeys } from "~/features/cart/lib/cart-queries";
-import { useCartStore } from "../store";
+  applyPendingMutationsToCart,
+  parsePendingCartMutation,
+} from "~/features/cart/lib/cart-pending-mutations";
+import {
+  cartMutationKeys,
+  cartQueries,
+} from "~/features/cart/lib/cart-queries";
+import {
+  getStoredCartId,
+  getStoredCartQuantity,
+} from "~/features/cart/lib/cart-storage";
 
-const CHECKOUT_SYNC_POLL_INTERVAL_MS = 50;
+// this hook should only be used in the cart store, not directly in components. use the cart store instead.
+export function useCart() {
+  const cookieCartQuery = useQuery({
+    ...cartQueries.cookie(),
+  });
 
-export function useAddCartLine() {
-  const cartId = useCartStore((store) => store.cartId);
-  const addLineMutation = useAddCartLineMutation();
+  const cartId = getStoredCartId() ?? cookieCartQuery.data?.id ?? null;
+
+  const cartQuery = useQuery({
+    ...cartQueries.detail(cartId),
+    enabled: cartId !== null,
+  });
+
+  const pendingMutations = useMutationState({
+    filters: {
+      mutationKey: cartMutationKeys.lineAll,
+      status: "pending",
+    },
+    select: parsePendingCartMutation,
+  }).filter((mutation) => mutation !== null);
+
+  const cart = useMemo(
+    () => applyPendingMutationsToCart(cartQuery.data ?? null, pendingMutations),
+    [cartQuery.data, pendingMutations],
+  );
+  const storedQuantity = getStoredCartQuantity();
+  const fallbackQuantity =
+    cartId === null
+      ? 0
+      : storedQuantity > 0
+        ? storedQuantity
+        : (cookieCartQuery.data?.quantity ?? 0);
+  const cartQuantity = cart?.totalQuantity ?? fallbackQuantity;
+
+  useEffect(() => {
+    if (cartId === null) {
+      return;
+    }
+
+    if (cartQuery.status !== "success") {
+      return;
+    }
+
+    if (cartQuery.data !== null) {
+      return;
+    }
+
+    clearCartStorage();
+  }, [cartId, cartQuery.data, cartQuery.status]);
 
   return {
-    mutate: (variables: {
-      merchandiseId: string;
-      quantity?: number;
-      optimisticLine?: OptimisticCartLineDraft;
-    }) => {
-      addLineMutation.mutate({
-        ...variables,
-        cartId: cartId ?? undefined,
-      });
-    },
-  };
-}
-
-export function useUpdateCartLine() {
-  const queryClient = useQueryClient();
-  const cartId = useCartStore((store) => store.cartId);
-  const cart = useCartStore((store) => store.cart);
-  const updateLineMutation = useUpdateCartLineMutation();
-  const removeLineMutation = useRemoveCartLineMutation();
-
-  const changeLineQuantity = useCallback(
-    ({ lineId, delta }: { lineId: string; delta: number }) => {
-      const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
-      if (cartLine === undefined || cartId === null) {
-        return;
-      }
-
-      const nextQuantity = cartLine.quantity + delta;
-      if (nextQuantity <= 0) {
-        removeLineMutation.mutate({
-          cartId,
-          lineId,
-        });
-        return;
-      }
-
-      updateLineMutation.mutate({
-        cartId,
-        lineId,
-        quantity: nextQuantity,
-      });
-    },
-    [cart, cartId, removeLineMutation, updateLineMutation],
-  );
-
-  const flushPending = useCallback(
-    async (options?: { timeoutMs?: number }) => {
-      const timeoutMs = options?.timeoutMs ?? 8000;
-      const deadline = Date.now() + timeoutMs;
-
-      while (Date.now() < deadline) {
-        const activeMutations = queryClient.isMutating({
-          mutationKey: cartMutationKeys.lineAll,
-        });
-
-        if (activeMutations === 0) {
-          return true;
-        }
-
-        await new Promise((resolve) => {
-          window.setTimeout(resolve, CHECKOUT_SYNC_POLL_INTERVAL_MS);
-        });
-      }
-
-      return false;
-    },
-    [queryClient],
-  );
-
-  return {
-    changeLineQuantity,
-    flushPending,
+    cartId,
+    cart,
+    cartQuantity,
+    cartQuery,
   };
 }

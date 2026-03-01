@@ -1,4 +1,5 @@
-import { Button } from "@acme/ui/button";
+import { Loader } from "lucide-react";
+
 import { ScrollArea } from "@acme/ui/scroll-area";
 import {
   Sheet,
@@ -10,16 +11,13 @@ import {
 
 import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
-import { useUpdateCartLine } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
+import { CartEmpty } from "./cart-empty";
 
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);
   const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
-  const cart = useCartStore((store) => store.cart);
-  const cartQuery = useCartStore((store) => store.cartQuery);
-  const updateCartLine = useUpdateCartLine();
-  const hasItems = (cart?.lines.nodes.length ?? 0) > 0;
+  const cartQuantity = useCartStore((store) => store.cartQuantity);
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -30,50 +28,44 @@ export function CartSheet() {
         <SheetHeader className="border-b px-4 py-5 sm:px-6">
           <SheetTitle>Cart</SheetTitle>
           <SheetDescription>
-            {cart?.totalQuantity ?? 0} item
-            {cart?.totalQuantity === 1 ? "" : "s"}
+            {cartQuantity} item
+            {cartQuantity === 1 ? "" : "s"}
           </SheetDescription>
         </SheetHeader>
 
-        {cartQuery.isLoading && cart === null ? (
-          <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-            Loading cart...
-          </div>
-        ) : hasItems && cart !== null ? (
-          <>
-            <ScrollArea className="min-h-0 flex-1 px-4 sm:px-6">
-              <div className="pb-4">
-                {cart.lines.nodes.map((line) => (
-                  <CartLineItem
-                    key={line.id}
-                    line={line}
-                    changeLineQuantity={updateCartLine.changeLineQuantity}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-            <CartSummary
-              cart={cart}
-              flushPendingCartUpdates={updateCartLine.flushPending}
-            />
-          </>
-        ) : (
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <p className="text-base font-medium">Your cart is empty.</p>
-            <p className="text-muted-foreground mt-2 text-sm">
-              Items will appear here after hitting "Add to Cart"
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4"
-              onClick={() => setIsCartOpen(false)}
-            >
-              Continue Shopping
-            </Button>
-          </div>
-        )}
+        <Body />
       </SheetContent>
     </Sheet>
   );
+}
+
+function Body() {
+  const isCartLoading = useCartStore((store) => store.cartQuery.isLoading);
+  const cartExists = useCartStore((store) => store.cart !== null);
+  const lines = useCartStore((store) => store.cart?.lines.nodes ?? []);
+
+  if (isCartLoading && !cartExists) {
+    return (
+      <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
+        <Loader className="size-4 animate-spin" />
+      </div>
+    );
+  }
+
+  if (lines.length > 0) {
+    return (
+      <>
+        <ScrollArea className="min-h-0 flex-1 px-4 sm:px-6">
+          <div className="pb-4">
+            {lines.map((line) => (
+              <CartLineItem key={line.id} line={line} />
+            ))}
+          </div>
+        </ScrollArea>
+        <CartSummary />
+      </>
+    );
+  }
+
+  return <CartEmpty />;
 }

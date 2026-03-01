@@ -5,11 +5,7 @@ import { Button } from "@acme/ui/button";
 
 import type { CartLine } from "~/features/cart/types";
 import { formatPrice } from "~/features/product/lib/price";
-
-interface CartLineItemProps {
-  line: CartLine;
-  changeLineQuantity: (args: { lineId: string; delta: number }) => void;
-}
+import { useCartStore } from "../store";
 
 function formatSelectedOptions(line: CartLine) {
   return line.merchandise.selectedOptions
@@ -17,9 +13,10 @@ function formatSelectedOptions(line: CartLine) {
     .join(" | ");
 }
 
-export function CartLineItem({ line, changeLineQuantity }: CartLineItemProps) {
+export function CartLineItem({ line }: { line: CartLine }) {
   const selectedOptionsLabel = formatSelectedOptions(line);
   const merchandiseImage = line.merchandise.image ?? null;
+  const changeLineQuantity = useCartStore((store) => store.changeLineQuantity);
 
   const decrement = () => {
     changeLineQuantity({

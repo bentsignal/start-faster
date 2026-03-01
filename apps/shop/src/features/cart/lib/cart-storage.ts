@@ -1,3 +1,4 @@
+import type { Cart } from "../types";
 import { getClientCookie } from "~/lib/cookies";
 
 export const CART_QUANTITY_COOKIE_KEY = "shopify-cart-quantity";
@@ -16,6 +17,11 @@ function parseStoredQuantity(value: string | null | undefined): number {
   }
 
   return parsedValue;
+}
+
+export function storeCart(cart: Cart) {
+  setStoredCartId(cart.id);
+  setStoredCartQuantity(cart.totalQuantity);
 }
 
 export function getStoredCartId() {

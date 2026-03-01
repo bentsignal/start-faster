@@ -1,18 +1,18 @@
+import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { toast } from "@acme/ui/toaster";
 
 import type { Cart, OptimisticCartLineDraft } from "~/features/cart/types";
 import {
-  clearStoredCartId,
-  clearStoredCartQuantity,
-  setStoredCartId,
-  setStoredCartQuantity,
-} from "~/features/cart/lib/cart-id";
-import {
   cartMutationKeys,
   cartQueries,
 } from "~/features/cart/lib/cart-queries";
+import {
+  clearStoredCartId,
+  clearStoredCartQuantity,
+  storeCart,
+} from "~/features/cart/lib/cart-storage";
 import {
   addCartLineFn,
   removeCartLineFn,
@@ -26,12 +26,93 @@ interface CartMutationContext {
   previousCartId: string | null;
 }
 
-function setCartStorageFromCart(cart: Cart) {
-  setStoredCartId(cart.id);
-  setStoredCartQuantity(cart.totalQuantity);
+const CHECKOUT_SYNC_POLL_INTERVAL_MS = 50;
+
+// this hook should only be used in the cart store, not directly in components. use the cart store instead.
+export function useAddCartLine({ cartId }: { cartId: string | null }) {
+  const addLineMutation = useInternalAddCartLineMutation();
+
+  return {
+    mutate: (variables: {
+      merchandiseId: string;
+      quantity?: number;
+      optimisticLine?: OptimisticCartLineDraft;
+    }) => {
+      addLineMutation.mutate({
+        ...variables,
+        cartId: cartId ?? undefined,
+      });
+    },
+  };
 }
 
-export function useAddCartLineMutation() {
+// this hook should only be used in the cart store, not directly in components. use the cart store instead.
+export function useUpdateCartLine({
+  cartId,
+  cart,
+}: {
+  cartId: string | null;
+  cart: Cart | null;
+}) {
+  const updateLineMutation = useInternalUpdateCartLineMutation();
+  const removeLineMutation = useInternalRemoveCartLineMutation();
+
+  const changeLineQuantity = useCallback(
+    ({ lineId, delta }: { lineId: string; delta: number }) => {
+      const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
+      if (cartLine === undefined || cartId === null) {
+        return;
+      }
+
+      const nextQuantity = cartLine.quantity + delta;
+      if (nextQuantity <= 0) {
+        removeLineMutation.mutate({
+          cartId,
+          lineId,
+        });
+        return;
+      }
+
+      updateLineMutation.mutate({
+        cartId,
+        lineId,
+        quantity: nextQuantity,
+      });
+    },
+    [cart, cartId, removeLineMutation, updateLineMutation],
+  );
+
+  return {
+    changeLineQuantity,
+  };
+}
+
+// this hook should only be used in the cart store, not directly in components. use the cart store instead.
+export function useCheckForPendingMutations() {
+  const queryClient = useQueryClient();
+
+  return async (options?: { timeoutMs?: number }) => {
+    const timeoutMs = options?.timeoutMs ?? 8000;
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
+      const activeMutations = queryClient.isMutating({
+        mutationKey: cartMutationKeys.lineAll,
+      });
+
+      if (activeMutations === 0) {
+        return true;
+      }
+
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, CHECKOUT_SYNC_POLL_INTERVAL_MS);
+      });
+    }
+    return false;
+  };
+}
+
+function useInternalAddCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -86,12 +167,12 @@ export function useAddCartLineMutation() {
         });
       }
 
-      setCartStorageFromCart(nextCart);
+      storeCart(nextCart);
     },
   });
 }
 
-export function useUpdateCartLineMutation() {
+function useInternalUpdateCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -129,12 +210,12 @@ export function useUpdateCartLineMutation() {
     onSuccess: (nextCart) => {
       const nextQueryKey = cartQueries.detail(nextCart.id).queryKey;
       queryClient.setQueryData(nextQueryKey, nextCart);
-      setCartStorageFromCart(nextCart);
+      storeCart(nextCart);
     },
   });
 }
 
-export function useRemoveCartLineMutation() {
+function useInternalRemoveCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -167,7 +248,7 @@ export function useRemoveCartLineMutation() {
     onSuccess: (nextCart) => {
       const nextQueryKey = cartQueries.detail(nextCart.id).queryKey;
       queryClient.setQueryData(nextQueryKey, nextCart);
-      setCartStorageFromCart(nextCart);
+      storeCart(nextCart);
     },
   });
 }

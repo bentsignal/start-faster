@@ -4,7 +4,7 @@ import { getCookie } from "@tanstack/react-start/server";
 import {
   CART_ID_COOKIE_KEY,
   CART_QUANTITY_COOKIE_KEY,
-} from "~/features/cart/lib/cart-id";
+} from "~/features/cart/lib/cart-storage";
 
 export interface CartCookieState {
   id: string | null;
