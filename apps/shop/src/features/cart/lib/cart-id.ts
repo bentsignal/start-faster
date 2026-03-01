@@ -1,3 +1,5 @@
+import { getClientCookie } from "~/lib/cookies";
+
 export const CART_QUANTITY_COOKIE_KEY = "shopify-cart-quantity";
 export const CART_ID_COOKIE_KEY = "shopify-cart-id";
 const SHOPIFY_CART_ID_KEY = "shopify-cart-id";
@@ -14,18 +16,6 @@ function parseStoredQuantity(value: string | null | undefined): number {
   }
 
   return parsedValue;
-}
-
-function getClientCookie(name: string): string | undefined {
-  if (typeof document === "undefined") {
-    return undefined;
-  }
-
-  const encodedPrefix = `${encodeURIComponent(name)}=`;
-  const cookieEntry = document.cookie
-    .split("; ")
-    .find((entry) => entry.startsWith(encodedPrefix));
-  return cookieEntry?.slice(encodedPrefix.length);
 }
 
 export function getStoredCartId() {
