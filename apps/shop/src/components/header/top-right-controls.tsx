@@ -10,7 +10,6 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
-import { useCartQuantity } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
 import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
@@ -28,8 +27,8 @@ export function TopRightControls() {
     from: "__root__",
     select: (context) => context.auth.isSignedIn,
   });
-  const totalQuantity = useCartQuantity();
-  const setCartOpen = useCartStore((store) => store.setCartOpen);
+  const cartQuantity = useCartStore((store) => store.cartQuantity);
+  const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
 
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
@@ -59,13 +58,13 @@ export function TopRightControls() {
       <button
         type="button"
         className="hover:text-primary relative flex items-center transition-colors hover:cursor-pointer"
-        onClick={() => setCartOpen(true)}
+        onClick={() => setIsCartOpen(true)}
       >
         <ShoppingCart className="h-6 w-6" strokeWidth={1.5} />
-        {totalQuantity > 0 ? (
+        {cartQuantity > 0 ? (
           <div className="bg-primary absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1">
             <span className="text-primary-foreground text-[10px] leading-none tabular-nums">
-              {totalQuantity > 99 ? "99+" : totalQuantity}
+              {cartQuantity > 99 ? "99+" : cartQuantity}
             </span>
           </div>
         ) : null}

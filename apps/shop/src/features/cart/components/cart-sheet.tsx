@@ -10,22 +10,19 @@ import {
 
 import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
-import {
-  useCartQuery,
-  useUpdateCartLine,
-} from "~/features/cart/hooks/use-cart";
+import { useUpdateCartLine } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
 
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);
-  const setCartOpen = useCartStore((store) => store.setCartOpen);
-  const cartQuery = useCartQuery();
+  const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
+  const cart = useCartStore((store) => store.cart);
+  const cartQuery = useCartStore((store) => store.cartQuery);
   const updateCartLine = useUpdateCartLine();
-  const cart = cartQuery.data ?? null;
   const hasItems = (cart?.lines.nodes.length ?? 0) > 0;
 
   return (
-    <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
+    <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetContent
         side="right"
         className="flex h-full w-full max-w-md flex-col p-0 sm:max-w-lg"
@@ -70,7 +67,7 @@ export function CartSheet() {
               type="button"
               variant="outline"
               className="mt-4"
-              onClick={() => setCartOpen(false)}
+              onClick={() => setIsCartOpen(false)}
             >
               Continue Shopping
             </Button>
