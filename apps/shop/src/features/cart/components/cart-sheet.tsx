@@ -12,7 +12,6 @@ import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
 import {
   useCartQuery,
-  useRemoveCartLine,
   useUpdateCartLine,
 } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
@@ -22,7 +21,6 @@ export function CartSheet() {
   const setCartOpen = useCartStore((store) => store.setCartOpen);
   const cartQuery = useCartQuery();
   const updateCartLine = useUpdateCartLine();
-  const removeCartLine = useRemoveCartLine();
   const cart = cartQuery.data ?? null;
   const hasItems = (cart?.lines.nodes.length ?? 0) > 0;
 
@@ -53,10 +51,6 @@ export function CartSheet() {
                     key={line.id}
                     line={line}
                     changeLineQuantity={updateCartLine.changeLineQuantity}
-                    clearLineIntent={updateCartLine.clearLineIntent}
-                    removeLine={(lineId) => {
-                      removeCartLine.mutate({ lineId });
-                    }}
                   />
                 ))}
               </div>

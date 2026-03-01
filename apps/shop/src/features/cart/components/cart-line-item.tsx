@@ -9,8 +9,6 @@ import { formatPrice } from "~/features/product/lib/price";
 interface CartLineItemProps {
   line: CartLine;
   changeLineQuantity: (args: { lineId: string; delta: number }) => void;
-  clearLineIntent: (lineId: string) => void;
-  removeLine: (lineId: string) => void;
 }
 
 function formatSelectedOptions(line: CartLine) {
@@ -19,22 +17,11 @@ function formatSelectedOptions(line: CartLine) {
     .join(" | ");
 }
 
-export function CartLineItem({
-  line,
-  changeLineQuantity,
-  clearLineIntent,
-  removeLine,
-}: CartLineItemProps) {
+export function CartLineItem({ line, changeLineQuantity }: CartLineItemProps) {
   const selectedOptionsLabel = formatSelectedOptions(line);
   const merchandiseImage = line.merchandise.image ?? null;
 
   const decrement = () => {
-    if (line.quantity <= 1) {
-      clearLineIntent(line.id);
-      removeLine(line.id);
-      return;
-    }
-
     changeLineQuantity({
       lineId: line.id,
       delta: -1,

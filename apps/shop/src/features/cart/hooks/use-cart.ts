@@ -91,19 +91,6 @@ function applyPendingMutationsToCart(
   return nextCart;
 }
 
-function readLineIdFromVariables(variables: unknown) {
-  if (typeof variables !== "object" || variables === null) {
-    return undefined;
-  }
-
-  if ("lineId" in variables === false) {
-    return undefined;
-  }
-
-  const lineId = (variables as { lineId?: unknown }).lineId;
-  return typeof lineId === "string" ? lineId : undefined;
-}
-
 function parsePendingCartMutation(
   mutation: unknown,
 ): PendingCartMutation | null {
@@ -160,10 +147,9 @@ function useCartState() {
     select: parsePendingCartMutation,
   }).filter((mutation) => mutation !== null);
 
-  const serverCart = cartQuery.data ?? null;
   const cart = useMemo(
-    () => applyPendingMutationsToCart(serverCart, pendingMutations),
-    [pendingMutations, serverCart],
+    () => applyPendingMutationsToCart(cartQuery.data ?? null, pendingMutations),
+    [cartQuery.data, pendingMutations],
   );
   const storedQuantity = getStoredCartQuantity();
   const fallbackQuantity =
@@ -193,62 +179,9 @@ function useCartState() {
   return {
     cartId,
     cart,
-    serverCart,
     cartQuery,
     cartQuantity,
   };
-}
-
-function useLineSyncStatusById() {
-  const mutations = useMutationState({
-    filters: {
-      mutationKey: cartMutationKeys.lineAll,
-    },
-    select: (mutation) => {
-      const typedMutation = mutation as {
-        state: {
-          variables: unknown;
-          status: "idle" | "pending" | "error" | "success";
-          failureCount: number;
-        };
-      };
-
-      return {
-        lineId: readLineIdFromVariables(typedMutation.state.variables),
-        status: typedMutation.state.status,
-        failureCount: typedMutation.state.failureCount,
-      };
-    },
-  });
-
-  return useMemo(() => {
-    const statusByLineId: Record<
-      string,
-      "queued" | "syncing" | "retrying" | "error"
-    > = {};
-
-    for (const mutation of mutations) {
-      if (mutation.lineId === undefined || mutation.status === "success") {
-        continue;
-      }
-
-      if (mutation.status === "error") {
-        statusByLineId[mutation.lineId] = "error";
-        continue;
-      }
-
-      if (mutation.status === "pending" && mutation.failureCount > 0) {
-        statusByLineId[mutation.lineId] = "retrying";
-        continue;
-      }
-
-      if (mutation.status === "pending") {
-        statusByLineId[mutation.lineId] = "syncing";
-      }
-    }
-
-    return statusByLineId;
-  }, [mutations]);
 }
 
 export function useCartQuery() {
@@ -257,7 +190,6 @@ export function useCartQuery() {
   return {
     data: cart,
     isLoading: cartQuery.isLoading,
-    isSuccess: cartQuery.isLoading === false,
   };
 }
 
@@ -284,33 +216,9 @@ export function useUpdateCartLine() {
   const { cartId, cart } = useCartState();
   const updateLineMutation = useUpdateCartLineMutation();
   const removeLineMutation = useRemoveCartLineMutation();
-  const lineSyncStatusById = useLineSyncStatusById();
-
-  const hasPendingSync =
-    useMutationState({
-      filters: {
-        mutationKey: cartMutationKeys.lineAll,
-        status: "pending",
-      },
-    }).length > 0;
-
-  const setLineQuantity = useCallback(
-    (lineId: string, quantity: number) => {
-      if (cartId === null || quantity <= 0) {
-        return;
-      }
-
-      updateLineMutation.mutate({
-        cartId,
-        lineId,
-        quantity,
-      });
-    },
-    [cartId, updateLineMutation],
-  );
 
   const changeLineQuantity = useCallback(
-    (lineId: string, delta: number) => {
+    ({ lineId, delta }: { lineId: string; delta: number }) => {
       const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
       if (cartLine === undefined || cartId === null) {
         return;
@@ -359,42 +267,8 @@ export function useUpdateCartLine() {
   );
 
   return {
-    changeLineQuantity: (args: { lineId: string; delta: number }) => {
-      changeLineQuantity(args.lineId, args.delta);
-    },
-    setLineQuantity: (args: { lineId: string; quantity: number }) => {
-      setLineQuantity(args.lineId, args.quantity);
-    },
-    clearLineIntent: () => {
-      // No-op for backward compatibility; intents are represented by queued mutations.
-    },
-    mutate: (args: { lineId: string; quantity: number }) => {
-      setLineQuantity(args.lineId, args.quantity);
-    },
+    changeLineQuantity,
     flushPending,
-    retryLineNow: () => Promise.resolve(),
-    retryFailedNow: () => Promise.resolve(),
-    lineSyncStatusById,
-    hasPendingSync,
-    isPending: hasPendingSync,
-  };
-}
-
-export function useRemoveCartLine() {
-  const { cartId } = useCartState();
-  const removeLineMutation = useRemoveCartLineMutation();
-
-  return {
-    mutate: ({ lineId }: { lineId: string }) => {
-      if (cartId === null) {
-        return;
-      }
-
-      removeLineMutation.mutate({
-        cartId,
-        lineId,
-      });
-    },
   };
 }
 
