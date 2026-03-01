@@ -1,5 +1,4 @@
 import {
-  Link,
   useNavigate,
   useRouteContext,
   useSearch,
@@ -23,6 +22,7 @@ import {
   DrawerTitle,
 } from "@acme/ui/drawer";
 
+import { Link } from "~/components/link";
 import { useIsMobile } from "~/hooks/use-is-mobile";
 
 function LoginButton() {

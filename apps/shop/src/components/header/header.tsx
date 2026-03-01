@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
+import { Link } from "~/components/link";
 import { SearchClearButton } from "~/features/search/atoms/clear-button";
 import { SearchIcon } from "~/features/search/atoms/icon";
 import { SearchInput } from "~/features/search/atoms/input";

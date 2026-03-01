@@ -1,7 +1,8 @@
-import { Link } from "@tanstack/react-router";
 import { House } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
+
+import { Link } from "~/components/link";
 
 export function NotFound() {
   return (

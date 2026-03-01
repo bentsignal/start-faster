@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import type { GetQueryVariables } from "@acme/shopify/storefront/generated";
 import { getProductsByCollection } from "@acme/shopify/storefront/product";
 
+import { Link } from "~/components/link";
 import { shopify } from "~/lib/shopify";
 
 const getProductsByCollectionFn = createServerFn({ method: "GET" })

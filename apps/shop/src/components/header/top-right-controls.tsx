@@ -1,4 +1,4 @@
-import { Link, useRouteContext } from "@tanstack/react-router";
+import { useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -10,6 +10,7 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
+import { Link } from "~/components/link";
 import { useCartStore } from "~/features/cart/store";
 import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
