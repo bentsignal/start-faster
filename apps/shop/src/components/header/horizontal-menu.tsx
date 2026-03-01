@@ -1,3 +1,5 @@
+import { Image } from "@unpic/react";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -48,13 +50,18 @@ export function HorizontalMenu() {
                 <NavigationMenuContent className="p-0!">
                   <div className="grid w-[min(90vw,72rem)] grid-cols-[1fr_1.5fr] gap-3 p-6">
                     <div className="flex h-full items-center justify-center">
-                      <img
+                      <Image
                         src={
                           item.ad?.image ??
                           "https://assets.gardeners.com/m/7ef302a1548259ad/High_Res_JPG-cat_hero_24A19a_BirdiesSale.jpg"
                         }
                         alt={item.ad?.alt ?? `${item.label} promotion`}
-                        className="rounded-md"
+                        width={960}
+                        height={720}
+                        sizes="(min-width: 1280px) 432px, 35vw"
+                        loading="eager"
+                        fetchPriority="high"
+                        className="h-auto w-full rounded-md object-cover"
                       />
                     </div>
                     <div className="grid w-full grid-cols-2 gap-3">

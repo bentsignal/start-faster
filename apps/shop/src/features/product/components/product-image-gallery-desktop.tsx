@@ -91,6 +91,16 @@ function GalleryThumbnail({
   productTitle: string;
   onSelect: (index: number) => void;
 }) {
+  const thumbnailWidth = 320;
+
+  const thumbnailHeight =
+    image.width !== null &&
+    image.width > 0 &&
+    image.height !== null &&
+    image.height > 0
+      ? Math.max(Math.round((thumbnailWidth * image.height) / image.width), 1)
+      : thumbnailWidth;
+
   return (
     <button
       type="button"
@@ -108,8 +118,11 @@ function GalleryThumbnail({
         <Image
           src={image.url}
           alt={image.altText ?? `${productTitle} preview ${imageIndex + 1}`}
-          width={image.width ?? 300}
-          height={image.height ?? 300}
+          width={thumbnailWidth}
+          height={thumbnailHeight}
+          sizes="80px"
+          loading="eager"
+          fetchPriority={imageIndex < 4 ? "high" : "auto"}
           className={cn(
             "h-full w-full object-cover transition-opacity duration-150",
             isActive
@@ -147,6 +160,9 @@ function GalleryImage({
           alt={image.altText ?? `${productTitle} image ${imageIndex + 1}`}
           width={image.width ?? 1600}
           height={image.height ?? 1600}
+          sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
+          loading={imageIndex < 2 ? "eager" : undefined}
+          fetchPriority={imageIndex < 2 ? "high" : undefined}
           className="h-full w-full object-cover"
         />
       </div>
