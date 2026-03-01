@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Image } from "@unpic/react";
 
 import {
@@ -10,6 +11,11 @@ import {
 import { cn } from "@acme/ui/utils";
 
 import { navItems } from "~/components/header/nav-data";
+
+const fallbackPromoImage =
+  "https://assets.gardeners.com/m/7ef302a1548259ad/High_Res_JPG-cat_hero_24A19a_BirdiesSale.jpg";
+
+const prefetchedPromoImages = new Set<string>();
 
 function HorizontalMenuItem({
   label,
@@ -30,6 +36,31 @@ function HorizontalMenuItem({
 }
 
 export function HorizontalMenu() {
+  useEffect(() => {
+    const preloadImage = (src: string) => {
+      if (prefetchedPromoImages.has(src)) {
+        return;
+      }
+
+      const image = new window.Image();
+      image.decoding = "async";
+      image.src = src;
+      prefetchedPromoImages.add(src);
+    };
+
+    const imageSources = new Set(
+      navItems.map((item) => item.ad?.image ?? fallbackPromoImage),
+    );
+
+    const timeoutId = window.setTimeout(() => {
+      imageSources.forEach(preloadImage);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <div className="border-border bg-background hidden border-b xl:block">
       <div className="container flex items-center justify-center px-6">
@@ -51,10 +82,7 @@ export function HorizontalMenu() {
                   <div className="grid w-[min(90vw,72rem)] grid-cols-[1fr_1.5fr] gap-3 p-6">
                     <div className="flex h-full items-center justify-center">
                       <Image
-                        src={
-                          item.ad?.image ??
-                          "https://assets.gardeners.com/m/7ef302a1548259ad/High_Res_JPG-cat_hero_24A19a_BirdiesSale.jpg"
-                        }
+                        src={item.ad?.image ?? fallbackPromoImage}
                         alt={item.ad?.alt ?? `${item.label} promotion`}
                         width={960}
                         height={720}
