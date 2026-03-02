@@ -17,7 +17,7 @@ import {
   addCartLineFn,
   removeCartLineFn,
   updateCartLineFn,
-} from "~/features/cart/server/manage-cart";
+} from "~/features/cart/lib/manage-cart";
 
 const CART_WRITE_SCOPE_ID = "cart-write";
 

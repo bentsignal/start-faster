@@ -10,7 +10,7 @@ import {
   setStoredCartId,
   setStoredCartQuantity,
 } from "~/features/cart/lib/cart-storage";
-import { prepareCheckoutFn } from "~/features/cart/server/prepare-checkout";
+import { prepareCheckoutFn } from "~/features/cart/lib/prepare-checkout";
 import { useCartStore } from "~/features/cart/store";
 import { useIsMobile } from "~/hooks/use-is-mobile";
 
@@ -29,7 +29,7 @@ export function useProductVariantActions({
   selectedVariant,
   selectedOptions,
 }: UseProductVariantActionsArgs) {
-  const navigate = useNavigate({ from: "/shop/$item" });
+  const navigate = useNavigate({ from: "/shop/$handle" });
   const isMobile = useIsMobile();
   const openCartWithDelay = useCartStore((store) => store.openCartWithDelay);
   const addCartLine = useCartStore((store) => store.addLine);

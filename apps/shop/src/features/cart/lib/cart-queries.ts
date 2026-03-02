@@ -1,4 +1,4 @@
-import { getCartFn } from "~/features/cart/server/manage-cart";
+import { getCartFn } from "~/features/cart/lib/manage-cart";
 import { getCartFromCookie } from "../server/cart-cookie";
 
 export const cartQueries = {
@@ -20,7 +20,6 @@ export const cartQueries = {
       if (cartId === null) {
         return null;
       }
-
       return getCartFn({
         data: {
           cartId,

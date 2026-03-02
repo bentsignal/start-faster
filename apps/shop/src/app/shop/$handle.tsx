@@ -1,47 +1,34 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
-
-import type { ProductByHandleQueryVariables } from "@acme/shopify/storefront/generated";
-import { getProduct } from "@acme/shopify/storefront/product";
 
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
+import { productQueries } from "~/features/product/lib/product-queries";
 import { ProductStore } from "~/features/product/store";
-import { shopify } from "~/lib/shopify";
 
-const getProductFn = createServerFn({ method: "GET" })
-  .inputValidator((value: ProductByHandleQueryVariables) => value)
-  .handler(async ({ data }) => {
-    const response = await shopify.request(getProduct, {
-      variables: data,
-    });
-    return response.data?.product;
-  });
-
-export const Route = createFileRoute("/shop/$item")({
+export const Route = createFileRoute("/shop/$handle")({
   component: ProductPage,
-  loader: async ({ params }) => {
-    const product = await getProductFn({
-      data: {
-        handle: params.item,
-      },
-    });
-    if (product === null || product === undefined) throw notFound();
-    return product;
-  },
   params: z.object({
-    item: z.string(),
+    handle: z.string(),
   }),
   validateSearch: z.object({
     variant: z.string().optional(),
   }),
+  loader: async ({ context, params }) => {
+    await context.queryClient.ensureQueryData(
+      productQueries.productByHandle(params.handle),
+    );
+  },
 });
 
 function ProductPage() {
-  const product = Route.useLoaderData();
+  const { handle } = Route.useParams();
   const variant = Route.useSearch({ select: (search) => search.variant });
+  const { data: product } = useSuspenseQuery(
+    productQueries.productByHandle(handle),
+  );
 
   return (
     <ProductStore variant={variant} product={product}>

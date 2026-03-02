@@ -15,7 +15,7 @@ import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
-import { Route as ShopItemRouteImport } from './app/shop/$item'
+import { Route as ShopHandleRouteImport } from './app/shop/$handle'
 import { Route as AuthLogoutRouteImport } from './app/_auth/logout'
 import { Route as AuthLoginRouteImport } from './app/_auth/login'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings.account'
@@ -49,9 +49,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopItemRoute = ShopItemRouteImport.update({
-  id: '/$item',
-  path: '/$item',
+const ShopHandleRoute = ShopHandleRouteImport.update({
+  id: '/$handle',
+  path: '/$handle',
   getParentRoute: () => ShopRouteRoute,
 } as any)
 const AuthLogoutRoute = AuthLogoutRouteImport.update({
@@ -79,7 +79,7 @@ export interface FileRoutesByFullPath {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
-  '/shop/$item': typeof ShopItemRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesByTo {
@@ -90,7 +90,7 @@ export interface FileRoutesByTo {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
-  '/shop/$item': typeof ShopItemRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesById {
@@ -103,7 +103,7 @@ export interface FileRoutesById {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/logout': typeof AuthLogoutRoute
-  '/shop/$item': typeof ShopItemRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRouteTypes {
@@ -116,7 +116,7 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/login'
     | '/logout'
-    | '/shop/$item'
+    | '/shop/$handle'
     | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,7 +127,7 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/login'
     | '/logout'
-    | '/shop/$item'
+    | '/shop/$handle'
     | '/settings/account'
   id:
     | '__root__'
@@ -139,7 +139,7 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/_auth/login'
     | '/_auth/logout'
-    | '/shop/$item'
+    | '/shop/$handle'
     | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
 }
@@ -198,11 +198,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop/$item': {
-      id: '/shop/$item'
-      path: '/$item'
-      fullPath: '/shop/$item'
-      preLoaderRoute: typeof ShopItemRouteImport
+    '/shop/$handle': {
+      id: '/shop/$handle'
+      path: '/$handle'
+      fullPath: '/shop/$handle'
+      preLoaderRoute: typeof ShopHandleRouteImport
       parentRoute: typeof ShopRouteRoute
     }
     '/_auth/logout': {
@@ -230,11 +230,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface ShopRouteRouteChildren {
-  ShopItemRoute: typeof ShopItemRoute
+  ShopHandleRoute: typeof ShopHandleRoute
 }
 
 const ShopRouteRouteChildren: ShopRouteRouteChildren = {
-  ShopItemRoute: ShopItemRoute,
+  ShopHandleRoute: ShopHandleRoute,
 }
 
 const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(

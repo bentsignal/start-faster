@@ -1,36 +1,29 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 
 import type { GetQueryVariables } from "@acme/shopify/storefront/generated";
-import { getProductsByCollection } from "@acme/shopify/storefront/product";
 
 import { Link } from "~/components/link";
-import { shopify } from "~/lib/shopify";
+import { productQueries } from "~/features/product/lib/product-queries";
 
-const getProductsByCollectionFn = createServerFn({ method: "GET" })
-  .inputValidator((value: GetQueryVariables) => value)
-  .handler(async ({ data }) => {
-    const response = await shopify.request(getProductsByCollection, {
-      variables: data,
-    });
-    return response.data?.collection?.products;
-  });
+const args = {
+  handle: "frontpage",
+  first: 24,
+} as const satisfies GetQueryVariables;
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const data = await getProductsByCollectionFn({
-      data: {
-        handle: "frontpage",
-        first: 24,
-      },
-    });
-    return data?.nodes ?? [];
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(
+      productQueries.productsFromCollection(args),
+    );
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const products = Route.useLoaderData();
+  const { data: products } = useSuspenseQuery(
+    productQueries.productsFromCollection(args),
+  );
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-12">
@@ -41,8 +34,8 @@ function RouteComponent() {
             {products.map((product) => (
               <Link
                 key={product.id}
-                to="/shop/$item"
-                params={{ item: product.handle }}
+                to="/shop/$handle"
+                params={{ handle: product.handle }}
                 className="hover:bg-muted rounded-lg border p-4 transition-colors"
               >
                 <p className="font-medium">{product.title}</p>

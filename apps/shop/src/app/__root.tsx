@@ -77,7 +77,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   },
   loader: async ({ context }) => {
     if (context.cart.id !== null) {
-      await context.queryClient.fetchQuery({
+      await context.queryClient.ensureQueryData({
         ...cartQueries.detail(context.cart.id),
       });
     }
