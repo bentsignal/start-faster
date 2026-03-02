@@ -16,10 +16,28 @@ export function useDesktopProductImageGallery({
   const imageSectionsRef = useRef<(HTMLElement | null)[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const activeImageIndexRef = useRef(0);
-  const isProgrammaticScrollRef = useRef(false);
-  const programmaticScrollUnlockTimeoutRef = useRef<number | null>(null);
+  const pendingProgrammaticTargetIndexRef = useRef<number | null>(null);
+  const pendingProgrammaticTargetScrollYRef = useRef<number | null>(null);
+  const wasProgrammaticScrollInterruptedRef = useRef(false);
   const visibleActiveImageIndex =
     imageCount > 0 ? Math.min(activeImageIndex, imageCount - 1) : 0;
+
+  const getHeaderHeight = useCallback(() => {
+    const headerElement =
+      document.querySelector<HTMLElement>("[data-site-header]");
+
+    return headerElement?.getBoundingClientRect().height ?? 0;
+  }, []);
+
+  const getViewportAnchorY = useCallback(() => {
+    return getHeaderHeight() + 24;
+  }, [getHeaderHeight]);
+
+  const getVisibleSections = useCallback(() => {
+    return imageSectionsRef.current.filter(
+      (section): section is HTMLElement => section !== null,
+    );
+  }, []);
 
   useEffect(() => {
     imageSectionsRef.current = imageSectionsRef.current.slice(0, imageCount);
@@ -30,37 +48,57 @@ export function useDesktopProductImageGallery({
       imageCount > 0
         ? Math.min(activeImageIndexRef.current, imageCount - 1)
         : 0;
+
+    if (
+      pendingProgrammaticTargetIndexRef.current !== null &&
+      pendingProgrammaticTargetIndexRef.current >= imageCount
+    ) {
+      pendingProgrammaticTargetIndexRef.current = null;
+      pendingProgrammaticTargetScrollYRef.current = null;
+      wasProgrammaticScrollInterruptedRef.current = false;
+    }
   }, [imageCount]);
 
   useEffect(() => {
-    function unlockProgrammaticScroll() {
-      isProgrammaticScrollRef.current = false;
-
-      if (programmaticScrollUnlockTimeoutRef.current !== null) {
-        window.clearTimeout(programmaticScrollUnlockTimeoutRef.current);
-        programmaticScrollUnlockTimeoutRef.current = null;
-      }
-    }
-
-    function handleScroll() {
-      if (!isProgrammaticScrollRef.current) {
+    function interruptProgrammaticScroll() {
+      if (pendingProgrammaticTargetIndexRef.current === null) {
         return;
       }
 
-      if (programmaticScrollUnlockTimeoutRef.current !== null) {
-        window.clearTimeout(programmaticScrollUnlockTimeoutRef.current);
-      }
-
-      programmaticScrollUnlockTimeoutRef.current = window.setTimeout(() => {
-        unlockProgrammaticScroll();
-      }, 140);
+      wasProgrammaticScrollInterruptedRef.current = true;
     }
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    function handleKeyDown(event: KeyboardEvent) {
+      if (
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown" ||
+        event.key === "PageUp" ||
+        event.key === "PageDown" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === " " ||
+        event.key === "Spacebar"
+      ) {
+        interruptProgrammaticScroll();
+      }
+    }
+
+    window.addEventListener("wheel", interruptProgrammaticScroll, {
+      passive: true,
+    });
+    window.addEventListener("touchstart", interruptProgrammaticScroll, {
+      passive: true,
+    });
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("pointerdown", interruptProgrammaticScroll, {
+      passive: true,
+    });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      unlockProgrammaticScroll();
+      window.removeEventListener("wheel", interruptProgrammaticScroll);
+      window.removeEventListener("touchstart", interruptProgrammaticScroll);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("pointerdown", interruptProgrammaticScroll);
     };
   }, []);
 
@@ -75,79 +113,89 @@ export function useDesktopProductImageGallery({
       return;
     }
 
-    const imageSections = imageSectionsRef.current.filter(
-      (section): section is HTMLElement => section !== null,
-    );
+    const imageSections = getVisibleSections();
 
     if (imageSections.length === 0) {
       return;
     }
 
-    const headerElement =
-      document.querySelector<HTMLElement>("[data-site-header]");
-    const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
-    const intersectionRatios = new Map<number, number>();
-
-    imageSections.forEach((section) => {
-      const index = Number(section.getAttribute("data-image-index"));
-
-      if (!Number.isNaN(index)) {
-        intersectionRatios.set(index, 0);
-      }
-    });
-
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (isProgrammaticScrollRef.current) {
+      () => {
+        const sections = getVisibleSections();
+
+        if (sections.length === 0) {
           return;
         }
 
-        entries.forEach((entry) => {
-          const index = Number(entry.target.getAttribute("data-image-index"));
+        const anchorY = getViewportAnchorY();
+        let closestSectionIndex = activeImageIndexRef.current;
+        let closestDistance = Number.POSITIVE_INFINITY;
+
+        sections.forEach((section) => {
+          const index = Number(section.getAttribute("data-image-index"));
 
           if (Number.isNaN(index)) {
             return;
           }
 
-          intersectionRatios.set(
-            index,
-            entry.isIntersecting ? entry.intersectionRatio : 0,
-          );
-        });
+          const rect = section.getBoundingClientRect();
 
-        let mostVisibleIndex = activeImageIndexRef.current;
-        let mostVisibleRatio = intersectionRatios.get(mostVisibleIndex) ?? 0;
+          if (rect.bottom <= anchorY || rect.top >= window.innerHeight) {
+            return;
+          }
 
-        intersectionRatios.forEach((ratio, index) => {
-          if (ratio > mostVisibleRatio) {
-            mostVisibleIndex = index;
-            mostVisibleRatio = ratio;
+          const distance = Math.abs(rect.top - anchorY);
+
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestSectionIndex = index;
           }
         });
 
-        if (mostVisibleRatio === 0) {
+        if (closestDistance === Number.POSITIVE_INFINITY) {
           return;
         }
 
-        const currentRatio =
-          intersectionRatios.get(activeImageIndexRef.current) ?? 0;
-        const ratioDelta = mostVisibleRatio - currentRatio;
+        const pendingTargetIndex = pendingProgrammaticTargetIndexRef.current;
 
-        if (
-          mostVisibleIndex !== activeImageIndexRef.current &&
-          ratioDelta < 0.08
-        ) {
-          return;
+        if (pendingTargetIndex !== null) {
+          if (wasProgrammaticScrollInterruptedRef.current) {
+            pendingProgrammaticTargetIndexRef.current = null;
+            pendingProgrammaticTargetScrollYRef.current = null;
+            wasProgrammaticScrollInterruptedRef.current = false;
+          } else {
+            const targetSection = imageSectionsRef.current[pendingTargetIndex];
+
+            if (!targetSection) {
+              pendingProgrammaticTargetIndexRef.current = null;
+              pendingProgrammaticTargetScrollYRef.current = null;
+            } else {
+              const targetDistance = Math.abs(
+                targetSection.getBoundingClientRect().top - anchorY,
+              );
+              const targetScrollY = pendingProgrammaticTargetScrollYRef.current;
+              const isNearTargetScrollY =
+                targetScrollY !== null &&
+                Math.abs(window.scrollY - targetScrollY) <= 6;
+
+              if (targetDistance <= 6 || isNearTargetScrollY) {
+                pendingProgrammaticTargetIndexRef.current = null;
+                pendingProgrammaticTargetScrollYRef.current = null;
+              } else {
+                return;
+              }
+            }
+          }
         }
 
-        if (mostVisibleIndex !== activeImageIndexRef.current) {
-          activeImageIndexRef.current = mostVisibleIndex;
-          setActiveImageIndex(mostVisibleIndex);
+        if (closestSectionIndex !== activeImageIndexRef.current) {
+          activeImageIndexRef.current = closestSectionIndex;
+          setActiveImageIndex(closestSectionIndex);
         }
       },
       {
-        threshold: [0.2, 0.4, 0.6, 0.8],
-        rootMargin: `-${headerHeight}px 0px -35% 0px`,
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+        rootMargin: `-${getHeaderHeight()}px 0px -20% 0px`,
       },
     );
 
@@ -156,7 +204,7 @@ export function useDesktopProductImageGallery({
     return () => {
       observer.disconnect();
     };
-  }, [imageCount]);
+  }, [getHeaderHeight, getViewportAnchorY, getVisibleSections, imageCount]);
 
   const setImageSectionRef = useCallback(
     (index: number, section: HTMLElement | null) => {
@@ -165,34 +213,32 @@ export function useDesktopProductImageGallery({
     [],
   );
 
-  const scrollToImage = useCallback((index: number) => {
-    const targetImage = imageSectionsRef.current[index];
+  const scrollToImage = useCallback(
+    (index: number) => {
+      const targetImage = imageSectionsRef.current[index];
 
-    if (!targetImage) {
-      return;
-    }
+      if (!targetImage) {
+        return;
+      }
 
-    activeImageIndexRef.current = index;
-    setActiveImageIndex(index);
+      activeImageIndexRef.current = index;
+      setActiveImageIndex(index);
 
-    isProgrammaticScrollRef.current = true;
+      pendingProgrammaticTargetIndexRef.current = index;
+      wasProgrammaticScrollInterruptedRef.current = false;
 
-    if (programmaticScrollUnlockTimeoutRef.current !== null) {
-      window.clearTimeout(programmaticScrollUnlockTimeoutRef.current);
-    }
+      const scrollTop =
+        targetImage.getBoundingClientRect().top + window.scrollY;
+      const targetTop = Math.max(scrollTop - getViewportAnchorY(), 0);
+      pendingProgrammaticTargetScrollYRef.current = targetTop;
 
-    programmaticScrollUnlockTimeoutRef.current = window.setTimeout(() => {
-      isProgrammaticScrollRef.current = false;
-      programmaticScrollUnlockTimeoutRef.current = null;
-    }, 1500);
-
-    const scrollTop = targetImage.getBoundingClientRect().top + window.scrollY;
-
-    window.scrollTo({
-      top: Math.max(scrollTop - 100, 0),
-      behavior: "smooth",
-    });
-  }, []);
+      window.scrollTo({
+        top: targetTop,
+        behavior: "smooth",
+      });
+    },
+    [getViewportAnchorY],
+  );
 
   return {
     visibleActiveImageIndex,
