@@ -1,7 +1,9 @@
+import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
+import type { CarouselApi } from "@acme/ui/carousel";
 import { toast } from "@acme/ui/toaster";
 
 import type { Product } from "~/features/product/types";
@@ -20,6 +22,7 @@ interface UseProductVariantActionsArgs {
   productHandle: string;
   selectedVariant: Product["variants"]["nodes"][number] | null;
   selectedOptions: Record<string, string>;
+  carouselApi: RefObject<CarouselApi | null>;
 }
 
 export function useProductVariantActions({
@@ -28,6 +31,7 @@ export function useProductVariantActions({
   productHandle,
   selectedVariant,
   selectedOptions,
+  carouselApi,
 }: UseProductVariantActionsArgs) {
   const navigate = useNavigate({ from: "/shop/$handle" });
   const isMobile = useIsMobile();
@@ -68,6 +72,8 @@ export function useProductVariantActions({
       return;
     }
 
+    console.log("selectOption", optionName, optionValue);
+
     const nextSelections = {
       ...selectedOptions,
       [optionName]: optionValue,
@@ -84,13 +90,17 @@ export function useProductVariantActions({
       return;
     }
 
+    carouselApi.current?.scrollTo(0, "auto");
+
+    const shouldResetScroll = isMobile === false && optionName === "Color";
+
     void navigate({
       to: ".",
       search: (previousSearch) => ({
         ...previousSearch,
         variant: nextVariant.id,
       }),
-      resetScroll: isMobile === false,
+      resetScroll: shouldResetScroll,
     });
   }
 

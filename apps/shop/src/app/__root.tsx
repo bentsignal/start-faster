@@ -29,7 +29,15 @@ import { ThemeStore } from "~/features/theme/store";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
-    links: [{ rel: "stylesheet", href: appStyles }],
+    links: [
+      { rel: "stylesheet", href: appStyles },
+      { rel: "dns-prefetch", href: "https://cdn.shopify.com" },
+      {
+        rel: "preconnect",
+        href: "https://cdn.shopify.com",
+        crossOrigin: "anonymous",
+      },
+    ],
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },

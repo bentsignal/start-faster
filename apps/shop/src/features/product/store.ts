@@ -1,4 +1,7 @@
+import { useRef } from "react";
 import { createStore } from "rostra";
+
+import type { CarouselApi } from "@acme/ui/carousel";
 
 import type { Product } from "./types";
 import { useProductGalleryImages } from "~/features/product/hooks/use-product-gallery-images";
@@ -15,6 +18,10 @@ interface ProductStoreProps {
 function useInternalStore({ product, variant }: ProductStoreProps) {
   const variants = product.variants.nodes;
   const options = useProductOptions(product);
+  const carouselApiRef = useRef<CarouselApi | null>(null);
+  const setCarouselApi = (carouselApi: CarouselApi) => {
+    carouselApiRef.current = carouselApi;
+  };
   const { selectedVariant, selectedOptions } = useSelectedProductVariant({
     variants,
     variantId: variant,
@@ -26,6 +33,7 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
   });
   const { selectOption, addToCart, wasAddedToCart, buyNow, isBuyingNow } =
     useProductVariantActions({
+      carouselApi: carouselApiRef,
       variants,
       productTitle: product.title,
       productHandle: product.handle,
@@ -49,6 +57,7 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
     wasAddedToCart,
     buyNow,
     isBuyingNow,
+    setCarouselApi,
   };
 
   return storeValue;

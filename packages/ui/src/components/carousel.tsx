@@ -9,7 +9,7 @@ import { Button } from "./button";
 interface CarouselApi {
   scrollPrev: () => void;
   scrollNext: () => void;
-  scrollTo: (index: number) => void;
+  scrollTo: (index: number, behavior?: ScrollBehavior) => void;
   canScrollPrev: () => boolean;
   canScrollNext: () => boolean;
   selectedScrollSnap: () => number;
@@ -28,7 +28,7 @@ type CarouselContextProps = {
   handleViewportScroll: () => void;
   scrollPrev: () => void;
   scrollNext: () => void;
-  scrollTo: (index: number) => void;
+  scrollTo: (index: number, behavior?: ScrollBehavior) => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
   selectedIndex: number;
@@ -135,12 +135,12 @@ function Carousel({
   );
 
   const scrollTo = React.useCallback(
-    (index: number) => {
+    (index: number, behavior: ScrollBehavior = "smooth") => {
       if (slideCountRef.current <= 0) return;
 
       const safeIndex = Math.max(0, Math.min(slideCountRef.current - 1, index));
 
-      scrollToRendered(safeIndex, "smooth");
+      scrollToRendered(safeIndex, behavior);
       updateSelectionState(safeIndex);
     },
     [scrollToRendered, updateSelectionState],

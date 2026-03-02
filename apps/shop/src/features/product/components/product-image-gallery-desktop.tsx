@@ -10,7 +10,6 @@ import { useProductStore } from "~/features/product/store";
 export function ProductImageGalleryDesktop() {
   const images = useProductStore((store) => store.galleryImages);
   const productTitle = useProductStore((store) => store.product.title);
-  const imageOrderKey = images.map((image) => image.id).join("|");
 
   if (images.length === 0) {
     return (
@@ -18,13 +17,7 @@ export function ProductImageGalleryDesktop() {
     );
   }
 
-  return (
-    <DesktopGalleryContent
-      key={imageOrderKey}
-      images={images}
-      productTitle={productTitle}
-    />
-  );
+  return <DesktopGalleryContent images={images} productTitle={productTitle} />;
 }
 
 function DesktopGalleryContent({
@@ -122,7 +115,7 @@ function GalleryThumbnail({
           height={thumbnailHeight}
           sizes="80px"
           loading="eager"
-          fetchPriority={imageIndex < 4 ? "high" : "auto"}
+          fetchPriority="high"
           className={cn(
             "h-full w-full object-cover transition-opacity duration-150",
             isActive
@@ -161,8 +154,8 @@ function GalleryImage({
           width={image.width ?? 1600}
           height={image.height ?? 1600}
           sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
-          loading={imageIndex < 2 ? "eager" : undefined}
-          fetchPriority={imageIndex < 2 ? "high" : undefined}
+          loading="eager"
+          fetchPriority="high"
           className="h-full w-full object-cover"
         />
       </div>
