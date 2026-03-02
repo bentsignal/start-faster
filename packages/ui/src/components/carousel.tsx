@@ -289,7 +289,10 @@ function CarouselContent({
           ? "touch-auto snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain"
           : "touch-auto snap-y snap-mandatory overflow-x-hidden overflow-y-auto overscroll-y-contain",
       )}
-      style={{ WebkitOverflowScrolling: "touch" }}
+      style={{
+        WebkitOverflowScrolling: "touch",
+        overflowAnchor: "none",
+      }}
       data-slot="carousel-content"
     >
       <div

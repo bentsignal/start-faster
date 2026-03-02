@@ -72,8 +72,6 @@ export function useProductVariantActions({
       return;
     }
 
-    console.log("selectOption", optionName, optionValue);
-
     const nextSelections = {
       ...selectedOptions,
       [optionName]: optionValue,
@@ -90,7 +88,11 @@ export function useProductVariantActions({
       return;
     }
 
-    carouselApi.current?.scrollTo(0, "auto");
+    if (optionName === "Color") {
+      window.requestAnimationFrame(() => {
+        carouselApi.current?.scrollTo(0, "auto");
+      });
+    }
 
     const shouldResetScroll = isMobile === false && optionName === "Color";
 
