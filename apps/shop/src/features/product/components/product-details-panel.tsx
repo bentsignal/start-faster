@@ -3,9 +3,11 @@ import { Loader } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
 
+import type { Product } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
 import { getKnownColorHex } from "~/features/product/colors";
 import { ColorSwatch } from "~/features/product/components/color-swatch";
+import { getOptionValueAvailability } from "~/features/product/lib/option-availability";
 import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductDetailsPanel() {
@@ -61,9 +63,22 @@ function ProductPrice() {
 
 function ProductOptionSelector() {
   const options = useProductPageStore((store) => store.options);
+  const variants = useProductPageStore((store) => store.product.variants.nodes);
   const selectedVariant = useProductPageStore((store) => store.selectedVariant);
   const selectedOptions = useProductPageStore((store) => store.selectedOptions);
   const selectOption = useProductPageStore((store) => store.selectOption);
+  const hasUnavailableOptions = options.some((option) =>
+    option.values.some((value) => {
+      const availability = getOptionValueAvailability({
+        variants,
+        optionName: option.name,
+        optionValue: value,
+        selectedOptions,
+      });
+
+      return availability !== "available";
+    }),
+  );
 
   if (options.length === 0) {
     return null;
@@ -80,9 +95,11 @@ function ProductOptionSelector() {
           return (
             <ColorOptionGroup
               key={option.name}
+              variants={variants}
               optionName={option.name}
               values={option.values}
               selectedValue={selectedOptions[option.name]}
+              selectedOptions={selectedOptions}
               onSelect={(value) => selectOption(option.name, value)}
             />
           );
@@ -96,6 +113,20 @@ function ProductOptionSelector() {
             <div className="flex flex-wrap gap-2">
               {option.values.map((value) => {
                 const isSelected = selectedOptions[option.name] === value;
+                const availability = getOptionValueAvailability({
+                  variants,
+                  optionName: option.name,
+                  optionValue: value,
+                  selectedOptions,
+                });
+                const isDisabled =
+                  isSelected === false && availability !== "available";
+                const title =
+                  availability === "sold-out"
+                    ? `${value} (Sold out)`
+                    : availability === "unavailable"
+                      ? `${value} (Unavailable)`
+                      : value;
                 return (
                   <Button
                     key={`${option.name}-${value}`}
@@ -103,6 +134,12 @@ function ProductOptionSelector() {
                     size="sm"
                     variant={isSelected ? "default" : "outline"}
                     aria-pressed={isSelected}
+                    disabled={isDisabled}
+                    title={title}
+                    className={cn(
+                      availability !== "available" &&
+                        "text-muted-foreground border-border/60 decoration-1.5 line-through",
+                    )}
                     onClick={() => selectOption(option.name, value)}
                   >
                     {value}
@@ -117,19 +154,28 @@ function ProductOptionSelector() {
       selectedVariant.availableForSale === false ? (
         <p className="text-destructive text-sm">This variant is sold out.</p>
       ) : null}
+      {hasUnavailableOptions ? (
+        <p className="text-muted-foreground text-xs">
+          Unavailable options are crossed out.
+        </p>
+      ) : null}
     </div>
   );
 }
 
 function ColorOptionGroup({
+  variants,
   optionName,
   values,
   selectedValue,
+  selectedOptions,
   onSelect,
 }: {
+  variants: Product["variants"]["nodes"];
   optionName: string;
   values: string[];
   selectedValue: string | undefined;
+  selectedOptions: Record<string, string>;
   onSelect: (value: string) => void;
 }) {
   const knownColors: string[] = [];
@@ -157,14 +203,25 @@ function ColorOptionGroup({
       {/* Known-color swatches */}
       {knownColors.length > 0 ? (
         <div className="flex flex-wrap gap-2.5">
-          {knownColors.map((value) => (
-            <ColorSwatch
-              key={`${optionName}-${value}`}
-              colorName={value}
-              isSelected={selectedValue === value}
-              onClick={() => onSelect(value)}
-            />
-          ))}
+          {knownColors.map((value) => {
+            const isSelected = selectedValue === value;
+            const availability = getOptionValueAvailability({
+              variants,
+              optionName,
+              optionValue: value,
+              selectedOptions,
+            });
+
+            return (
+              <ColorSwatch
+                key={`${optionName}-${value}`}
+                colorName={value}
+                isSelected={isSelected}
+                availability={availability}
+                onClick={() => onSelect(value)}
+              />
+            );
+          })}
         </div>
       ) : null}
 
@@ -173,6 +230,20 @@ function ColorOptionGroup({
         <div className="flex flex-wrap gap-2">
           {unknownColors.map((value) => {
             const isSelected = selectedValue === value;
+            const availability = getOptionValueAvailability({
+              variants,
+              optionName,
+              optionValue: value,
+              selectedOptions,
+            });
+            const isDisabled =
+              isSelected === false && availability !== "available";
+            const title =
+              availability === "sold-out"
+                ? `${value} (Sold out)`
+                : availability === "unavailable"
+                  ? `${value} (Unavailable)`
+                  : value;
             return (
               <Button
                 key={`${optionName}-${value}`}
@@ -180,6 +251,12 @@ function ColorOptionGroup({
                 size="sm"
                 variant={isSelected ? "default" : "outline"}
                 aria-pressed={isSelected}
+                disabled={isDisabled}
+                title={title}
+                className={cn(
+                  availability !== "available" &&
+                    "text-muted-foreground border-border/60 decoration-1.5 line-through",
+                )}
                 onClick={() => onSelect(value)}
               >
                 {value}
