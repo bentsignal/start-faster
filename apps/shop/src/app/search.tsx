@@ -78,12 +78,10 @@ export const Route = createFileRoute("/search")({
 function SearchPage() {
   return (
     <SearchPageStore>
-      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-10 sm:px-8 xl:px-16">
+      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 xl:px-16">
         <SearchResultsHeader />
 
-        <div className="bg-border h-px" />
-
-        <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-0">
+        <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
           <SearchFilters />
 
           <section className="space-y-8">

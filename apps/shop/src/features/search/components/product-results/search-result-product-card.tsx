@@ -33,20 +33,20 @@ export function SearchResultProductCard({
 
 function ListProductCard() {
   return (
-    <article className="flex gap-4">
-      <div className="shrink-0">
+    <article className="group flex gap-3 rounded-2xl p-3">
+      <div className="shrink-0 overflow-hidden rounded-xl">
         <SearchResultProductCardImage
-          width={120}
-          height={120}
-          className="bg-muted size-28 rounded-lg object-cover"
+          width={132}
+          height={132}
+          className="bg-muted aspect-square size-[132px] object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
-        <div className="space-y-1">
-          <SearchResultProductCardTitle className="line-clamp-2 text-sm font-medium hover:underline" />
-          <SearchResultProductCardPrice />
-          <SearchResultProductCardSoldOut className="text-destructive text-xs" />
+      <div className="flex min-w-0 flex-1 flex-col justify-center py-0.5">
+        <div className="space-y-1.5">
+          <SearchResultProductCardTitle className="text-foreground/90 line-clamp-2 text-sm leading-snug font-medium tracking-tight hover:underline" />
+          <SearchResultProductCardPrice className="text-foreground text-lg leading-none font-semibold tracking-tight" />
+          <SearchResultProductCardSoldOut className="text-destructive text-xs font-medium" />
         </div>
 
         {/* <SearchResultProductCardAddToCartButton /> */}
@@ -70,7 +70,7 @@ function GridProductCard() {
 
       <div className="mt-3 space-y-0.5">
         <SearchResultProductCardTitle className="line-clamp-1 text-sm font-medium" />
-        <SearchResultProductCardPrice />
+        <SearchResultProductCardPrice className="text-sm" />
       </div>
     </article>
   );
@@ -119,10 +119,14 @@ function SearchResultProductCardTitle({ className }: { className: string }) {
   );
 }
 
-function SearchResultProductCardPrice() {
+function SearchResultProductCardPrice({ className }: { className?: string }) {
   const price = useProductResultStore((store) => store.price);
 
-  return <p className="text-muted-foreground text-sm">{price}</p>;
+  return (
+    <p className={className ?? "text-muted-foreground text-sm font-medium"}>
+      {price}
+    </p>
+  );
 }
 
 // function SearchResultProductCardAddToCartButton() {

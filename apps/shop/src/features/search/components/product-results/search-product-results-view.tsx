@@ -6,7 +6,7 @@ export function SearchProductResultsView() {
 
   if (products.length === 0) {
     return (
-      <p className="text-muted-foreground py-16 text-center text-sm">
+      <p className="text-muted-foreground py-10 pt-8 text-center sm:h-[calc(100vh-20rem)] sm:py-16">
         No results found.
       </p>
     );
@@ -14,7 +14,7 @@ export function SearchProductResultsView() {
 
   return (
     <>
-      <div className="space-y-4 md:hidden">
+      <div className="space-y-3 md:hidden">
         {products.map((product) => (
           <SearchResultProductCard
             key={product.id}
