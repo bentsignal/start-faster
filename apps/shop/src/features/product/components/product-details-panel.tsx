@@ -20,7 +20,7 @@ export function ProductDetailsPanel() {
     >
       <div className="mx-auto max-w-xl lg:mx-0 lg:h-full lg:max-w-md xl:max-w-lg">
         <div className={cn(stickyHeaderTokens.stickyContent)}>
-          <ProductHandle />
+          {/* <ProductHandle /> */}
           <ProductTitle />
           <ProductOptionSelector />
           <ProductPrice />
@@ -35,15 +35,15 @@ export function ProductDetailsPanel() {
   );
 }
 
-function ProductHandle() {
-  const handle = useProductPageStore((store) => store.product.handle);
+// function ProductHandle() {
+//   const handle = useProductPageStore((store) => store.product.handle);
 
-  return (
-    <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">
-      {handle}
-    </p>
-  );
-}
+//   return (
+//     <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">
+//       {handle}
+//     </p>
+//   );
+// }
 
 function ProductTitle() {
   const title = useProductPageStore((store) => store.product.title);
