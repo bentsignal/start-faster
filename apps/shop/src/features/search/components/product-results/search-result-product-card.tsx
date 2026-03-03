@@ -1,8 +1,10 @@
 import { Image } from "@unpic/react";
-import { Loader, ShoppingBag } from "lucide-react";
+
+// import { Loader, ShoppingBag } from "lucide-react";
 
 import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
-import { Button } from "@acme/ui/button";
+
+// import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
 import {
@@ -47,7 +49,7 @@ function ListProductCard() {
           <SearchResultProductCardSoldOut className="text-destructive text-xs" />
         </div>
 
-        <SearchResultProductCardAddToCartButton />
+        {/* <SearchResultProductCardAddToCartButton /> */}
       </div>
     </article>
   );
@@ -62,7 +64,7 @@ function GridProductCard() {
           height={500}
           className="bg-muted aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <SearchResultProductCardQuickAddButton />
+        {/* <SearchResultProductCardQuickAddButton /> */}
         <SearchResultProductCardSoldOutBadge />
       </div>
 
@@ -123,58 +125,58 @@ function SearchResultProductCardPrice() {
   return <p className="text-muted-foreground text-sm">{price}</p>;
 }
 
-function SearchResultProductCardAddToCartButton() {
-  const isUnavailable = useProductResultStore((store) => store.isUnavailable);
-  const wasAddedToCart = useProductResultStore((store) => store.wasAddedToCart);
-  const addToCart = useProductResultStore((store) => store.addToCart);
+// function SearchResultProductCardAddToCartButton() {
+//   const isUnavailable = useProductResultStore((store) => store.isUnavailable);
+//   const wasAddedToCart = useProductResultStore((store) => store.wasAddedToCart);
+//   const addToCart = useProductResultStore((store) => store.addToCart);
 
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      className="mt-2 w-fit"
-      disabled={isUnavailable || wasAddedToCart}
-      onClick={addToCart}
-    >
-      {wasAddedToCart ? "Added" : "Add to Cart"}
-    </Button>
-  );
-}
+//   return (
+//     <Button
+//       size="sm"
+//       variant="outline"
+//       className="mt-2 w-fit"
+//       disabled={isUnavailable || wasAddedToCart}
+//       onClick={addToCart}
+//     >
+//       {wasAddedToCart ? "Added" : "Add to Cart"}
+//     </Button>
+//   );
+// }
 
-function SearchResultProductCardQuickAddButton() {
-  const isUnavailable = useProductResultStore((store) => store.isUnavailable);
-  const wasAddedToCart = useProductResultStore((store) => store.wasAddedToCart);
-  const isBuyingNow = useProductResultStore((store) => store.isBuyingNow);
-  const addToCart = useProductResultStore((store) => store.addToCart);
+// function SearchResultProductCardQuickAddButton() {
+//   const isUnavailable = useProductResultStore((store) => store.isUnavailable);
+//   const wasAddedToCart = useProductResultStore((store) => store.wasAddedToCart);
+//   const isBuyingNow = useProductResultStore((store) => store.isBuyingNow);
+//   const addToCart = useProductResultStore((store) => store.addToCart);
 
-  if (isUnavailable) {
-    return null;
-  }
+//   if (isUnavailable) {
+//     return null;
+//   }
 
-  return (
-    <div className="absolute right-3 bottom-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-      <Button
-        size="icon"
-        variant="secondary"
-        className="bg-background/80 size-9 backdrop-blur-sm"
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          addToCart();
-        }}
-        disabled={wasAddedToCart}
-      >
-        {wasAddedToCart ? (
-          <ShoppingBag className="size-4" />
-        ) : isBuyingNow ? (
-          <Loader className="size-4 animate-spin" />
-        ) : (
-          <ShoppingBag className="size-4" />
-        )}
-      </Button>
-    </div>
-  );
-}
+//   return (
+//     <div className="absolute right-3 bottom-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+//       <Button
+//         size="icon"
+//         variant="secondary"
+//         className="bg-background/80 size-9 backdrop-blur-sm"
+//         onClick={(event) => {
+//           event.preventDefault();
+//           event.stopPropagation();
+//           addToCart();
+//         }}
+//         disabled={wasAddedToCart}
+//       >
+//         {wasAddedToCart ? (
+//           <ShoppingBag className="size-4" />
+//         ) : isBuyingNow ? (
+//           <Loader className="size-4 animate-spin" />
+//         ) : (
+//           <ShoppingBag className="size-4" />
+//         )}
+//       </Button>
+//     </div>
+//   );
+// }
 
 function SearchResultProductCardSoldOut({ className }: { className: string }) {
   const isUnavailable = useProductResultStore((store) => store.isUnavailable);
