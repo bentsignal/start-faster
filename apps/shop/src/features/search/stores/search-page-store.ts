@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { createStore } from "rostra";
@@ -19,11 +18,12 @@ import {
   searchQueries,
 } from "~/features/search/lib/search-queries";
 import { toProductFilters } from "~/features/search/lib/search-route";
+import { useLoading } from "~/hooks/use-loading";
 
 function useInternalStore({ search }: { search: SearchRouteSearch }) {
   const navigate = useNavigate({ from: "/search" });
   const filters = toProductFilters(search.filters);
-  const [pageJumpLoading, setPageJumpLoading] = useState(false);
+  const { isLoading: pageJumpLoading, start: startPageJump } = useLoading();
 
   const { data } = useSuspenseQuery(
     searchQueries.products({
@@ -109,10 +109,8 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
       return;
     }
 
-    setPageJumpLoading(true);
     let nextCursor: string | undefined;
-
-    try {
+    startPageJump(async () => {
       nextCursor =
         nextPage > 1
           ? await searchQueries.resolveCursorForPage({
@@ -123,9 +121,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
               filters,
             })
           : undefined;
-    } finally {
-      setPageJumpLoading(false);
-    }
+    });
 
     if (nextPage > 1 && nextCursor === undefined) {
       return;
