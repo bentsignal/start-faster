@@ -1,8 +1,14 @@
 import { createStore } from "rostra";
 
-import type { SearchResultProductNode } from "~/features/search/types";
+import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
+
 import { useProductPurchaseActions } from "~/features/product/hooks/use-product-purchase-actions";
 import { formatPrice } from "~/features/product/lib/price";
+
+type SearchResultProductNode = Extract<
+  SearchProductsQuery["search"]["nodes"][number],
+  { __typename: "Product" }
+>;
 
 function useInternalStore({ product }: { product: SearchResultProductNode }) {
   const selectedVariant = product.selectedOrFirstAvailableVariant ?? null;

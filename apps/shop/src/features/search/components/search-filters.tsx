@@ -1,15 +1,20 @@
+import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
 import type { ProductFilter } from "@acme/shopify/storefront/types";
 import { Button } from "@acme/ui/button";
 
-import type { SearchResultFilter } from "~/features/search/types";
 import {
   getPriceRangeFromFilters,
   hasSelectedFilterValue,
 } from "~/features/search/lib/search-filter-utils";
 import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
+type SearchResultFilter =
+  SearchProductsQuery["search"]["productFilters"][number];
+
 export function SearchFilters() {
-  const filters = useSearchPageStore((store) => store.data.productFilters);
+  const filters = useSearchPageStore(
+    (store) => store.data?.productFilters ?? [],
+  );
   const selectedFilters = useSearchPageStore((store) => store.filters);
   const onToggleFilter = useSearchPageStore((store) => store.onToggleFilter);
   const onApplyPriceRange = useSearchPageStore(

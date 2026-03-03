@@ -40,6 +40,7 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 - Avoid `unknown` + narrowing.
 - Use discriminated unions where appropriate.
 - Prefer type inference over explicitly defined types, use `as const` where appropriate.
+- Do not attempt to override the typesystem with explicitly defined types as a means of bypassing typecheck. Always address the problem instead of trying to cheat typescript.
 
 ### React / UI
 

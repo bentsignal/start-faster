@@ -8,7 +8,7 @@ import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
 export function SearchResultsHeader() {
   const query = useSearchPageStore((store) => store.search.q);
-  const totalCount = useSearchPageStore((store) => store.data.totalCount);
+  const totalCount = useSearchPageStore((store) => store.totalCount);
   const sortBy = useSearchPageStore((store) => store.search.sortBy);
   const sortDirection = useSearchPageStore(
     (store) => store.search.sortDirection,

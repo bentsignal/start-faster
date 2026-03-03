@@ -1,14 +1,19 @@
 import { Image } from "@unpic/react";
 import { Loader, ShoppingBag } from "lucide-react";
 
+import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
 import { Button } from "@acme/ui/button";
 
-import type { SearchResultProductNode } from "~/features/search/types";
 import { Link } from "~/components/link";
 import {
   ProductResultStore,
   useProductResultStore,
 } from "~/features/product/stores/product-result-store";
+
+type SearchResultProductNode = Extract<
+  SearchProductsQuery["search"]["nodes"][number],
+  { __typename: "Product" }
+>;
 
 export function SearchResultProductCard({
   product,

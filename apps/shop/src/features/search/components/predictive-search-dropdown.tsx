@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "@unpic/react";
 
-import type { PredictiveSearchProduct } from "~/features/search/types";
+import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
+
 import { Link } from "~/components/link";
 import { formatPrice } from "~/features/product/lib/price";
 import { searchQueries } from "~/features/search/lib/search-queries";
 import { useSearchBarStore } from "~/features/search/stores/search-bar-store";
+
+type PredictiveSearchProduct = NonNullable<
+  GetPredictiveSearchQuery["predictiveSearch"]
+>["products"][number];
 
 export function PredictiveSearchDropdown() {
   const hidePredictiveDropdown = useSearchBarStore(
@@ -32,7 +37,7 @@ function PredictiveProductsSection() {
   const { data: products } = useQuery({
     ...searchQueries.predictive({ query: queryText }),
     placeholderData: (previousData) => previousData,
-    select: (data) => data.products,
+    select: (data) => data?.products ?? [],
   });
 
   if (!products) {
@@ -105,7 +110,7 @@ function PredictiveSuggestionsSection() {
   const queryText = useSearchBarStore((s) => s.debouncedSearchTerm.trim());
   const { data: suggestions } = useQuery({
     ...searchQueries.predictive({ query: queryText }),
-    select: (data) => data.suggestions,
+    select: (data) => data?.queries ?? [],
   });
 
   const setIsPredictiveOpen = useSearchBarStore((s) => s.setIsPredictiveOpen);

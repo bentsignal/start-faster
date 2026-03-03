@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
 import type { ProductFilter } from "@acme/shopify/storefront/types";
@@ -8,7 +8,6 @@ import type {
   SearchSortBy,
   SearchSortDirection,
 } from "~/features/search/lib/search-queries";
-import type { SearchRouteSearch } from "~/features/search/lib/search-route";
 import {
   applyPriceRangeFilter,
   toggleFilter,
@@ -17,12 +16,11 @@ import {
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
-import { toProductFilters } from "~/features/search/lib/search-route";
 import { useLoading } from "~/hooks/use-loading";
 
-function useInternalStore({ search }: { search: SearchRouteSearch }) {
+function useInternalStore() {
   const navigate = useNavigate({ from: "/search" });
-  const filters = toProductFilters(search.filters);
+  const search = useSearch({ from: "/search" });
   const { isLoading: pageJumpLoading, start: startPageJump } = useLoading();
 
   const { data } = useSuspenseQuery(
@@ -30,13 +28,16 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
       query: search.q,
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
-      filters,
+      filters: search.filters,
       first: SEARCH_PAGE_SIZE,
       after: search.page === 1 ? undefined : search.cursor,
     }),
   );
+  const products =
+    data?.nodes.filter((node) => node.__typename === "Product") ?? [];
 
-  const totalPages = Math.max(1, Math.ceil(data.totalCount / SEARCH_PAGE_SIZE));
+  const totalCount = data?.totalCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / SEARCH_PAGE_SIZE));
   const activePage = Math.min(search.page, totalPages);
 
   const navigateToSearch = ({
@@ -68,7 +69,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
     void navigateToSearch({
       sortBy: nextSortBy,
       sortDirection: nextSortBy === "relevance" ? "desc" : search.sortDirection,
-      nextFilters: filters,
+      nextFilters: search.filters,
       page: 1,
     });
   };
@@ -77,7 +78,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
     void navigateToSearch({
       sortBy: search.sortBy,
       sortDirection: nextSortDirection,
-      nextFilters: filters,
+      nextFilters: search.filters,
       page: 1,
     });
   };
@@ -86,7 +87,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
     void navigateToSearch({
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
-      nextFilters: toggleFilter(filters, input),
+      nextFilters: toggleFilter(search.filters, input),
       page: 1,
     });
   };
@@ -96,7 +97,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
       nextFilters: applyPriceRangeFilter({
-        filters,
+        filters: search.filters,
         min,
         max,
       }),
@@ -118,7 +119,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
               query: search.q,
               sortBy: search.sortBy,
               sortDirection: search.sortDirection,
-              filters,
+              filters: search.filters,
             })
           : undefined;
     });
@@ -130,7 +131,7 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
     await navigateToSearch({
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
-      nextFilters: filters,
+      nextFilters: search.filters,
       page: nextPage,
       cursor: nextCursor,
     });
@@ -138,8 +139,10 @@ function useInternalStore({ search }: { search: SearchRouteSearch }) {
 
   return {
     search,
-    filters,
+    filters: search.filters,
     data,
+    products,
+    totalCount,
     totalPages,
     activePage,
     pageJumpLoading,

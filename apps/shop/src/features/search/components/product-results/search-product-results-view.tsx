@@ -2,7 +2,7 @@ import { SearchResultProductCard } from "~/features/search/components/product-re
 import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
 export function SearchProductResultsView() {
-  const products = useSearchPageStore((store) => store.data.products);
+  const products = useSearchPageStore((store) => store.products);
 
   if (products.length === 0) {
     return (
