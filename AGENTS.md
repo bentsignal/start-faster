@@ -45,6 +45,7 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 
 - **_IMPORTANT_**: Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
 - Keep components focused and composable, divide functionality into smaller components where it makes sense to; extract logic into hooks/stores when it grows beyond simple things.
+- Keep component files component-focused. Move shared types and pure helpers to `types.ts` or `lib/`.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
 - Route files should stay thin, validation, loaders, and route component should live in the route file. Everything else should be abstracted away into smaller pieces of code outside the route file.
