@@ -67,18 +67,6 @@ function ProductOptionSelector() {
   const selectedVariant = useProductPageStore((store) => store.selectedVariant);
   const selectedOptions = useProductPageStore((store) => store.selectedOptions);
   const selectOption = useProductPageStore((store) => store.selectOption);
-  const hasUnavailableOptions = options.some((option) =>
-    option.values.some((value) => {
-      const availability = getOptionValueAvailability({
-        variants,
-        optionName: option.name,
-        optionValue: value,
-        selectedOptions,
-      });
-
-      return availability !== "available";
-    }),
-  );
 
   if (options.length === 0) {
     return null;
@@ -153,11 +141,6 @@ function ProductOptionSelector() {
       {selectedVariant !== null &&
       selectedVariant.availableForSale === false ? (
         <p className="text-destructive text-sm">This variant is sold out.</p>
-      ) : null}
-      {hasUnavailableOptions ? (
-        <p className="text-muted-foreground text-xs">
-          Unavailable options are crossed out.
-        </p>
       ) : null}
     </div>
   );
