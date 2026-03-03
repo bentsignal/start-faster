@@ -5,11 +5,11 @@ import { cn } from "@acme/ui/utils";
 import type { ProductGalleryImage } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
-import { useProductStore } from "~/features/product/store";
+import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductImageGalleryDesktop() {
-  const images = useProductStore((store) => store.galleryImages);
-  const productTitle = useProductStore((store) => store.product.title);
+  const images = useProductPageStore((store) => store.galleryImages);
+  const productTitle = useProductPageStore((store) => store.product.title);
 
   if (images.length === 0) {
     return (

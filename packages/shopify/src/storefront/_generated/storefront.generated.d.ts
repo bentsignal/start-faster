@@ -190,10 +190,49 @@ export type GetQuery = { collection?: StorefrontTypes.Maybe<{ products: { nodes:
         & { featuredImage?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText'>>, priceRange: { minVariantPrice: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'> } }
       )> } }> };
 
+export type GetPredictiveSearchQueryVariables = StorefrontTypes.Exact<{
+  query: StorefrontTypes.Scalars['String']['input'];
+  limit: StorefrontTypes.Scalars['Int']['input'];
+}>;
+
+
+export type GetPredictiveSearchQuery = { predictiveSearch?: StorefrontTypes.Maybe<{ products: Array<(
+      Pick<StorefrontTypes.Product, 'id' | 'handle' | 'title'>
+      & { featuredImage?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText'>>, priceRange: { minVariantPrice: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'> } }
+    )>, queries: Array<Pick<StorefrontTypes.SearchQuerySuggestion, 'text'>> }> };
+
+export type SearchProductsQueryVariables = StorefrontTypes.Exact<{
+  query: StorefrontTypes.Scalars['String']['input'];
+  first?: StorefrontTypes.InputMaybe<StorefrontTypes.Scalars['Int']['input']>;
+  after?: StorefrontTypes.InputMaybe<StorefrontTypes.Scalars['String']['input']>;
+  before?: StorefrontTypes.InputMaybe<StorefrontTypes.Scalars['String']['input']>;
+  sortKey?: StorefrontTypes.InputMaybe<StorefrontTypes.SearchSortKeys>;
+  reverse?: StorefrontTypes.InputMaybe<StorefrontTypes.Scalars['Boolean']['input']>;
+  productFilters?: StorefrontTypes.InputMaybe<Array<StorefrontTypes.ProductFilter> | StorefrontTypes.ProductFilter>;
+}>;
+
+
+export type SearchProductsQuery = { search: (
+    Pick<StorefrontTypes.SearchResultItemConnection, 'totalCount'>
+    & { nodes: Array<{ __typename: 'Article' | 'Page' } | (
+      { __typename: 'Product' }
+      & Pick<StorefrontTypes.Product, 'id' | 'handle' | 'title'>
+      & { featuredImage?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText'>>, priceRange: { minVariantPrice: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'> }, selectedOrFirstAvailableVariant?: StorefrontTypes.Maybe<(
+        Pick<StorefrontTypes.ProductVariant, 'id' | 'title' | 'availableForSale'>
+        & { price: Pick<StorefrontTypes.MoneyV2, 'amount' | 'currencyCode'>, image?: StorefrontTypes.Maybe<Pick<StorefrontTypes.Image, 'url' | 'altText' | 'width' | 'height'>>, selectedOptions: Array<Pick<StorefrontTypes.SelectedOption, 'name' | 'value'>> }
+      )> }
+    )>, pageInfo: Pick<StorefrontTypes.PageInfo, 'hasNextPage' | 'hasPreviousPage' | 'startCursor' | 'endCursor'>, productFilters: Array<(
+      Pick<StorefrontTypes.Filter, 'id' | 'label' | 'type' | 'presentation'>
+      & { values: Array<Pick<StorefrontTypes.FilterValue, 'id' | 'label' | 'count' | 'input'>> }
+    )> }
+  ) };
+
 interface GeneratedQueryTypes {
   "#graphql\n  query CartById($id: ID!) {\n    cart(id: $id) {\n      ...CartFields\n    }\n  }\n\n  fragment CartFields on Cart {\n    id\n    checkoutUrl\n    totalQuantity\n    cost {\n      totalAmount {\n        amount\n        currencyCode\n      }\n    }\n    lines(first: 100) {\n      nodes {\n        ...CartLineFields\n      }\n    }\n  }\n\n  fragment CartLineFields on BaseCartLine {\n    id\n    quantity\n    cost {\n      amountPerQuantity {\n        amount\n        currencyCode\n      }\n      subtotalAmount {\n        amount\n        currencyCode\n      }\n      totalAmount {\n        amount\n        currencyCode\n      }\n    }\n    merchandise {\n      ... on ProductVariant {\n        id\n        title\n        image {\n          url\n          altText\n          width\n          height\n        }\n        product {\n          title\n          handle\n        }\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n": {return: CartByIdQuery, variables: CartByIdQueryVariables},
   "#graphql\n  query ProductByHandle($handle: String!) {\n    product(handle: $handle) {\n      id\n      title\n      handle\n      description\n      options {\n        name\n        values\n      }\n      images(first: 50) {\n        nodes {\n          id\n          url\n          altText\n          width\n          height\n        }\n      }\n      featuredImage {\n        url\n        altText\n      }\n      priceRange {\n        minVariantPrice {\n          amount\n          currencyCode\n        }\n      }\n      variants(first: 100) {\n        nodes {\n          id\n          title\n          availableForSale\n          image {\n            id\n            url\n            altText\n            width\n            height\n          }\n          price {\n            amount\n            currencyCode\n          }\n          selectedOptions {\n            name\n            value\n          }\n        }\n      }\n    }\n  }\n": {return: ProductByHandleQuery, variables: ProductByHandleQueryVariables},
   "#graphql\n  query get($handle: String!, $first: Int!) {\n    collection(handle: $handle) {\n      products(first: $first) {\n        nodes {\n          id\n          title\n          handle\n          featuredImage {\n            url\n            altText\n          }\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n        }\n      }\n    }\n  }\n": {return: GetQuery, variables: GetQueryVariables},
+  "#graphql\n  query GetPredictiveSearch($query: String!, $limit: Int!) {\n    predictiveSearch(\n      query: $query\n      limit: $limit\n      limitScope: EACH\n      types: [PRODUCT, QUERY]\n    ) {\n      products {\n        id\n        handle\n        title\n        featuredImage {\n          url\n          altText\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n      }\n      queries {\n        text\n      }\n    }\n  }\n": {return: GetPredictiveSearchQuery, variables: GetPredictiveSearchQueryVariables},
+  "#graphql\n  query SearchProducts(\n    $query: String!\n    $first: Int\n    $after: String\n    $before: String\n    $sortKey: SearchSortKeys\n    $reverse: Boolean\n    $productFilters: [ProductFilter!]\n  ) {\n    search(\n      query: $query\n      first: $first\n      after: $after\n      before: $before\n      sortKey: $sortKey\n      reverse: $reverse\n      types: [PRODUCT]\n      unavailableProducts: LAST\n      productFilters: $productFilters\n    ) {\n      nodes {\n        __typename\n        ... on Product {\n          id\n          handle\n          title\n          featuredImage {\n            url\n            altText\n          }\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          selectedOrFirstAvailableVariant {\n            id\n            title\n            availableForSale\n            price {\n              amount\n              currencyCode\n            }\n            image {\n              url\n              altText\n              width\n              height\n            }\n            selectedOptions {\n              name\n              value\n            }\n          }\n        }\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n      totalCount\n      productFilters {\n        id\n        label\n        type\n        presentation\n        values {\n          id\n          label\n          count\n          input\n        }\n      }\n    }\n  }\n": {return: SearchProductsQuery, variables: SearchProductsQueryVariables},
 }
 
 interface GeneratedMutationTypes {

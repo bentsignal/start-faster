@@ -2,12 +2,12 @@ import { X } from "lucide-react";
 
 import { cn } from "@acme/ui/utils";
 
-import { useSearchStore } from "../store";
+import { useSearchBarStore } from "~/features/search/stores/search-bar-store";
 
 export function SearchClearButton({ className }: { className?: string }) {
-  const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
-  const hideButton = useSearchStore((s) => s.searchTerm.length === 0);
-  const focusInput = useSearchStore((s) => s.focusInput);
+  const setSearchTerm = useSearchBarStore((s) => s.setSearchTerm);
+  const hideButton = useSearchBarStore((s) => s.searchTerm.length === 0);
+  const focusInput = useSearchBarStore((s) => s.focusInput);
 
   if (hideButton) return null;
 

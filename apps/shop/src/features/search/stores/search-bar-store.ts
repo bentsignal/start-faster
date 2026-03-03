@@ -1,16 +1,18 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
 import useDebouncedInput from "~/hooks/use-debounced-input";
 
 function useInternalStore({
-  debounceTime = 500,
+  debounceTime = 250,
   initialSearchTerm,
 }: {
   debounceTime?: number;
   initialSearchTerm?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const {
     value: searchTerm,
@@ -20,6 +22,7 @@ function useInternalStore({
     time: debounceTime,
     initialValue: initialSearchTerm,
   });
+  const [isPredictiveOpen, setIsPredictiveOpen] = useState(false);
 
   function focusInput() {
     if (inputRef.current) {
@@ -29,14 +32,31 @@ function useInternalStore({
     }
   }
 
+  function performSearch() {
+    void navigate({
+      to: "/search",
+      search: {
+        q: searchTerm.trim(),
+        sortBy: "relevance",
+        sortDirection: "desc",
+        filters: [],
+        page: 1,
+      },
+    });
+    setIsPredictiveOpen(false);
+  }
+
   return {
     searchTerm,
     setSearchTerm,
     debouncedSearchTerm,
+    isPredictiveOpen,
+    setIsPredictiveOpen,
     focusInput,
     inputRef,
+    performSearch,
   };
 }
 
-export const { Store: SearchStore, useStore: useSearchStore } =
+export const { Store: SearchBarStore, useStore: useSearchBarStore } =
   createStore(useInternalStore);

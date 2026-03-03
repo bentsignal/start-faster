@@ -6,7 +6,7 @@ import { cn } from "@acme/ui/utils";
 import { stickyHeaderTokens } from "~/components/header/header";
 import { getKnownColorHex } from "~/features/product/colors";
 import { ColorSwatch } from "~/features/product/components/color-swatch";
-import { useProductStore } from "~/features/product/store";
+import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductDetailsPanel() {
   return (
@@ -34,7 +34,7 @@ export function ProductDetailsPanel() {
 }
 
 function ProductHandle() {
-  const handle = useProductStore((store) => store.product.handle);
+  const handle = useProductPageStore((store) => store.product.handle);
 
   return (
     <p className="text-muted-foreground mb-8 font-mono text-[10px] tracking-[0.2em] uppercase">
@@ -44,7 +44,7 @@ function ProductHandle() {
 }
 
 function ProductTitle() {
-  const title = useProductStore((store) => store.product.title);
+  const title = useProductPageStore((store) => store.product.title);
 
   return (
     <h1 className="mb-8 text-4xl leading-tight font-semibold tracking-tight lg:text-4xl">
@@ -54,16 +54,16 @@ function ProductTitle() {
 }
 
 function ProductPrice() {
-  const price = useProductStore((store) => store.price);
+  const price = useProductPageStore((store) => store.price);
 
   return <p className="mb-8 text-2xl font-medium">{price}</p>;
 }
 
 function ProductOptionSelector() {
-  const options = useProductStore((store) => store.options);
-  const selectedVariant = useProductStore((store) => store.selectedVariant);
-  const selectedOptions = useProductStore((store) => store.selectedOptions);
-  const selectOption = useProductStore((store) => store.selectOption);
+  const options = useProductPageStore((store) => store.options);
+  const selectedVariant = useProductPageStore((store) => store.selectedVariant);
+  const selectedOptions = useProductPageStore((store) => store.selectedOptions);
+  const selectOption = useProductPageStore((store) => store.selectOption);
 
   if (options.length === 0) {
     return null;
@@ -193,11 +193,11 @@ function ColorOptionGroup({
 }
 
 function ProductActions() {
-  const selectedVariant = useProductStore((store) => store.selectedVariant);
-  const addToCart = useProductStore((store) => store.addToCart);
-  const wasAddedToCart = useProductStore((store) => store.wasAddedToCart);
-  const buyNow = useProductStore((store) => store.buyNow);
-  const isBuyingNow = useProductStore((store) => store.isBuyingNow);
+  const selectedVariant = useProductPageStore((store) => store.selectedVariant);
+  const addToCart = useProductPageStore((store) => store.addToCart);
+  const wasAddedToCart = useProductPageStore((store) => store.wasAddedToCart);
+  const buyNow = useProductPageStore((store) => store.buyNow);
+  const isBuyingNow = useProductPageStore((store) => store.isBuyingNow);
   const isUnavailable =
     selectedVariant === null || selectedVariant.availableForSale === false;
 
@@ -222,7 +222,7 @@ function ProductActions() {
 }
 
 function ProductDescription() {
-  const description = useProductStore((store) => store.product.description);
+  const description = useProductPageStore((store) => store.product.description);
 
   return (
     <p className="text-muted-foreground xs:mb-0 mb-4 text-sm leading-7">

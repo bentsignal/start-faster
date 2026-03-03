@@ -24,6 +24,8 @@ Before finishing, report what you ran and whether it passed.
 
 All GraphQL queries and mutations should be written in `@packages/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use generics of narrowing to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
 
+- In app code, prefer using generated operation types from `@acme/shopify/storefront/generated` over writing large custom GraphQL result types.
+
 ## Code Style and Conventions
 
 ### Imports
@@ -42,9 +44,10 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 ### React / UI
 
 - **_IMPORTANT_**: Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
-- Keep components focused and composable; extract logic into hooks/stores when it grows.
+- Keep components focused and composable, divide functionality into smaller components where it makes sense to; extract logic into hooks/stores when it grows beyond simple things.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
+- Route files should stay thin, validation, loaders, and route component should live in the route file. Everything else should be abstracted away into smaller pieces of code outside the route file.
 
 ### State Management
 
@@ -76,6 +79,9 @@ All GraphQL queries and mutations should be written in `@packages/shopify`. This
 - Never perform queries or mutations inside useEffect. Data fetching should not rely on react's render behavior
 - Data loading should be done in route loaders when appropriate, or through tanstack query when done in components
 - Mutations should use tanstack query's useMutation and should always be driven by user events.
+- Query option builders should follow the `*Queries` object pattern (for example `productQueries`, `searchQueries`) with stable query keys and colocated fetch logic.
+- For multi-part product result UIs, use a feature store and selector-based subcomponents instead of one large card component.
+- Use optimistic updates to provide instant feedback to user after they perform an action.
 
 ### Testing
 

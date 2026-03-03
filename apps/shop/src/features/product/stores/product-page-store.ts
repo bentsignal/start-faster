@@ -3,19 +3,19 @@ import { createStore } from "rostra";
 
 import type { CarouselApi } from "@acme/ui/carousel";
 
-import type { Product } from "./types";
+import type { Product } from "../types";
 import { useProductGalleryImages } from "~/features/product/hooks/use-product-gallery-images";
 import { useProductOptions } from "~/features/product/hooks/use-product-options";
 import { useProductVariantActions } from "~/features/product/hooks/use-product-variant-actions";
 import { useSelectedProductVariant } from "~/features/product/hooks/use-selected-product-variant";
 import { formatPrice } from "~/features/product/lib/price";
 
-interface ProductStoreProps {
+interface ProductPageStoreProps {
   product: Product;
   variant?: string;
 }
 
-function useInternalStore({ product, variant }: ProductStoreProps) {
+function useInternalStore({ product, variant }: ProductPageStoreProps) {
   const variants = product.variants.nodes;
   const options = useProductOptions(product);
   const carouselApiRef = useRef<CarouselApi | null>(null);
@@ -63,7 +63,7 @@ function useInternalStore({ product, variant }: ProductStoreProps) {
   return storeValue;
 }
 
-const { Store: ProductStore, useStore: useProductStore } =
+const { Store: ProductPageStore, useStore: useProductPageStore } =
   createStore(useInternalStore);
 
-export { ProductStore, useProductStore };
+export { ProductPageStore, useProductPageStore };

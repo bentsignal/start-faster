@@ -1,3 +1,4 @@
+import { useSearch } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
@@ -5,11 +6,12 @@ import { cn } from "@acme/ui/utils";
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
 import { Link } from "~/components/link";
-import { SearchClearButton } from "~/features/search/atoms/clear-button";
-import { SearchIcon } from "~/features/search/atoms/icon";
-import { SearchInput } from "~/features/search/atoms/input";
-import { SearchBar } from "~/features/search/atoms/search-bar";
-import { SearchStore } from "~/features/search/store";
+import { PredictiveSearchDropdown } from "~/features/search/components/predictive-search-dropdown";
+import { SearchClearButton } from "~/features/search/components/search-bar/clear-button";
+import { SearchBarContainer } from "~/features/search/components/search-bar/container";
+import { SearchIcon } from "~/features/search/components/search-bar/icon";
+import { SearchInput } from "~/features/search/components/search-bar/input";
+import { SearchBarStore } from "~/features/search/stores/search-bar-store";
 
 export const stickyHeaderTokens = {
   headerHeight: "lg:h-18 xl:h-28",
@@ -19,8 +21,13 @@ export const stickyHeaderTokens = {
 };
 
 export function Header() {
+  const searchParam = useSearch({
+    from: "/search",
+    shouldThrow: false,
+    select: (search) => search.q,
+  });
   return (
-    <SearchStore>
+    <SearchBarStore initialSearchTerm={searchParam}>
       <header
         data-site-header
         className={cn(
@@ -37,22 +44,24 @@ export function Header() {
               height={36}
             />
           </Link>
-          <SearchBar className="hidden w-96 sm:flex">
+          <SearchBarContainer className="hidden w-96 sm:flex">
             <SearchIcon />
             <SearchInput />
             <SearchClearButton />
-          </SearchBar>
+            <PredictiveSearchDropdown />
+          </SearchBarContainer>
           <TopRightControls />
         </div>
         <div className="px-4 pb-4 sm:hidden">
-          <SearchBar>
+          <SearchBarContainer>
             <SearchIcon />
             <SearchInput />
             <SearchClearButton />
-          </SearchBar>
+            <PredictiveSearchDropdown />
+          </SearchBarContainer>
         </div>
         <HorizontalMenu />
       </header>
-    </SearchStore>
+    </SearchBarStore>
   );
 }

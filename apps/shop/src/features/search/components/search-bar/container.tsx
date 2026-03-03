@@ -1,6 +1,6 @@
 import { cn } from "@acme/ui/utils";
 
-export function SearchBar({
+export function SearchBarContainer({
   className,
   children,
 }: {
@@ -10,7 +10,7 @@ export function SearchBar({
   return (
     <div
       className={cn(
-        "bg-sidebar border-sidebar-border flex flex-row items-center rounded-xl border px-4",
+        "bg-sidebar border-sidebar-border relative flex flex-row items-center rounded-xl border px-4",
         className,
       )}
     >
