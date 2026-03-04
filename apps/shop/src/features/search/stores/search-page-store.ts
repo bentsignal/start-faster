@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { createStore } from "rostra";
@@ -20,6 +21,9 @@ import {
 function useInternalStore() {
   const navigate = useNavigate({ from: "/search" });
   const search = useSearch({ from: "/search" });
+  const [isFilterNavigationLoading, setIsFilterNavigationLoading] =
+    useState(false);
+  const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
 
   const { data } = useSuspenseQuery({
     ...searchQueries.products({
@@ -64,43 +68,73 @@ function useInternalStore() {
       },
     });
 
+  const runWithLoading = async ({
+    setLoading,
+    action,
+  }: {
+    setLoading: (isLoading: boolean) => void;
+    action: () => Promise<void>;
+  }) => {
+    setLoading(true);
+    await action().finally(() => {
+      setLoading(false);
+    });
+  };
+
   const onSortByChange = (nextSortBy: SearchSortBy) => {
-    void navigateToSearch({
-      sortBy: nextSortBy,
-      sortDirection: nextSortBy === "relevance" ? "desc" : search.sortDirection,
-      nextFilters: search.filters,
-      page: 1,
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigateToSearch({
+          sortBy: nextSortBy,
+          sortDirection:
+            nextSortBy === "relevance" ? "desc" : search.sortDirection,
+          nextFilters: search.filters,
+          page: 1,
+        }),
     });
   };
 
   const onSortDirectionChange = (nextSortDirection: SearchSortDirection) => {
-    void navigateToSearch({
-      sortBy: search.sortBy,
-      sortDirection: nextSortDirection,
-      nextFilters: search.filters,
-      page: 1,
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigateToSearch({
+          sortBy: search.sortBy,
+          sortDirection: nextSortDirection,
+          nextFilters: search.filters,
+          page: 1,
+        }),
     });
   };
 
   const onToggleFilter = (input: ProductFilter) => {
-    void navigateToSearch({
-      sortBy: search.sortBy,
-      sortDirection: search.sortDirection,
-      nextFilters: toggleFilter(search.filters, input),
-      page: 1,
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigateToSearch({
+          sortBy: search.sortBy,
+          sortDirection: search.sortDirection,
+          nextFilters: toggleFilter(search.filters, input),
+          page: 1,
+        }),
     });
   };
 
   const onApplyPriceRange = (min: string, max: string) => {
-    void navigateToSearch({
-      sortBy: search.sortBy,
-      sortDirection: search.sortDirection,
-      nextFilters: applyPriceRangeFilter({
-        filters: search.filters,
-        min,
-        max,
-      }),
-      page: 1,
+    void runWithLoading({
+      setLoading: setIsPriceApplyLoading,
+      action: () =>
+        navigateToSearch({
+          sortBy: search.sortBy,
+          sortDirection: search.sortDirection,
+          nextFilters: applyPriceRangeFilter({
+            filters: search.filters,
+            min,
+            max,
+          }),
+          page: 1,
+        }),
     });
   };
 
@@ -118,6 +152,8 @@ function useInternalStore() {
     });
   };
 
+  const isFiltering = isFilterNavigationLoading || isPriceApplyLoading;
+
   return {
     search,
     filters: search.filters,
@@ -126,7 +162,8 @@ function useInternalStore() {
     totalCount,
     totalPages,
     activePage,
-    pageJumpLoading: false,
+    isFiltering,
+    isPriceApplyLoading,
     onSortByChange,
     onSortDirectionChange,
     onToggleFilter,

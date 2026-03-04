@@ -8,12 +8,12 @@ import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 export function SearchPagination() {
   const activePage = useSearchPageStore((store) => store.activePage);
   const totalPages = useSearchPageStore((store) => store.totalPages);
-  const loading = useSearchPageStore((store) => store.pageJumpLoading);
+  const isFiltering = useSearchPageStore((store) => store.isFiltering);
   const onPageChange = useSearchPageStore((store) => store.onPageChange);
   const search = useSearchPageStore((store) => store.search);
   const isAtFirstPage = activePage <= 1;
   const isAtLastPage = activePage >= totalPages;
-  const isBusy = loading;
+  const isBusy = isFiltering;
 
   const getSearchForPage = (page: number) => ({
     q: search.q,

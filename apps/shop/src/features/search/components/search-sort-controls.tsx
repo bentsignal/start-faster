@@ -11,17 +11,20 @@ export function SortByControl({
   sortBy,
   onSortByChange,
   className,
+  disabled = false,
 }: {
   sortBy: SearchSortBy;
   onSortByChange: (value: SearchSortBy) => void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="relative">
       <select
         value={sortBy}
+        disabled={disabled}
         className={cn(
-          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none",
+          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
           className,
         )}
         onChange={(event) => {
@@ -40,17 +43,20 @@ export function SortDirectionControl({
   sortDirection,
   onSortDirectionChange,
   className,
+  disabled = false,
 }: {
   sortDirection: SearchSortDirection;
   onSortDirectionChange: (value: SearchSortDirection) => void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="relative">
       <select
         value={sortDirection}
+        disabled={disabled}
         className={cn(
-          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none",
+          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
           className,
         )}
         onChange={(event) => {

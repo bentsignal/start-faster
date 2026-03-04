@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowDownWideNarrow, ListFilter } from "lucide-react";
+import { ArrowDownWideNarrow, ListFilter, Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -32,6 +32,7 @@ export function SearchResultsHeader() {
   const onSortDirectionChange = useSearchPageStore(
     (store) => store.onSortDirectionChange,
   );
+  const isFiltering = useSearchPageStore((store) => store.isFiltering);
   const activeFilterCount = selectedFilters.length;
 
   return (
@@ -46,7 +47,11 @@ export function SearchResultsHeader() {
           <Drawer open={sortOpen} onOpenChange={setSortOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="sm" className="flex-1">
-                <ArrowDownWideNarrow className="size-3.5" />
+                {isFiltering ? (
+                  <Loader className="size-3.5 animate-spin" />
+                ) : (
+                  <ArrowDownWideNarrow className="size-3.5" />
+                )}
                 Sort
               </Button>
             </DrawerTrigger>
@@ -61,11 +66,13 @@ export function SearchResultsHeader() {
                 <SortByControl
                   sortBy={sortBy}
                   onSortByChange={onSortByChange}
+                  disabled={isFiltering}
                   className="bg-input/30 border-border h-10 rounded-xl px-3"
                 />
                 <SortDirectionControl
                   sortDirection={sortDirection}
                   onSortDirectionChange={onSortDirectionChange}
+                  disabled={isFiltering}
                   className="bg-input/30 border-border h-10 rounded-xl px-3"
                 />
               </div>
@@ -75,7 +82,11 @@ export function SearchResultsHeader() {
           <Drawer open={filtersOpen} onOpenChange={setFiltersOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="sm" className="flex-1 gap-2">
-                <ListFilter className="size-3.5" />
+                {isFiltering ? (
+                  <Loader className="size-3.5 animate-spin" />
+                ) : (
+                  <ListFilter className="size-3.5" />
+                )}
                 Filters
                 {activeFilterCount > 0 ? (
                   <span className="bg-primary text-primary-foreground min-w-5 rounded-full px-1.5 text-xs leading-5">
