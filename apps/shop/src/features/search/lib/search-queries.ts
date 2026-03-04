@@ -1,3 +1,5 @@
+import type { QueryClient } from "@tanstack/react-query";
+
 import type {
   ProductFilter,
   SearchSortKeys,
@@ -9,7 +11,7 @@ import {
 
 import { shopify } from "~/lib/shopify";
 
-export const SEARCH_PAGE_SIZE = 40;
+export const SEARCH_PAGE_SIZE = 6;
 
 export type SearchSortBy = "relevance" | "price";
 export type SearchSortDirection = "asc" | "desc";
@@ -81,12 +83,14 @@ export const searchQueries = {
     },
   }),
   resolveCursorForPage: async ({
+    queryClient,
     page,
     query,
     sortBy,
     sortDirection,
     filters,
   }: {
+    queryClient?: QueryClient;
     page: number;
     query: string;
     sortBy: SearchSortBy;
@@ -101,16 +105,18 @@ export const searchQueries = {
     let cursor: string | undefined;
 
     while (currentPage < page) {
-      const result = await searchQueries
-        .products({
-          query,
-          sortBy,
-          sortDirection,
-          filters,
-          first: SEARCH_PAGE_SIZE,
-          after: cursor,
-        })
-        .queryFn();
+      const searchProductsQuery = searchQueries.products({
+        query,
+        sortBy,
+        sortDirection,
+        filters,
+        first: SEARCH_PAGE_SIZE,
+        after: cursor,
+      });
+
+      const result = queryClient
+        ? await queryClient.ensureQueryData(searchProductsQuery)
+        : await searchProductsQuery.queryFn();
 
       const nextCursor = result?.pageInfo.endCursor ?? undefined;
       if (nextCursor === undefined) {

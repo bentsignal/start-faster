@@ -32,6 +32,7 @@ export const Route = createFileRoute("/search")({
 
     const filters = deps.filters;
 
+    const hasCursorInSearch = deps.cursor !== undefined;
     let cursor = deps.cursor;
 
     if (deps.page === 1) {
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/search")({
 
     if (deps.page > 1 && cursor === undefined) {
       cursor = await searchQueries.resolveCursorForPage({
+        queryClient,
         page: deps.page,
         query,
         sortBy: deps.sortBy,
@@ -57,6 +59,20 @@ export const Route = createFileRoute("/search")({
           sortDirection: deps.sortDirection,
           filters,
           page: 1,
+        },
+      });
+    }
+
+    if (deps.page > 1 && !hasCursorInSearch && cursor !== undefined) {
+      throw redirect({
+        to: "/search",
+        search: {
+          q: query,
+          sortBy: deps.sortBy,
+          sortDirection: deps.sortDirection,
+          filters,
+          page: deps.page,
+          cursor,
         },
       });
     }

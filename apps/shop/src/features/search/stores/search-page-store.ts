@@ -16,15 +16,13 @@ import {
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
-import { useLoading } from "~/hooks/use-loading";
 
 function useInternalStore() {
   const navigate = useNavigate({ from: "/search" });
   const search = useSearch({ from: "/search" });
-  const { isLoading: pageJumpLoading, start: startPageJump } = useLoading();
 
-  const { data } = useSuspenseQuery(
-    searchQueries.products({
+  const { data } = useSuspenseQuery({
+    ...searchQueries.products({
       query: search.q,
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
@@ -32,7 +30,8 @@ function useInternalStore() {
       first: SEARCH_PAGE_SIZE,
       after: search.page === 1 ? undefined : search.cursor,
     }),
-  );
+    refetchOnMount: false,
+  });
   const products =
     data?.nodes.filter((node) => node.__typename === "Product") ?? [];
 
@@ -106,25 +105,7 @@ function useInternalStore() {
   };
 
   const onPageChange = async (nextPage: number) => {
-    if (nextPage < 1 || nextPage > totalPages || nextPage === search.page) {
-      return;
-    }
-
-    let nextCursor: string | undefined;
-    startPageJump(async () => {
-      nextCursor =
-        nextPage > 1
-          ? await searchQueries.resolveCursorForPage({
-              page: nextPage,
-              query: search.q,
-              sortBy: search.sortBy,
-              sortDirection: search.sortDirection,
-              filters: search.filters,
-            })
-          : undefined;
-    });
-
-    if (nextPage > 1 && nextCursor === undefined) {
+    if (nextPage < 1 || nextPage > totalPages || nextPage === activePage) {
       return;
     }
 
@@ -133,7 +114,7 @@ function useInternalStore() {
       sortDirection: search.sortDirection,
       nextFilters: search.filters,
       page: nextPage,
-      cursor: nextCursor,
+      cursor: undefined,
     });
   };
 
@@ -145,7 +126,7 @@ function useInternalStore() {
     totalCount,
     totalPages,
     activePage,
-    pageJumpLoading,
+    pageJumpLoading: false,
     onSortByChange,
     onSortDirectionChange,
     onToggleFilter,

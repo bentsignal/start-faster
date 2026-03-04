@@ -1,5 +1,7 @@
 import { Button } from "@acme/ui/button";
+import { cn } from "@acme/ui/utils";
 
+import { Link } from "~/components/link";
 import { getPageWindow } from "~/features/search/lib/search-pagination";
 import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
@@ -8,6 +10,19 @@ export function SearchPagination() {
   const totalPages = useSearchPageStore((store) => store.totalPages);
   const loading = useSearchPageStore((store) => store.pageJumpLoading);
   const onPageChange = useSearchPageStore((store) => store.onPageChange);
+  const search = useSearchPageStore((store) => store.search);
+  const isAtFirstPage = activePage <= 1;
+  const isAtLastPage = activePage >= totalPages;
+  const isBusy = loading;
+
+  const getSearchForPage = (page: number) => ({
+    q: search.q,
+    sortBy: search.sortBy,
+    sortDirection: search.sortDirection,
+    filters: search.filters,
+    page,
+    cursor: undefined,
+  });
 
   if (totalPages <= 1) {
     return null;
@@ -18,10 +33,23 @@ export function SearchPagination() {
       <Button
         variant="ghost"
         size="sm"
-        disabled={activePage <= 1 || loading}
-        onClick={() => {
-          void onPageChange(activePage - 1);
-        }}
+        disabled={isAtFirstPage || isBusy}
+        className={cn((isAtFirstPage || isBusy) && "opacity-50")}
+        render={(props) => (
+          <Link
+            to="/search"
+            search={getSearchForPage(activePage - 1)}
+            preload="intent"
+            {...props}
+            disabled={true}
+            onClick={(event) => {
+              event.preventDefault();
+              void onPageChange(activePage - 1);
+            }}
+          >
+            Prev
+          </Link>
+        )}
       >
         Prev
       </Button>
@@ -31,10 +59,21 @@ export function SearchPagination() {
           key={page}
           variant={page === activePage ? "default" : "ghost"}
           size="sm"
-          disabled={loading}
-          onClick={() => {
-            void onPageChange(page);
-          }}
+          disabled={isBusy || page === activePage}
+          render={(props) => (
+            <Link
+              to="/search"
+              search={getSearchForPage(page)}
+              preload="intent"
+              {...props}
+              onClick={(event) => {
+                event.preventDefault();
+                void onPageChange(page);
+              }}
+            >
+              {page}
+            </Link>
+          )}
         >
           {page}
         </Button>
@@ -43,10 +82,22 @@ export function SearchPagination() {
       <Button
         variant="ghost"
         size="sm"
-        disabled={activePage >= totalPages || loading}
-        onClick={() => {
-          void onPageChange(activePage + 1);
-        }}
+        disabled={isAtLastPage || isBusy}
+        className={cn((isAtLastPage || isBusy) && "opacity-50")}
+        render={(props) => (
+          <Link
+            to="/search"
+            search={getSearchForPage(activePage + 1)}
+            preload="intent"
+            {...props}
+            onClick={(event) => {
+              event.preventDefault();
+              void onPageChange(activePage + 1);
+            }}
+          >
+            Next
+          </Link>
+        )}
       >
         Next
       </Button>
