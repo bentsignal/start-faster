@@ -1,4 +1,4 @@
-import { useRouteContext } from "@tanstack/react-router";
+import { Link as TanstackLink, useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -37,12 +37,11 @@ export function TopRightControls() {
         <Link
           to="/settings/account"
           className="hover:text-primary transition-colors"
-          preload={false}
         >
           <AccountIcon />
         </Link>
       ) : (
-        <Link
+        <TanstackLink
           to="."
           search={(previousSearch) => ({
             ...previousSearch,
@@ -50,11 +49,10 @@ export function TopRightControls() {
             returnTo: "/settings/account",
           })}
           className="hover:text-primary transition-colors"
-          preload={false}
           resetScroll={false}
         >
           <AccountIcon />
-        </Link>
+        </TanstackLink>
       )}
       <button
         type="button"
