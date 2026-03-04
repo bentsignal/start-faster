@@ -6,7 +6,7 @@ import { ProductDetailsPanel } from "~/features/product/components/product-detai
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
 import { productQueries } from "~/features/product/lib/product-queries";
-import { ProductStore } from "~/features/product/store";
+import { ProductPageStore } from "~/features/product/stores/product-page-store";
 
 export const Route = createFileRoute("/shop/$handle")({
   component: ProductPage,
@@ -31,7 +31,7 @@ function ProductPage() {
   );
 
   return (
-    <ProductStore variant={variant} product={product}>
+    <ProductPageStore variant={variant} product={product}>
       <main className="mx-auto w-full max-w-[1700px] lg:px-8 xl:px-12">
         <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch lg:gap-10 xl:gap-16">
           <section className="lg:py-14">
@@ -41,6 +41,6 @@ function ProductPage() {
           <ProductDetailsPanel />
         </div>
       </main>
-    </ProductStore>
+    </ProductPageStore>
   );
 }

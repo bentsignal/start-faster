@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './app/__root'
 import { Route as TermsOfServiceRouteImport } from './app/terms-of-service'
+import { Route as SearchRouteImport } from './app/search'
 import { Route as PrivacyPolicyRouteImport } from './app/privacy-policy'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
@@ -23,6 +24,11 @@ import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authent
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
   path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/search': typeof SearchRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/search': typeof SearchRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/search': typeof SearchRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/logout': typeof AuthLogoutRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/callback'
     | '/privacy-policy'
+    | '/search'
     | '/terms-of-service'
     | '/login'
     | '/logout'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/callback'
     | '/privacy-policy'
+    | '/search'
     | '/terms-of-service'
     | '/login'
     | '/logout'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/callback'
     | '/privacy-policy'
+    | '/search'
     | '/terms-of-service'
     | '/_auth/login'
     | '/_auth/logout'
@@ -149,6 +161,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  SearchRoute: typeof SearchRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/terms-of-service'
       fullPath: '/terms-of-service'
       preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  SearchRoute: SearchRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,

@@ -33,6 +33,20 @@ export function getKnownColorHex(colorName: string): string | undefined {
  * Uses relative luminance with a threshold tuned for swatch visibility.
  */
 export function isLightColor(hex: string): boolean {
+  const luminance = getRelativeLuminance(hex);
+  return luminance > 0.7;
+}
+
+/**
+ * Returns true if a hex color is perceptually dark (would blend into a dark background).
+ * Uses relative luminance with a threshold tuned for swatch visibility.
+ */
+export function isDarkColor(hex: string): boolean {
+  const luminance = getRelativeLuminance(hex);
+  return luminance < 0.08;
+}
+
+function getRelativeLuminance(hex: string): number {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
   const b = parseInt(hex.slice(5, 7), 16) / 255;
@@ -41,8 +55,5 @@ export function isLightColor(hex: string): boolean {
   const toLinear = (c: number) =>
     c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 
-  const luminance =
-    0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
-
-  return luminance > 0.7;
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }

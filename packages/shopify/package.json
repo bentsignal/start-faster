@@ -7,6 +7,7 @@
     "./storefront/generated": "./src/storefront/_generated/storefront.generated.d.ts",
     "./storefront/cart": "./src/storefront/cart/index.ts",
     "./storefront/product": "./src/storefront/product/index.ts",
+    "./storefront/search": "./src/storefront/search/index.ts",
     "./customer/generated": "./src/customer/_generated/customer.generated.d.ts",
     "./customer/types": "./src/customer/_generated/customer.types.d.ts",
     "./customer/account": "./src/customer/account/index.ts",

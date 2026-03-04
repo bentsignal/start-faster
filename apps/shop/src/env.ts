@@ -14,7 +14,6 @@ export const env = createEnv({
   clientPrefix: "VITE_",
   server: {
     SHOPIFY_SHOP_ID: z.string().min(1),
-    SHOPIFY_STOREFRONT_PRIVATE_TOKEN: z.string().min(1),
     SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID: z.string().min(1),
     SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET: z.string().length(64),
     SHOPIFY_CUSTOMER_ACCOUNT_AUTHORIZATION_ENDPOINT: z.url(),
