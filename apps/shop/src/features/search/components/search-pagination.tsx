@@ -43,12 +43,10 @@ export function SearchPagination() {
             {...props}
             disabled={isAtFirstPage || isBusy}
             onClick={(event) => {
+              event.preventDefault();
               if (isAtFirstPage || isBusy) {
-                event.preventDefault();
                 return;
               }
-
-              event.preventDefault();
               void onPageChange(activePage - 1);
             }}
           >
@@ -73,6 +71,9 @@ export function SearchPagination() {
               {...props}
               onClick={(event) => {
                 event.preventDefault();
+                if (isBusy || page === activePage) {
+                  return;
+                }
                 void onPageChange(page);
               }}
             >
@@ -97,6 +98,9 @@ export function SearchPagination() {
             {...props}
             onClick={(event) => {
               event.preventDefault();
+              if (isAtLastPage || isBusy) {
+                return;
+              }
               void onPageChange(activePage + 1);
             }}
           >
