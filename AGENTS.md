@@ -22,7 +22,7 @@ Before finishing, report what you ran and whether it passed.
 
 ### GraphQL
 
-- All GraphQL queries and mutations should be written in `@packages/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use generics of narrowing to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
+- All GraphQL queries and mutations should be written in `@packages/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use generics or casting to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
 - In app code, prefer using generated operation types from `@acme/shopify/storefront/generated` over writing large custom GraphQL result types. Normalizing the results from GraphQL queries is generally unnecessary and just bloats the codebase.
 
 ## Code Style and Conventions
