@@ -2,8 +2,8 @@ import { z } from "zod";
 
 const priceFilterSchema = z
   .object({
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().min(0).optional(),
+    max: z.number().min(0).optional(),
   })
   .strict()
   .refine((value) => value.min !== undefined || value.max !== undefined);
