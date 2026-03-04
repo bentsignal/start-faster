@@ -70,6 +70,7 @@ function useInternalStore({
   }
 
   function performSearch() {
+    inputRef.current?.blur();
     void navigate({
       to: "/search",
       search: {
