@@ -1,6 +1,10 @@
 import { cn } from "@acme/ui/utils";
 
-import { getKnownColorHex, isLightColor } from "~/features/product/colors";
+import {
+  getKnownColorHex,
+  isDarkColor,
+  isLightColor,
+} from "~/features/product/colors";
 
 type SwatchAvailability = "available" | "sold-out" | "unavailable";
 
@@ -20,6 +24,7 @@ function ColorSwatch({
   if (!hex) return null;
 
   const isColorLight = isLightColor(hex);
+  const isColorDark = isDarkColor(hex);
   const isDisabled = availability !== "available" && isSelected === false;
   const availabilityLabel =
     availability === "sold-out"
@@ -45,6 +50,7 @@ function ColorSwatch({
         "transition-[box-shadow,transform] duration-200 ease-out",
         "focus-visible:ring-ring/50 focus-visible:ring-2",
         isColorLight && "shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]",
+        isColorDark && "dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]",
         availability !== "available" && [
           "opacity-45",
           "after:bg-foreground/80 after:pointer-events-none after:absolute after:inset-x-0.5 after:top-1/2 after:h-px after:-rotate-45",
