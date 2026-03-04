@@ -12,6 +12,7 @@ import { useProductPageStore } from "~/features/product/stores/product-page-stor
 
 export function ProductImageGalleryMobile() {
   const images = useProductPageStore((store) => store.galleryImages);
+  const productTitle = useProductPageStore((store) => store.product.title);
   const setCarouselApi = useProductPageStore((store) => store.setCarouselApi);
 
   if (images.length === 0) {
@@ -27,7 +28,12 @@ export function ProductImageGalleryMobile() {
       >
         <CarouselContent className="ml-0">
           {images.map((image, index) => (
-            <MobileImageSlide key={image.id} image={image} index={index} />
+            <MobileImageSlide
+              key={image.id}
+              image={image}
+              index={index}
+              productTitle={productTitle}
+            />
           ))}
         </CarouselContent>
         <CarouselDots className="mt-5" fallbackDotCount={images.length} />
@@ -39,12 +45,12 @@ export function ProductImageGalleryMobile() {
 function MobileImageSlide({
   image,
   index,
+  productTitle,
 }: {
   image: ProductGalleryImage;
   index: number;
+  productTitle: string;
 }) {
-  const productTitle = useProductPageStore((store) => store.product.title);
-
   return (
     <CarouselItem className="pl-0">
       <div className="bg-muted/40 aspect-square w-full overflow-hidden">

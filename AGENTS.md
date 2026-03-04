@@ -22,7 +22,7 @@ Before finishing, report what you ran and whether it passed.
 
 ### GraphQL
 
-- All GraphQL queries and mutations should be written in `@packages/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use generics or casting to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
+- All GraphQL queries and mutations should be written in `@acme/shopify`. This package has GraphQL codegen setup so that any queries written will have TypeScript types generated for them, giving us type safety when calling the query. When done right, you won't have to use manual generics or type narrowing to get a return type from calling `shopify.request(myQuery)` or `customerAccount.query(myQuery)`.
 - In app code, prefer using generated operation types from `@acme/shopify/storefront/generated` over writing large custom GraphQL result types. Normalizing the results from GraphQL queries is generally unnecessary and just bloats the codebase.
 
 ## Code Style and Conventions
@@ -38,6 +38,7 @@ Before finishing, report what you ran and whether it passed.
 - Avoid `any`;
 - Avoid `unknown` + narrowing.
 - Use discriminated unions where appropriate.
+- Avoid type casting for variable definition, this is generally an anti pattern and should NOT be used to dodge the type system
 - Prefer type inference over explicitly defined types, use `as const` where appropriate.
 - Do not attempt to override the typesystem with explicitly defined types as a means of bypassing typecheck. Always address the problem instead of trying to cheat typescript.
 
@@ -48,7 +49,15 @@ Before finishing, report what you ran and whether it passed.
 - Keep component files component-focused. Move shared types and pure helpers to `types.ts` or `lib/`.
 - Use shared UI from `@acme/ui` before creating one-off primitives.
 - Use `cn()` from `@acme/ui` to merge classnames when necessary.
-- Route files should stay thin, validation, loaders, and route component should live in the route file. Everything else should be abstracted away into smaller pieces of code outside the route file.
+
+### Route File Boundaries (Hard Rule)
+
+- Route files are wiring only. Keep them easy to scan.
+- Allowed in route files: route registration, `validateSearch` wiring, loader/action wiring, redirects, and route component composition.
+- Not allowed in route files: helper functions, utility logic, custom parsing/sanitizing logic, reusable constants, or new schema/type declarations.
+- If logic is used by anything other than the route declaration itself, move it out immediately.
+- Put schemas in feature `schema.ts` (or `lib/*-schema.ts`), and helpers in feature `lib/*`.
+- PRs that add non-wiring logic to route files should be considered incorrect and refactored before completion.
 
 ### State Management
 

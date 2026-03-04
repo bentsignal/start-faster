@@ -41,8 +41,13 @@ export function SearchPagination() {
             search={getSearchForPage(activePage - 1)}
             preload="intent"
             {...props}
-            disabled={true}
+            disabled={isAtFirstPage || isBusy}
             onClick={(event) => {
+              if (isAtFirstPage || isBusy) {
+                event.preventDefault();
+                return;
+              }
+
               event.preventDefault();
               void onPageChange(activePage - 1);
             }}

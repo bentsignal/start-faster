@@ -11,7 +11,10 @@ import {
 
 import { shopify } from "~/lib/shopify";
 
-export const SEARCH_PAGE_SIZE = 6;
+const PREDICTIVE_SEARCH_PAGE_SIZE = 6;
+export const SEARCH_PAGE_SIZE = 30;
+export const MAX_SEARCH_PAGE = 50;
+export const MAX_PAGE_ITERATIONS = MAX_SEARCH_PAGE - 1;
 
 export type SearchSortBy = "relevance" | "price";
 export type SearchSortDirection = "asc" | "desc";
@@ -31,7 +34,7 @@ export const searchQueries = {
       const response = await shopify.request(getPredictiveSearch, {
         variables: {
           query,
-          limit: 6,
+          limit: PREDICTIVE_SEARCH_PAGE_SIZE,
         },
       });
 
@@ -101,10 +104,19 @@ export const searchQueries = {
       return undefined;
     }
 
+    if (page > MAX_SEARCH_PAGE) {
+      return undefined;
+    }
+
     let currentPage = 1;
     let cursor: string | undefined;
+    let iterationCount = 0;
 
     while (currentPage < page) {
+      if (iterationCount >= MAX_PAGE_ITERATIONS) {
+        return undefined;
+      }
+
       const searchProductsQuery = searchQueries.products({
         query,
         sortBy,
@@ -125,6 +137,7 @@ export const searchQueries = {
 
       cursor = nextCursor;
       currentPage += 1;
+      iterationCount += 1;
     }
 
     return cursor;

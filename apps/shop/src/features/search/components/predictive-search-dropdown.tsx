@@ -14,7 +14,7 @@ type PredictiveSearchProduct = NonNullable<
 
 export function PredictiveSearchDropdown() {
   const hidePredictiveDropdown = useSearchBarStore(
-    (s) => s.isPredictiveOpen === false || s.searchTerm.length < 2,
+    (s) => s.isPredictiveOpen === false || s.searchTerm.trim().length < 2,
   );
 
   if (hidePredictiveDropdown) {

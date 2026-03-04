@@ -27,41 +27,43 @@ export function Header() {
     select: (search) => search.q,
   });
   return (
-    <SearchBarStore initialSearchTerm={searchParam}>
-      <header
-        data-site-header
-        className={cn(
-          "bg-background sticky top-0 z-50 flex flex-col justify-center",
-          stickyHeaderTokens.headerHeight,
-        )}
-      >
-        <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
-          <Link to="/" className="w-48">
-            <Image
-              src="/logo.webp"
-              alt="Start Faster Logo"
-              width={36}
-              height={36}
-            />
-          </Link>
+    <header
+      data-site-header
+      className={cn(
+        "bg-background sticky top-0 z-50 flex flex-col justify-center",
+        stickyHeaderTokens.headerHeight,
+      )}
+    >
+      <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
+        <Link to="/" className="w-48">
+          <Image
+            src="/logo.webp"
+            alt="Start Faster Logo"
+            width={36}
+            height={36}
+          />
+        </Link>
+        <SearchBarStore initialSearchTerm={searchParam}>
           <SearchBarContainer className="hidden w-96 sm:flex">
             <SearchIcon />
             <SearchInput />
             <SearchClearButton />
             <PredictiveSearchDropdown />
           </SearchBarContainer>
-          <TopRightControls />
-        </div>
-        <div className="px-4 pb-4 sm:hidden">
+        </SearchBarStore>
+        <TopRightControls />
+      </div>
+      <div className="px-4 pb-4 sm:hidden">
+        <SearchBarStore initialSearchTerm={searchParam}>
           <SearchBarContainer>
             <SearchIcon />
             <SearchInput />
             <SearchClearButton />
             <PredictiveSearchDropdown />
           </SearchBarContainer>
-        </div>
-        <HorizontalMenu />
-      </header>
-    </SearchBarStore>
+        </SearchBarStore>
+      </div>
+      <HorizontalMenu />
+    </header>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Loader } from "lucide-react";
 
 import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
@@ -191,55 +192,18 @@ function FilterSectionContent({
 }) {
   if (String(filter.type) === "PRICE_RANGE") {
     const priceRange = getPriceRangeFromFilters(selectedFilters);
+    const priceInputKey = `${filter.id}:${priceRange.min}:${priceRange.max}`;
 
     return (
-      <section className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <textarea
-            name={`price-min-${filter.id}`}
-            rows={1}
-            defaultValue={priceRange.min}
-            placeholder="Min"
-            disabled={isFiltering}
-            className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
-          />
-          <textarea
-            name={`price-max-${filter.id}`}
-            rows={1}
-            defaultValue={priceRange.max}
-            placeholder="Max"
-            disabled={isFiltering}
-            className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
-          />
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={isFiltering}
-          className="w-full rounded-full"
-          onClick={(event) => {
-            const section = event.currentTarget.closest("section");
-            if (section === null) {
-              return;
-            }
-
-            const minValue = section.querySelector<HTMLTextAreaElement>(
-              `textarea[name="price-min-${filter.id}"]`,
-            )?.value;
-            const maxValue = section.querySelector<HTMLTextAreaElement>(
-              `textarea[name="price-max-${filter.id}"]`,
-            )?.value;
-
-            onApplyPriceRange(minValue ?? "", maxValue ?? "");
-          }}
-        >
-          {isPriceApplyLoading ? (
-            <Loader className="size-3.5 animate-spin" />
-          ) : (
-            "Apply"
-          )}
-        </Button>
-      </section>
+      <PriceRangeFilterContent
+        key={priceInputKey}
+        filterId={filter.id}
+        initialMin={priceRange.min}
+        initialMax={priceRange.max}
+        onApplyPriceRange={onApplyPriceRange}
+        isFiltering={isFiltering}
+        isPriceApplyLoading={isPriceApplyLoading}
+      />
     );
   }
 
@@ -274,6 +238,65 @@ function FilterSectionContent({
           );
         })}
       </div>
+    </section>
+  );
+}
+
+function PriceRangeFilterContent({
+  filterId,
+  initialMin,
+  initialMax,
+  onApplyPriceRange,
+  isFiltering,
+  isPriceApplyLoading,
+}: {
+  filterId: string;
+  initialMin: string;
+  initialMax: string;
+  onApplyPriceRange: (min: string, max: string) => void;
+  isFiltering: boolean;
+  isPriceApplyLoading: boolean;
+}) {
+  const [priceMin, setPriceMin] = useState(initialMin);
+  const [priceMax, setPriceMax] = useState(initialMax);
+
+  return (
+    <section className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <textarea
+          name={`price-min-${filterId}`}
+          rows={1}
+          value={priceMin}
+          placeholder="Min"
+          disabled={isFiltering}
+          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          onChange={(event) => setPriceMin(event.target.value)}
+        />
+        <textarea
+          name={`price-max-${filterId}`}
+          rows={1}
+          value={priceMax}
+          placeholder="Max"
+          disabled={isFiltering}
+          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          onChange={(event) => setPriceMax(event.target.value)}
+        />
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={isFiltering}
+        className="w-full rounded-full"
+        onClick={() => {
+          onApplyPriceRange(priceMin, priceMax);
+        }}
+      >
+        {isPriceApplyLoading ? (
+          <Loader className="size-3.5 animate-spin" />
+        ) : (
+          "Apply"
+        )}
+      </Button>
     </section>
   );
 }

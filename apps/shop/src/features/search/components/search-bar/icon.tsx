@@ -2,7 +2,7 @@ import { Search } from "lucide-react";
 
 import { cn } from "@acme/ui/utils";
 
-import { useSearchBarStore } from "../../stores/search-bar-store";
+import { useSearchBarStore } from "~/features/search/stores/search-bar-store";
 
 export function SearchIcon({ className }: { className?: string }) {
   const performSearch = useSearchBarStore((s) => s.performSearch);
@@ -19,7 +19,7 @@ export function SearchIcon({ className }: { className?: string }) {
       onClick={performSearch}
       disabled={!canSearch}
     >
-      <Search className={cn("text-sidebar-foreground size-4", className)} />
+      <Search className="text-sidebar-foreground size-4" />
     </button>
   );
 }

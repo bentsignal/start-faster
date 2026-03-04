@@ -43,31 +43,6 @@ function useInternalStore() {
   const totalPages = Math.max(1, Math.ceil(totalCount / SEARCH_PAGE_SIZE));
   const activePage = Math.min(search.page, totalPages);
 
-  const navigateToSearch = ({
-    sortBy,
-    sortDirection,
-    nextFilters,
-    page,
-    cursor,
-  }: {
-    sortBy: SearchSortBy;
-    sortDirection: SearchSortDirection;
-    nextFilters: ProductFilter[];
-    page: number;
-    cursor?: string;
-  }) =>
-    navigate({
-      to: "/search",
-      search: {
-        q: search.q,
-        sortBy,
-        sortDirection,
-        filters: nextFilters,
-        page,
-        cursor,
-      },
-    });
-
   const runWithLoading = async ({
     setLoading,
     action,
@@ -85,12 +60,17 @@ function useInternalStore() {
     void runWithLoading({
       setLoading: setIsFilterNavigationLoading,
       action: () =>
-        navigateToSearch({
-          sortBy: nextSortBy,
-          sortDirection:
-            nextSortBy === "relevance" ? "desc" : search.sortDirection,
-          nextFilters: search.filters,
-          page: 1,
+        navigate({
+          to: "/search",
+          search: {
+            q: search.q,
+            sortBy: nextSortBy,
+            sortDirection:
+              nextSortBy === "relevance" ? "desc" : search.sortDirection,
+            filters: search.filters,
+            page: 1,
+            cursor: undefined,
+          },
         }),
     });
   };
@@ -99,11 +79,16 @@ function useInternalStore() {
     void runWithLoading({
       setLoading: setIsFilterNavigationLoading,
       action: () =>
-        navigateToSearch({
-          sortBy: search.sortBy,
-          sortDirection: nextSortDirection,
-          nextFilters: search.filters,
-          page: 1,
+        navigate({
+          to: "/search",
+          search: {
+            q: search.q,
+            sortBy: search.sortBy,
+            sortDirection: nextSortDirection,
+            filters: search.filters,
+            page: 1,
+            cursor: undefined,
+          },
         }),
     });
   };
@@ -112,11 +97,16 @@ function useInternalStore() {
     void runWithLoading({
       setLoading: setIsFilterNavigationLoading,
       action: () =>
-        navigateToSearch({
-          sortBy: search.sortBy,
-          sortDirection: search.sortDirection,
-          nextFilters: toggleFilter(search.filters, input),
-          page: 1,
+        navigate({
+          to: "/search",
+          search: {
+            q: search.q,
+            sortBy: search.sortBy,
+            sortDirection: search.sortDirection,
+            filters: toggleFilter(search.filters, input),
+            page: 1,
+            cursor: undefined,
+          },
         }),
     });
   };
@@ -125,15 +115,20 @@ function useInternalStore() {
     void runWithLoading({
       setLoading: setIsPriceApplyLoading,
       action: () =>
-        navigateToSearch({
-          sortBy: search.sortBy,
-          sortDirection: search.sortDirection,
-          nextFilters: applyPriceRangeFilter({
-            filters: search.filters,
-            min,
-            max,
-          }),
-          page: 1,
+        navigate({
+          to: "/search",
+          search: {
+            q: search.q,
+            sortBy: search.sortBy,
+            sortDirection: search.sortDirection,
+            filters: applyPriceRangeFilter({
+              filters: search.filters,
+              min,
+              max,
+            }),
+            page: 1,
+            cursor: undefined,
+          },
         }),
     });
   };
@@ -143,12 +138,16 @@ function useInternalStore() {
       return;
     }
 
-    await navigateToSearch({
-      sortBy: search.sortBy,
-      sortDirection: search.sortDirection,
-      nextFilters: search.filters,
-      page: nextPage,
-      cursor: undefined,
+    await navigate({
+      to: "/search",
+      search: {
+        q: search.q,
+        sortBy: search.sortBy,
+        sortDirection: search.sortDirection,
+        filters: search.filters,
+        page: nextPage,
+        cursor: undefined,
+      },
     });
   };
 

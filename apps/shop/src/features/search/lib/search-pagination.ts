@@ -1,12 +1,28 @@
 export function getPageWindow(current: number, total: number, size: number) {
-  const windowSize = Math.min(size, total);
+  if (
+    Number.isFinite(current) === false ||
+    Number.isFinite(total) === false ||
+    Number.isFinite(size) === false ||
+    total < 1 ||
+    size <= 0
+  ) {
+    return [];
+  }
+
+  const normalizedTotal = Math.floor(total);
+  const normalizedSize = Math.min(Math.floor(size), normalizedTotal);
+  const normalizedCurrent = Math.min(
+    Math.max(Math.floor(current), 1),
+    normalizedTotal,
+  );
+  const windowSize = Math.min(normalizedSize, normalizedTotal);
   const half = Math.floor(windowSize / 2);
 
-  let start = Math.max(1, current - half);
+  let start = Math.max(1, normalizedCurrent - half);
   let end = start + windowSize - 1;
 
-  if (end > total) {
-    end = total;
+  if (end > normalizedTotal) {
+    end = normalizedTotal;
     start = Math.max(1, end - windowSize + 1);
   }
 

@@ -1,13 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
-import type { ProductFilter } from "@acme/shopify/storefront/types";
-
 import { SearchProductResultsView } from "~/features/search/components/product-results/search-product-results-view";
 import { SearchFilters } from "~/features/search/components/search-filters";
 import { SearchPagination } from "~/features/search/components/search-pagination";
 import { SearchResultsHeader } from "~/features/search/components/search-results-header";
+import { sanitizeProductFilters } from "~/features/search/lib/search-filter-utils";
 import {
+  MAX_SEARCH_PAGE,
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
@@ -18,7 +18,11 @@ export const Route = createFileRoute("/search")({
     q: z.string().default(""),
     sortBy: z.enum(["relevance", "price"]).default("relevance"),
     sortDirection: z.enum(["asc", "desc"]).default("desc"),
-    filters: z.array(z.custom<ProductFilter>()).default([]),
+    filters: z
+      .unknown()
+      .optional()
+      .default([])
+      .transform((value) => sanitizeProductFilters(value)),
     page: z.coerce.number().int().min(1).default(1),
     cursor: z.string().optional(),
   }),
@@ -31,6 +35,19 @@ export const Route = createFileRoute("/search")({
     }
 
     const filters = deps.filters;
+    if (deps.page > MAX_SEARCH_PAGE) {
+      throw redirect({
+        to: "/search",
+        search: {
+          q: query,
+          sortBy: deps.sortBy,
+          sortDirection: deps.sortDirection,
+          filters,
+          page: MAX_SEARCH_PAGE,
+          cursor: undefined,
+        },
+      });
+    }
 
     const hasCursorInSearch = deps.cursor !== undefined;
     let cursor = deps.cursor;

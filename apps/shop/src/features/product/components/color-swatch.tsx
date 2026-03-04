@@ -1,12 +1,11 @@
 import { cn } from "@acme/ui/utils";
 
+import type { OptionValueAvailability } from "~/features/product/lib/option-availability";
 import {
   getKnownColorHex,
   isDarkColor,
   isLightColor,
 } from "~/features/product/colors";
-
-type SwatchAvailability = "available" | "sold-out" | "unavailable";
 
 function ColorSwatch({
   colorName,
@@ -16,7 +15,7 @@ function ColorSwatch({
 }: {
   colorName: string;
   isSelected: boolean;
-  availability: SwatchAvailability;
+  availability: OptionValueAvailability;
   onClick: () => void;
 }) {
   const hex = getKnownColorHex(colorName);
@@ -35,11 +34,14 @@ function ColorSwatch({
   const title = availabilityLabel
     ? `${colorName} (${availabilityLabel})`
     : colorName;
+  const ariaLabel = availabilityLabel
+    ? `${colorName}, ${availabilityLabel}`
+    : colorName;
 
   return (
     <button
       type="button"
-      aria-label={colorName}
+      aria-label={ariaLabel}
       aria-pressed={isSelected}
       aria-disabled={isDisabled}
       title={title}
