@@ -16,6 +16,25 @@ export const getProductsByCollection = `#graphql
               currencyCode
             }
           }
+          selectedOrFirstAvailableVariant {
+            id
+            title
+            availableForSale
+            price {
+              amount
+              currencyCode
+            }
+            image {
+              url
+              altText
+              width
+              height
+            }
+            selectedOptions {
+              name
+              value
+            }
+          }
         }
       }
     }

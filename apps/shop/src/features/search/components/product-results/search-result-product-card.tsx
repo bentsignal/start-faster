@@ -1,8 +1,7 @@
 import { Image } from "@unpic/react";
 
+import type { ProductResultNode } from "~/features/product/types";
 // import { Loader, ShoppingBag } from "lucide-react";
-
-import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
 
 // import { Button } from "@acme/ui/button";
 
@@ -12,16 +11,11 @@ import {
   useProductResultStore,
 } from "~/features/product/stores/product-result-store";
 
-type SearchResultProductNode = Extract<
-  SearchProductsQuery["search"]["nodes"][number],
-  { __typename: "Product" }
->;
-
 export function SearchResultProductCard({
   product,
   mode,
 }: {
-  product: SearchResultProductNode;
+  product: ProductResultNode;
   mode: "grid" | "list";
 }) {
   return (

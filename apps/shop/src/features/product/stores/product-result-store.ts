@@ -1,16 +1,10 @@
 import { createStore } from "rostra";
 
-import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
-
+import type { ProductResultNode } from "~/features/product/types";
 import { useProductPurchaseActions } from "~/features/product/hooks/use-product-purchase-actions";
 import { formatPrice } from "~/features/product/lib/price";
 
-type SearchResultProductNode = Extract<
-  SearchProductsQuery["search"]["nodes"][number],
-  { __typename: "Product" }
->;
-
-function useInternalStore({ product }: { product: SearchResultProductNode }) {
+function useInternalStore({ product }: { product: ProductResultNode }) {
   const selectedVariant = product.selectedOrFirstAvailableVariant ?? null;
   const isUnavailable =
     selectedVariant === null || selectedVariant.availableForSale === false;

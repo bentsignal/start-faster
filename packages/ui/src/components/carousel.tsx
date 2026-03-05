@@ -23,8 +23,8 @@ interface CarouselProps {
 
 type CarouselContextProps = {
   carouselRef: (node: HTMLDivElement | null) => void;
+  trackRef: (node: HTMLDivElement | null) => void;
   api: CarouselApi;
-  setSlideCount: (count: number) => void;
   handleViewportScroll: () => void;
   scrollPrev: () => void;
   scrollNext: () => void;
@@ -55,11 +55,16 @@ function Carousel({
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
+  const trackRef = React.useRef<HTMLDivElement | null>(null);
   const selectedIndexRef = React.useRef(0);
   const slideCountRef = React.useRef(0);
 
   const carouselRef = React.useCallback((node: HTMLDivElement | null) => {
     viewportRef.current = node;
+  }, []);
+
+  const setTrackRef = React.useCallback((node: HTMLDivElement | null) => {
+    trackRef.current = node;
   }, []);
 
   const [slideCount, setSlideCountState] = React.useState(0);
@@ -71,7 +76,7 @@ function Carousel({
     [slideCount],
   );
 
-  const getSlideSize = React.useCallback(() => {
+  const getViewportSize = React.useCallback(() => {
     const viewport = viewportRef.current;
 
     if (!viewport) return 0;
@@ -81,17 +86,42 @@ function Carousel({
       : viewport.clientHeight;
   }, [orientation]);
 
+  const getPageCount = React.useCallback(() => {
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    const viewportSize = getViewportSize();
+
+    if (!viewport || !track || viewportSize <= 0) return 0;
+
+    const contentSize =
+      orientation === "horizontal" ? track.scrollWidth : track.scrollHeight;
+
+    if (contentSize <= viewportSize) {
+      return 1;
+    }
+
+    return Math.ceil((contentSize - viewportSize) / viewportSize) + 1;
+  }, [getViewportSize, orientation]);
+
+  const updateSlideMetrics = React.useCallback(() => {
+    const pageCount = getPageCount();
+    slideCountRef.current = pageCount;
+    setSlideCountState((current) =>
+      current === pageCount ? current : pageCount,
+    );
+  }, [getPageCount]);
+
   const getRenderedIndexFromScroll = React.useCallback(() => {
     const viewport = viewportRef.current;
-    const slideSize = getSlideSize();
+    const viewportSize = getViewportSize();
 
-    if (!viewport || slideSize <= 0) return 0;
+    if (!viewport || viewportSize <= 0) return 0;
 
     const scrollPosition =
       orientation === "horizontal" ? viewport.scrollLeft : viewport.scrollTop;
 
-    return Math.round(scrollPosition / slideSize);
-  }, [getSlideSize, orientation]);
+    return Math.round(scrollPosition / viewportSize);
+  }, [getViewportSize, orientation]);
 
   const updateSelectionState = React.useCallback((renderedIndex: number) => {
     const nextSelected = Math.max(
@@ -119,11 +149,11 @@ function Carousel({
   const scrollToRendered = React.useCallback(
     (renderedIndex: number, behavior: ScrollBehavior) => {
       const viewport = viewportRef.current;
-      const slideSize = getSlideSize();
+      const viewportSize = getViewportSize();
 
-      if (!viewport || slideSize <= 0) return;
+      if (!viewport || viewportSize <= 0) return;
 
-      const nextPosition = renderedIndex * slideSize;
+      const nextPosition = renderedIndex * viewportSize;
 
       viewport.scrollTo(
         orientation === "horizontal"
@@ -131,7 +161,7 @@ function Carousel({
           : { top: nextPosition, behavior },
       );
     },
-    [getSlideSize, orientation],
+    [getViewportSize, orientation],
   );
 
   const scrollTo = React.useCallback(
@@ -172,11 +202,6 @@ function Carousel({
     }),
     [scrollNext, scrollPrev, scrollTo],
   );
-
-  const setSlideCount = React.useCallback((count: number) => {
-    slideCountRef.current = count;
-    setSlideCountState((current) => (current === count ? current : count));
-  }, []);
 
   const handleViewportScroll = React.useCallback(() => {
     updateSelectionState(getRenderedIndexFromScroll());
@@ -220,27 +245,39 @@ function Carousel({
 
   React.useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport) return;
+    const track = trackRef.current;
+
+    if (!viewport || !track) return;
+
+    updateSlideMetrics();
+    updateSelectionState(getRenderedIndexFromScroll());
 
     const observer = new ResizeObserver(() => {
+      updateSlideMetrics();
       const currentIndex = selectedIndexRef.current;
       scrollToRendered(currentIndex, "auto");
       updateSelectionState(getRenderedIndexFromScroll());
     });
 
     observer.observe(viewport);
+    observer.observe(track);
 
     return () => {
       observer.disconnect();
     };
-  }, [getRenderedIndexFromScroll, scrollToRendered, updateSelectionState]);
+  }, [
+    getRenderedIndexFromScroll,
+    scrollToRendered,
+    updateSelectionState,
+    updateSlideMetrics,
+  ]);
 
   return (
     <CarouselContext.Provider
       value={{
         carouselRef,
+        trackRef: setTrackRef,
         api,
-        setSlideCount,
         handleViewportScroll,
         orientation,
         scrollPrev,
@@ -271,13 +308,8 @@ function CarouselContent({
   children,
   ...props
 }: React.ComponentProps<"div">) {
-  const { carouselRef, orientation, setSlideCount, handleViewportScroll } =
+  const { carouselRef, orientation, trackRef, handleViewportScroll } =
     useCarousel();
-  const childArray = React.Children.toArray(children);
-
-  React.useEffect(() => {
-    setSlideCount(childArray.length);
-  }, [childArray.length, setSlideCount]);
 
   return (
     <div
@@ -296,6 +328,7 @@ function CarouselContent({
       data-slot="carousel-content"
     >
       <div
+        ref={trackRef}
         className={cn(
           "flex",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
@@ -341,10 +374,10 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute touch-manipulation rounded-full",
+        "absolute touch-manipulation rounded-full active:scale-100",
         orientation === "horizontal"
-          ? "top-1/2 -left-12 -translate-y-1/2"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "top-1/2 -left-12 -translate-y-1/2 active:-translate-y-1/2"
+          : "-top-12 left-1/2 -translate-x-1/2 rotate-90 active:translate-y-0",
         className,
       )}
       disabled={!canScrollPrev}
@@ -371,10 +404,10 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute touch-manipulation rounded-full",
+        "absolute touch-manipulation rounded-full active:scale-100",
         orientation === "horizontal"
-          ? "top-1/2 -right-12 -translate-y-1/2"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "top-1/2 -right-12 -translate-y-1/2 active:-translate-y-1/2"
+          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90 active:translate-y-0",
         className,
       )}
       disabled={!canScrollNext}

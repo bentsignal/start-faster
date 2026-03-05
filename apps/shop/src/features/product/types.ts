@@ -1,4 +1,8 @@
-import type { ProductByHandleQuery } from "@acme/shopify/storefront/generated";
+import type {
+  GetQuery,
+  ProductByHandleQuery,
+  SearchProductsQuery,
+} from "@acme/shopify/storefront/generated";
 
 export type Product = NonNullable<ProductByHandleQuery["product"]>;
 
@@ -9,3 +13,16 @@ export interface ProductGalleryImage {
   width: number | null;
   height: number | null;
 }
+
+export type SearchResultProductNode = Extract<
+  SearchProductsQuery["search"]["nodes"][number],
+  { __typename: "Product" }
+>;
+
+export type HomeCollectionProductNode = NonNullable<
+  NonNullable<GetQuery["collection"]>["products"]["nodes"][number]
+>;
+
+export type ProductResultNode =
+  | SearchResultProductNode
+  | HomeCollectionProductNode;
