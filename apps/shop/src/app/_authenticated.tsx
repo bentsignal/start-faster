@@ -117,7 +117,7 @@ function RouteComponent() {
           </div>
         </aside>
 
-        <section>
+        <section className="min-h-[calc(100vh-30rem)]">
           <Outlet />
         </section>
       </div>
