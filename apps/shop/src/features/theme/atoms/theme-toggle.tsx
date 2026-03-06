@@ -10,7 +10,11 @@ export function ThemeToggle() {
 
   if (currentTheme === "light") {
     return (
-      <Button variant="ghost" onClick={() => changeTheme("dark")}>
+      <Button
+        variant="ghost"
+        className="h-11 w-full justify-center rounded-2xl px-4 text-base sm:h-10 sm:w-auto sm:justify-start sm:text-sm"
+        onClick={() => changeTheme("dark")}
+      >
         <MoonIcon />
         Switch to Dark Mode
       </Button>
@@ -18,7 +22,11 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button variant="ghost" onClick={() => changeTheme("light")}>
+    <Button
+      variant="ghost"
+      className="h-11 w-full justify-center rounded-2xl px-4 text-base sm:h-10 sm:w-auto sm:justify-start sm:text-sm"
+      onClick={() => changeTheme("light")}
+    >
       <SunIcon />
       Switch to Light Mode
     </Button>

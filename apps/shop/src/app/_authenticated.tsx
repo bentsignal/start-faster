@@ -1,5 +1,32 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useLocation,
+  useNavigate,
+} from "@tanstack/react-router";
+import { LogOut, Package, Settings, User } from "lucide-react";
 
+import { Button, buttonVariants } from "@acme/ui/button";
+import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
+import { cn } from "@acme/ui/utils";
+
+import { Link } from "~/components/link";
+
+const navItems = [
+  { icon: User, label: "Account", to: "/account" },
+  { icon: Package, label: "Orders", to: "/orders" },
+  { icon: Settings, label: "Settings", to: "/settings" },
+] as const;
+
+function getSelectedRoute(pathname: string) {
+  const matchingItem = navItems.find((item) => pathname.startsWith(item.to));
+  if (matchingItem !== undefined) {
+    return matchingItem.to;
+  }
+
+  return "/account";
+}
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
   beforeLoad: ({ location, context }) => {
@@ -16,5 +43,84 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function RouteComponent() {
-  return <Outlet />;
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const navigate = useNavigate();
+  const selectedRoute = getSelectedRoute(pathname);
+
+  return (
+    <main className="container py-8 sm:py-12">
+      <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+        <aside className="space-y-4 lg:space-y-6">
+          <div className="lg:hidden">
+            <NativeSelect
+              className="w-full"
+              value={selectedRoute}
+              onChange={(event) => {
+                void navigate({ to: event.target.value });
+              }}
+              aria-label="Select account page"
+            >
+              {navItems.map((item) => (
+                <NativeSelectOption key={item.to} value={item.to}>
+                  {item.label}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            <form method="post" action="/logout" className="mt-3">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full justify-start"
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </Button>
+            </form>
+          </div>
+
+          <nav
+            className="hidden space-y-2 lg:block"
+            aria-label="Account navigation"
+          >
+            {navItems.map((item) => {
+              const isActive = pathname.startsWith(item.to);
+
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "lg" }),
+                    "w-full justify-start rounded-xl",
+                    isActive && "bg-muted text-foreground",
+                  )}
+                  preload="viewport"
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="hidden lg:block">
+            <form method="post" action="/logout">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full justify-start"
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </Button>
+            </form>
+          </div>
+        </aside>
+
+        <section>
+          <Outlet />
+        </section>
+      </div>
+    </main>
+  );
 }

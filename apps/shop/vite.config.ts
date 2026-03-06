@@ -21,9 +21,7 @@ export default defineConfig(async ({ mode }) => {
           : undefined,
     },
     plugins: [
-      devtools({
-        consolePiping: { enabled: false },
-      }),
+      devtools({}),
       tailwindcss(),
       tsconfigPaths(),
       tanstackStart({

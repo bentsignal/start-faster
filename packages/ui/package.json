@@ -13,6 +13,7 @@
     "./hover-card": "./src/components/hover-card.tsx",
     "./input": "./src/components/input.tsx",
     "./navigation-menu": "./src/components/navigation-menu.tsx",
+    "./native-select": "./src/components/native-select.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./separator": "./src/components/separator.tsx",
     "./sheet": "./src/components/sheet.tsx",

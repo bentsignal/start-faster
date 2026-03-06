@@ -17,9 +17,11 @@ import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopHandleRouteImport } from './app/shop/$handle'
+import { Route as AuthenticatedSettingsRouteImport } from './app/_authenticated/settings'
+import { Route as AuthenticatedOrdersRouteImport } from './app/_authenticated/orders'
+import { Route as AuthenticatedAccountRouteImport } from './app/_authenticated/account'
 import { Route as AuthLogoutRouteImport } from './app/_auth/logout'
 import { Route as AuthLoginRouteImport } from './app/_auth/login'
-import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings.account'
 
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
@@ -60,6 +62,21 @@ const ShopHandleRoute = ShopHandleRouteImport.update({
   path: '/$handle',
   getParentRoute: () => ShopRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthLogoutRoute = AuthLogoutRouteImport.update({
   id: '/_auth/logout',
   path: '/logout',
@@ -70,12 +87,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSettingsAccountRoute =
-  AuthenticatedSettingsAccountRouteImport.update({
-    id: '/settings/account',
-    path: '/settings/account',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,8 +97,10 @@ export interface FileRoutesByFullPath {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/shop/$handle': typeof ShopHandleRoute
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,8 +111,10 @@ export interface FileRoutesByTo {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/shop/$handle': typeof ShopHandleRoute
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,8 +127,10 @@ export interface FileRoutesById {
   '/terms-of-service': typeof TermsOfServiceRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/logout': typeof AuthLogoutRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/shop/$handle': typeof ShopHandleRoute
-  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,8 +143,10 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/login'
     | '/logout'
+    | '/account'
+    | '/orders'
+    | '/settings'
     | '/shop/$handle'
-    | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,8 +157,10 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/login'
     | '/logout'
+    | '/account'
+    | '/orders'
+    | '/settings'
     | '/shop/$handle'
-    | '/settings/account'
   id:
     | '__root__'
     | '/'
@@ -151,8 +172,10 @@ export interface FileRouteTypes {
     | '/terms-of-service'
     | '/_auth/login'
     | '/_auth/logout'
+    | '/_authenticated/account'
+    | '/_authenticated/orders'
+    | '/_authenticated/settings'
     | '/shop/$handle'
-    | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -225,6 +248,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopHandleRouteImport
       parentRoute: typeof ShopRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_auth/logout': {
       id: '/_auth/logout'
       path: '/logout'
@@ -238,13 +282,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/settings/account': {
-      id: '/_authenticated/settings/account'
-      path: '/settings/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
@@ -262,11 +299,15 @@ const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
 )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

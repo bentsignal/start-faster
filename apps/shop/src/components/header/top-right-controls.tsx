@@ -34,10 +34,7 @@ export function TopRightControls() {
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
       {isSignedIn ? (
-        <Link
-          to="/settings/account"
-          className="hover:text-primary transition-colors"
-        >
+        <Link to="/orders" className="hover:text-primary transition-colors">
           <AccountIcon />
         </Link>
       ) : (
@@ -46,7 +43,7 @@ export function TopRightControls() {
           search={(previousSearch) => ({
             ...previousSearch,
             showLogin: true,
-            returnTo: "/settings/account",
+            returnTo: "/orders",
           })}
           className="hover:text-primary transition-colors"
           resetScroll={false}

@@ -127,7 +127,8 @@ function RootComponent() {
               <Footer />
               <TanStackDevtools
                 config={{
-                  position: "bottom-right",
+                  position: "bottom-left",
+                  inspectHotkey: ["Control", "Shift", "I"],
                 }}
                 plugins={[
                   {
