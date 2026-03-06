@@ -11,6 +11,7 @@ import { Button, buttonVariants } from "@acme/ui/button";
 import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { cn } from "@acme/ui/utils";
 
+import { stickyHeaderTokens } from "~/components/header/header";
 import { Link } from "~/components/link";
 
 const navItems = [
@@ -50,7 +51,12 @@ function RouteComponent() {
   return (
     <main className="container py-8 sm:py-12">
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-        <aside className="space-y-4 lg:space-y-6">
+        <aside
+          className={cn(
+            "space-y-4 lg:h-fit lg:space-y-6 lg:self-start",
+            stickyHeaderTokens.stickyContent,
+          )}
+        >
           <div className="lg:hidden">
             <NativeSelect
               className="w-full"
