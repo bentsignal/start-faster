@@ -119,7 +119,7 @@ export function LoginModal() {
         to: ".",
         search: (previousSearch) => ({
           ...previousSearch,
-          showLogin: false,
+          showLogin: undefined,
           returnTo: undefined,
         }),
         resetScroll: false,
