@@ -4,7 +4,6 @@ import { convert } from "great-time";
 import { Check, LoaderCircle, LogOut, RotateCcw } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
-import { toast } from "@acme/ui/toaster";
 
 import { accountQueries } from "~/features/account/lib/account-queries";
 
@@ -47,8 +46,8 @@ export function SignOutButton({ className }: { className?: string }) {
         convert(1, "second", "to ms"),
       );
     },
-    onError: () => {
-      toast.error("Unable to sign out. Please try again.");
+    onError: (error) => {
+      console.error(error);
     },
   });
 
@@ -57,39 +56,46 @@ export function SignOutButton({ className }: { className?: string }) {
   const isError = signOutMutation.status === "error";
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="lg"
-      className={className}
-      aria-label={
-        isPending ? "Signing out" : isSuccess ? "Signed out" : "Sign out"
-      }
-      disabled={isPending || isSuccess}
-      onClick={() => {
-        signOutMutation.mutate();
-      }}
-    >
-      {isPending ? (
-        <LoaderCircle className="size-4 animate-spin" />
-      ) : isSuccess ? (
-        <>
-          <Check className="size-4 text-green-600 dark:text-green-300" />
-          <span className="text-green-600 dark:text-green-300">
-            See ya later!
-          </span>
-        </>
-      ) : isError ? (
-        <>
-          <RotateCcw className="text-destructive size-4" />
-          <span className="text-destructive">Retry</span>
-        </>
-      ) : (
-        <>
-          <LogOut className="size-4" />
-          Sign out
-        </>
-      )}
-    </Button>
+    <div className="w-full">
+      <Button
+        type="button"
+        variant="ghost"
+        size="lg"
+        className={className}
+        aria-label={
+          isPending ? "Signing out" : isSuccess ? "Signed out" : "Sign out"
+        }
+        disabled={isPending || isSuccess}
+        onClick={() => {
+          signOutMutation.mutate();
+        }}
+      >
+        {isPending ? (
+          <LoaderCircle className="size-4 animate-spin" />
+        ) : isSuccess ? (
+          <>
+            <Check className="size-4 text-green-600 dark:text-green-300" />
+            <span className="text-green-600 dark:text-green-300">
+              See ya later!
+            </span>
+          </>
+        ) : isError ? (
+          <>
+            <RotateCcw className="size-4" />
+            <span>Retry</span>
+          </>
+        ) : (
+          <>
+            <LogOut className="size-4" />
+            Sign out
+          </>
+        )}
+      </Button>
+      {isError ? (
+        <p className="text-destructive mt-2 text-sm leading-5" role="alert">
+          Unable to sign out. Please try again.
+        </p>
+      ) : null}
+    </div>
   );
 }
