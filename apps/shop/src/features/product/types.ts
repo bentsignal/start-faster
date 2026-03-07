@@ -1,5 +1,5 @@
 import type {
-  GetQuery,
+  GetProductsByCollectionQuery,
   ProductByHandleQuery,
   SearchProductsQuery,
 } from "@acme/shopify/storefront/generated";
@@ -19,10 +19,10 @@ export type SearchResultProductNode = Extract<
   { __typename: "Product" }
 >;
 
-export type HomeCollectionProductNode = NonNullable<
-  NonNullable<GetQuery["collection"]>["products"]["nodes"][number]
+export type CollectionProductNode = NonNullable<
+  NonNullable<
+    GetProductsByCollectionQuery["collection"]
+  >["products"]["nodes"][number]
 >;
 
-export type ProductResultNode =
-  | SearchResultProductNode
-  | HomeCollectionProductNode;
+export type ProductResultNode = SearchResultProductNode | CollectionProductNode;
