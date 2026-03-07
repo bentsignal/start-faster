@@ -5,14 +5,15 @@ import {
   useLocation,
   useNavigate,
 } from "@tanstack/react-router";
-import { LogOut, Package, Settings, User } from "lucide-react";
+import { Package, Settings, User } from "lucide-react";
 
-import { Button, buttonVariants } from "@acme/ui/button";
+import { buttonVariants } from "@acme/ui/button";
 import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { cn } from "@acme/ui/utils";
 
 import { stickyHeaderTokens } from "~/components/header/header";
 import { Link } from "~/components/link";
+import { SignOutButton } from "~/features/auth/components/sign-out-button";
 
 const navItems = [
   { icon: User, label: "Account", to: "/account" },
@@ -72,16 +73,7 @@ function RouteComponent() {
                 </NativeSelectOption>
               ))}
             </NativeSelect>
-            <form method="post" action="/logout" className="mt-3">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full justify-start"
-              >
-                <LogOut className="size-4" />
-                Sign out
-              </Button>
-            </form>
+            <SignOutButton className="mt-3 w-full justify-start" />
           </div>
 
           <nav
@@ -110,16 +102,7 @@ function RouteComponent() {
           </nav>
 
           <div className="hidden lg:block">
-            <form method="post" action="/logout">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full justify-start"
-              >
-                <LogOut className="size-4" />
-                Sign out
-              </Button>
-            </form>
+            <SignOutButton className="w-full justify-start" />
           </div>
         </aside>
 
