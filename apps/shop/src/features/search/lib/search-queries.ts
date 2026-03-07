@@ -11,7 +11,7 @@ import {
 
 import { shopify } from "~/lib/shopify";
 
-const PREDICTIVE_SEARCH_PAGE_SIZE = 6;
+export const PREDICTIVE_SEARCH_PAGE_SIZE = 6;
 export const SEARCH_PAGE_SIZE = 30;
 export const MAX_SEARCH_PAGE = 50;
 export const MAX_PAGE_ITERATIONS = MAX_SEARCH_PAGE - 1;

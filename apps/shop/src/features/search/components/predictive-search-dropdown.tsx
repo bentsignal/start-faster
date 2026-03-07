@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "@unpic/react";
 
@@ -5,7 +6,10 @@ import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generate
 
 import { Link } from "~/components/link";
 import { formatPrice } from "~/features/product/lib/price";
-import { searchQueries } from "~/features/search/lib/search-queries";
+import {
+  PREDICTIVE_SEARCH_PAGE_SIZE,
+  searchQueries,
+} from "~/features/search/lib/search-queries";
 import { useSearchBarStore } from "~/features/search/stores/search-bar-store";
 
 type PredictiveSearchProduct = NonNullable<
@@ -25,7 +29,6 @@ export function PredictiveSearchDropdown() {
     <div className="bg-background absolute top-full right-0 left-0 z-50 mt-2 rounded-xl border p-3 shadow-lg">
       <div className="max-h-96 space-y-3 overflow-auto">
         <PredictiveProductsSection />
-        <PredictiveSuggestionsSection />
         <ViewAllResultsLink />
       </div>
     </div>
@@ -33,18 +36,54 @@ export function PredictiveSearchDropdown() {
 }
 
 function PredictiveProductsSection() {
+  const rawQueryText = useSearchBarStore((s) => s.searchTerm.trim());
   const queryText = useSearchBarStore((s) => s.debouncedSearchTerm.trim());
-  const { data: products } = useQuery({
+  const { data: products, isFetching } = useQuery({
     ...searchQueries.predictive({ query: queryText }),
-    placeholderData: (previousData) => previousData,
+    enabled: queryText.length >= 2,
     select: (data) => data?.products ?? [],
   });
+  const [visibleResult, setVisibleResult] = useState<{
+    query: string;
+    products: PredictiveSearchProduct[];
+  } | null>(null);
+  const swapTokenRef = useRef(0);
 
-  if (!products) {
-    return null;
+  useEffect(() => {
+    swapTokenRef.current += 1;
+  }, [queryText]);
+
+  useEffect(() => {
+    if (!products || isFetching) {
+      return;
+    }
+
+    const token = swapTokenRef.current + 1;
+    swapTokenRef.current = token;
+
+    void preloadProductImages(products).then(() => {
+      if (swapTokenRef.current !== token) {
+        return;
+      }
+
+      setVisibleResult({
+        query: queryText,
+        products,
+      });
+    });
+  }, [products, isFetching, queryText]);
+
+  const visibleProducts =
+    visibleResult?.query === rawQueryText ? visibleResult.products : null;
+  const shouldShowPlaceholder =
+    rawQueryText.length >= 2 &&
+    (rawQueryText !== queryText || isFetching || visibleProducts === null);
+
+  if (shouldShowPlaceholder || visibleProducts === null) {
+    return <PredictiveProductsPlaceholder />;
   }
 
-  if (products.length === 0) {
+  if (visibleProducts.length === 0) {
     return (
       <section className="py-1">
         <p className="text-muted-foreground px-2 text-sm">No products found</p>
@@ -54,7 +93,7 @@ function PredictiveProductsSection() {
 
   return (
     <section className="space-y-1.5">
-      {products.map((product) => (
+      {visibleProducts.map((product) => (
         <PredictiveProductRow key={product.id} product={product} />
       ))}
     </section>
@@ -92,6 +131,7 @@ function PredictiveProductRow({
           alt={imageAlt}
           width={48}
           height={48}
+          loading="eager"
           className="bg-muted size-12 shrink-0 rounded-md object-cover"
         />
       ) : (
@@ -103,53 +143,6 @@ function PredictiveProductRow({
         <p className="text-muted-foreground text-xs">{price}</p>
       </div>
     </Link>
-  );
-}
-
-function PredictiveSuggestionsSection() {
-  const queryText = useSearchBarStore((s) => s.debouncedSearchTerm.trim());
-  const { data: suggestions } = useQuery({
-    ...searchQueries.predictive({ query: queryText }),
-    select: (data) => data?.queries ?? [],
-  });
-
-  const setIsPredictiveOpen = useSearchBarStore((s) => s.setIsPredictiveOpen);
-
-  if (!suggestions) {
-    return null;
-  }
-
-  if (suggestions.length === 0) {
-    return null;
-  }
-
-  function onSelect() {
-    setIsPredictiveOpen(false);
-  }
-
-  return (
-    <section className="space-y-1.5 border-t pt-2">
-      <p className="text-muted-foreground px-2 text-xs uppercase">
-        Suggestions
-      </p>
-      {suggestions.map((suggestion) => (
-        <Link
-          key={suggestion.text}
-          to="/search"
-          search={{
-            q: suggestion.text,
-            sortBy: "relevance",
-            sortDirection: "desc",
-            filters: [],
-            page: 1,
-          }}
-          className="hover:bg-muted block rounded-lg px-2 py-1.5 text-sm"
-          onClick={onSelect}
-        >
-          {suggestion.text}
-        </Link>
-      ))}
-    </section>
   );
 }
 
@@ -179,4 +172,51 @@ function ViewAllResultsLink() {
       </Link>
     </div>
   );
+}
+
+function PredictiveProductsPlaceholder() {
+  return (
+    <section className="space-y-1.5" aria-hidden="true">
+      {Array.from({ length: PREDICTIVE_SEARCH_PAGE_SIZE }).map((_, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-3 rounded-lg px-2 py-2"
+        >
+          <div className="bg-muted h-12 w-12 shrink-0 animate-pulse rounded-md" />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <div className="bg-muted h-3 w-2/3 animate-pulse rounded" />
+            <div className="bg-muted h-3 w-1/4 animate-pulse rounded" />
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function preloadProductImages(products: PredictiveSearchProduct[]) {
+  const imageUrls = products
+    .map((product) => product.featuredImage?.url)
+    .filter((url): url is string => Boolean(url));
+
+  if (imageUrls.length === 0) {
+    return Promise.resolve();
+  }
+
+  return Promise.all(imageUrls.map((url) => preloadImage(url))).then(
+    () => undefined,
+  );
+}
+
+function preloadImage(url: string) {
+  return new Promise<void>((resolve) => {
+    const image = new window.Image();
+
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+    image.src = url;
+
+    if (image.complete) {
+      resolve();
+    }
+  });
 }

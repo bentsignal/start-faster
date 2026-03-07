@@ -4,7 +4,7 @@ export const getPredictiveSearch = `#graphql
       query: $query
       limit: $limit
       limitScope: EACH
-      types: [PRODUCT, QUERY]
+      types: [PRODUCT]
     ) {
       products {
         id
@@ -20,9 +20,6 @@ export const getPredictiveSearch = `#graphql
             currencyCode
           }
         }
-      }
-      queries {
-        text
       }
     }
   }
