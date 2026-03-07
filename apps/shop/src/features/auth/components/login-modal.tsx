@@ -1,9 +1,10 @@
+import { useState } from "react";
 import {
   useNavigate,
   useRouteContext,
   useSearch,
 } from "@tanstack/react-router";
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowRight, Loader, LockKeyhole } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -30,12 +31,25 @@ function LoginButton() {
     from: "__root__",
     select: (search) => search.returnTo,
   });
+  const [loading, setLoading] = useState(false);
+
   return (
-    <form method="post" action="/login" className="flex flex-col gap-3">
+    <form
+      method="post"
+      action="/login"
+      className="flex flex-col gap-3"
+      onSubmit={() => setLoading(true)}
+    >
       <input type="hidden" name="returnTo" value={returnTo} />
-      <Button type="submit" size="lg" className="w-full">
-        Continue to Sign In
-        <ArrowRight data-icon="inline-end" className="size-4" />
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>
+        {loading ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          <>
+            Continue to Sign In
+            <ArrowRight data-icon="inline-end" className="size-4" />
+          </>
+        )}
       </Button>
     </form>
   );
