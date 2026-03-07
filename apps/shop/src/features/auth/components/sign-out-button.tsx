@@ -4,6 +4,7 @@ import { convert } from "great-time";
 import { Check, LoaderCircle, LogOut, RotateCcw } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
+import { cn } from "@acme/ui/utils";
 
 import { accountQueries } from "~/features/account/lib/account-queries";
 
@@ -61,7 +62,7 @@ export function SignOutButton({ className }: { className?: string }) {
         type="button"
         variant="ghost"
         size="lg"
-        className={className}
+        className={cn(className, isSuccess && "disabled:opacity-100")}
         aria-label={
           isPending ? "Signing out" : isSuccess ? "Signed out" : "Sign out"
         }

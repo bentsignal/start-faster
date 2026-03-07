@@ -27,7 +27,7 @@ function getSelectedRoute(pathname: string) {
     return matchingItem.to;
   }
 
-  return "/account";
+  return "/orders";
 }
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
