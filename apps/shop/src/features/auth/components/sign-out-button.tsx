@@ -29,7 +29,7 @@ export function SignOutButton({ className }: SignOutButtonProps) {
       }
     },
     onSuccess: async () => {
-      await navigate({ to: "/" });
+      await navigate({ to: "/", replace: true });
       await router.invalidate();
       toast.success("Successfully signed out, see you soon!");
     },
@@ -52,12 +52,10 @@ export function SignOutButton({ className }: SignOutButtonProps) {
       {signOutMutation.isPending ? (
         <Loader className="size-4 animate-spin" />
       ) : (
-        <LogOut className="size-4" />
-      )}
-      {signOutMutation.isPending ? (
-        <Loader className="size-4 animate-spin" />
-      ) : (
-        "Sign out"
+        <>
+          <LogOut className="size-4" />
+          Sign out
+        </>
       )}
     </Button>
   );
