@@ -32,6 +32,7 @@ export function SignOutButton({ className }: { className?: string }) {
       setTimeout(
         () => {
           void (async () => {
+            await navigate({ to: "/", replace: true });
             queryClient.setQueryData(["auth"], {
               isSignedIn: false,
               customer: null,
@@ -40,7 +41,6 @@ export function SignOutButton({ className }: { className?: string }) {
               queryKey: accountQueries.all().queryKey,
             });
             await queryClient.invalidateQueries({ queryKey: ["auth"] });
-            await navigate({ to: "/", replace: true });
             await router.invalidate();
           })();
         },
@@ -73,7 +73,12 @@ export function SignOutButton({ className }: { className?: string }) {
       {isPending ? (
         <LoaderCircle className="size-4 animate-spin" />
       ) : isSuccess ? (
-        <Check className="size-4" />
+        <>
+          <Check className="size-4 text-green-600 dark:text-green-300" />
+          <span className="text-green-600 dark:text-green-300">
+            See ya later!
+          </span>
+        </>
       ) : isError ? (
         <>
           <RotateCcw className="text-destructive size-4" />
