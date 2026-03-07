@@ -1,12 +1,17 @@
-import { Package } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { Loader, Package } from "lucide-react";
 
+import type { CartLineInput } from "@acme/shopify/storefront/types";
+import { cartCreateForCheckout } from "@acme/shopify/storefront/cart";
 import { Button, buttonVariants } from "@acme/ui/button";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
+import { toast } from "@acme/ui/toaster";
 
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type { LiveOrderProducts } from "~/features/account/types";
 import { Link } from "~/components/link";
 import { OrderProductsSection } from "~/features/account/components/order-products-section";
+import { shopify } from "~/lib/shopify";
 
 function formatMoney(amount: number | string, currencyCode: string) {
   const parsedAmount =
@@ -51,6 +56,112 @@ function StatusPill({
   );
 }
 
+function getReorderLines({
+  order,
+  liveProducts,
+}: {
+  order: OrderListItem;
+  liveProducts: LiveOrderProducts;
+}) {
+  const liveProductsById = new Map<
+    string,
+    Extract<LiveOrderProducts[number], { __typename: "Product" }>
+  >();
+
+  for (const product of liveProducts) {
+    if (product?.__typename !== "Product") {
+      continue;
+    }
+
+    liveProductsById.set(product.id, product);
+  }
+
+  return order.lineItems.nodes.flatMap((lineItem): CartLineInput[] => {
+    if (lineItem.productId == null || lineItem.variantId == null) {
+      return [];
+    }
+
+    const liveProduct = liveProductsById.get(lineItem.productId);
+    if (liveProduct === undefined) {
+      return [];
+    }
+
+    const hasLiveVariant = liveProduct.variants.nodes.some(
+      (variant) => variant.id === lineItem.variantId,
+    );
+    if (hasLiveVariant === false) {
+      return [];
+    }
+
+    return [
+      {
+        merchandiseId: lineItem.variantId,
+        quantity: lineItem.quantity,
+      },
+    ];
+  });
+}
+
+function getTrackingEntries(order: OrderListItem) {
+  const entries = order.fulfillments.nodes.flatMap((fulfillment) =>
+    fulfillment.trackingInformation.flatMap((trackingInformation) => {
+      const label = trackingInformation.number?.trim();
+      if (!label) {
+        return [];
+      }
+
+      return [
+        {
+          number: label,
+          url: trackingInformation.url ?? null,
+        },
+      ];
+    }),
+  );
+
+  return entries.filter((entry, index, allEntries) => {
+    return (
+      allEntries.findIndex(
+        (candidate) =>
+          candidate.number === entry.number && candidate.url === entry.url,
+      ) === index
+    );
+  });
+}
+
+function TrackingNumbers({ order }: { order: OrderListItem }) {
+  const trackingEntries = getTrackingEntries(order);
+
+  if (trackingEntries.length === 0) {
+    return null;
+  }
+
+  return (
+    <p className="text-muted-foreground text-xs">
+      Tracking:{" "}
+      {trackingEntries.map((trackingEntry, index) => (
+        <span key={`${trackingEntry.number}-${index}`}>
+          {index > 0 ? ", " : null}
+          {trackingEntry.url ? (
+            <a
+              href={trackingEntry.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground font-medium underline underline-offset-4"
+            >
+              {trackingEntry.number}
+            </a>
+          ) : (
+            <span className="text-foreground font-medium">
+              {trackingEntry.number}
+            </span>
+          )}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 export function OrdersList({
   orders,
   liveProducts,
@@ -58,6 +169,42 @@ export function OrdersList({
   orders: OrderListItem[];
   liveProducts: LiveOrderProducts;
 }) {
+  const reorderMutation = useMutation({
+    mutationFn: async ({
+      orderId,
+      lines,
+    }: {
+      orderId: string;
+      lines: CartLineInput[];
+    }) => {
+      if (lines.length === 0) {
+        throw new Error("No reorder lines are available.");
+      }
+
+      const response = await shopify.request(cartCreateForCheckout, {
+        variables: {
+          lines,
+        },
+      });
+      const checkoutCart = response.data?.cartCreate?.cart;
+
+      if (checkoutCart === null || checkoutCart === undefined) {
+        throw new Error(`Unable to create a reorder checkout for ${orderId}.`);
+      }
+
+      return checkoutCart;
+    },
+    onSuccess: (checkoutCart) => {
+      window.location.assign(checkoutCart.checkoutUrl);
+    },
+    onError: () => {
+      toast.error("Unable to start reorder checkout. Please try again.");
+    },
+  });
+  const activeReorderOrderId = reorderMutation.isPending
+    ? reorderMutation.variables.orderId
+    : null;
+
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center gap-6 py-16 text-center">
@@ -79,50 +226,83 @@ export function OrdersList({
 
   return (
     <div className="grid gap-4">
-      {orders.map((order) => (
-        <Card key={order.id} className="gap-0">
-          <CardHeader className="gap-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-col gap-4">
-                <div>
-                  <StatusPill
-                    label={order.primaryStatusLabel}
-                    tone={order.primaryStatusTone}
-                  />
+      {orders.map((order) => {
+        const isReorderingThisOrder = activeReorderOrderId === order.id;
+
+        return (
+          <Card key={order.id} className="gap-0">
+            <CardHeader className="gap-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-col gap-4">
+                  <div>
+                    <StatusPill
+                      label={order.primaryStatusLabel}
+                      tone={order.primaryStatusTone}
+                    />
+                  </div>
+                  <div>
+                    <p className="font-semibold">{order.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                      Placed on {formatDate(order.processedAt)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold">{order.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    Placed on {formatDate(order.processedAt)}
-                  </p>
-                </div>
+                <p className="text-base font-semibold">
+                  {formatMoney(
+                    order.totalPrice.amount,
+                    order.totalPrice.currencyCode,
+                  )}
+                </p>
               </div>
-              <p className="text-base font-semibold">
-                {formatMoney(
-                  order.totalPrice.amount,
-                  order.totalPrice.currencyCode,
-                )}
-              </p>
-            </div>
-          </CardHeader>
-          {order.lineItems.nodes.length > 0 ? (
-            <CardContent className="py-6">
-              <OrderProductsSection order={order} liveProducts={liveProducts} />
+            </CardHeader>
+            {order.lineItems.nodes.length > 0 ? (
+              <CardContent className="py-6">
+                <OrderProductsSection
+                  order={order}
+                  liveProducts={liveProducts}
+                />
+              </CardContent>
+            ) : null}
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 border-t pt-6">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusPill label={order.fulfillmentStatusLabel} />
+                  <StatusPill label={order.financialStatusLabel} />
+                </div>
+                <TrackingNumbers order={order} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-22"
+                  onClick={() => {
+                    const lines = getReorderLines({ order, liveProducts });
+                    if (lines.length === 0) {
+                      toast.error(
+                        "No currently available items from this order can be reordered.",
+                      );
+                      return;
+                    }
+
+                    reorderMutation.mutate({
+                      orderId: order.id,
+                      lines,
+                    });
+                  }}
+                  disabled={isReorderingThisOrder}
+                >
+                  {isReorderingThisOrder ? (
+                    <Loader className="size-4 animate-spin" />
+                  ) : (
+                    "Reorder"
+                  )}
+                </Button>
+              </div>
             </CardContent>
-          ) : null}
-          <CardContent className="flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusPill label={order.fulfillmentStatusLabel} />
-              <StatusPill label={order.financialStatusLabel} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" disabled>
-                Reorder unavailable
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
     </div>
   );
 }

@@ -6,6 +6,11 @@ export const getProductsByIds = `#graphql
         id
         handle
         title
+        variants(first: 100) {
+          nodes {
+            id
+          }
+        }
         featuredImage {
           url
           altText
