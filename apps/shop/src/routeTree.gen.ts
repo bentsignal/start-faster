@@ -14,7 +14,6 @@ import { Route as SearchRouteImport } from './app/search'
 import { Route as PrivacyPolicyRouteImport } from './app/privacy-policy'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
-import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopHandleRouteImport } from './app/shop/$handle'
 import { Route as AuthenticatedSettingsRouteImport } from './app/_authenticated/settings'
@@ -47,20 +46,15 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopRouteRoute = ShopRouteRouteImport.update({
-  id: '/shop',
-  path: '/shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopHandleRoute = ShopHandleRouteImport.update({
-  id: '/$handle',
-  path: '/$handle',
-  getParentRoute: () => ShopRouteRoute,
+  id: '/shop/$handle',
+  path: '/shop/$handle',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -90,7 +84,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/search': typeof SearchRoute
@@ -104,7 +97,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/search': typeof SearchRoute
@@ -119,7 +111,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -136,7 +127,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/shop'
     | '/callback'
     | '/privacy-policy'
     | '/search'
@@ -150,7 +140,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/shop'
     | '/callback'
     | '/privacy-policy'
     | '/search'
@@ -164,7 +153,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/shop'
     | '/_authenticated'
     | '/callback'
     | '/privacy-policy'
@@ -180,7 +168,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ShopRouteRoute: typeof ShopRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -188,6 +175,7 @@ export interface RootRouteChildren {
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
+  ShopHandleRoute: typeof ShopHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,13 +215,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -243,10 +224,10 @@ declare module '@tanstack/react-router' {
     }
     '/shop/$handle': {
       id: '/shop/$handle'
-      path: '/$handle'
+      path: '/shop/$handle'
       fullPath: '/shop/$handle'
       preLoaderRoute: typeof ShopHandleRouteImport
-      parentRoute: typeof ShopRouteRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -286,18 +267,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ShopRouteRouteChildren {
-  ShopHandleRoute: typeof ShopHandleRoute
-}
-
-const ShopRouteRouteChildren: ShopRouteRouteChildren = {
-  ShopHandleRoute: ShopHandleRoute,
-}
-
-const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
-  ShopRouteRouteChildren,
-)
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
@@ -316,7 +285,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ShopRouteRoute: ShopRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
@@ -324,6 +292,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsOfServiceRoute: TermsOfServiceRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
+  ShopHandleRoute: ShopHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
