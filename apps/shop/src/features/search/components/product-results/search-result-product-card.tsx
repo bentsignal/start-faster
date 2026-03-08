@@ -27,7 +27,7 @@ export function SearchResultProductCard({
 
 function ListProductCard() {
   return (
-    <article className="group flex gap-3 rounded-2xl p-3">
+    <article className="group flex gap-3 p-3">
       <div className="shrink-0 overflow-hidden rounded-xl">
         <SearchResultProductCardImage
           width={132}
@@ -52,7 +52,7 @@ function ListProductCard() {
 function GridProductCard() {
   return (
     <article className="group">
-      <div className="relative overflow-hidden rounded-lg">
+      <div className="relative overflow-hidden">
         <SearchResultProductCardImage
           width={400}
           height={500}
