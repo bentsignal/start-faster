@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
@@ -21,37 +21,37 @@ import {
 function useInternalStore() {
   const navigate = useNavigate({ from: "/collections/$handle" });
   const params = useParams({ from: "/collections/$handle" });
-  const { sortBy, sortDirection, urlFilters, page, cursor } = useSearch({
+  const { sortBy, sortDirection, urlFilters } = useSearch({
     from: "/collections/$handle",
     select: (search) => ({
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
       urlFilters: search.filters,
-      page: search.page,
-      cursor: search.cursor,
     }),
   });
   const [isFilterNavigationLoading, setIsFilterNavigationLoading] =
     useState(false);
   const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
 
-  const { data: collection } = useSuspenseQuery({
-    ...collectionQueries.productsPage({
+  const query = useSuspenseInfiniteQuery({
+    ...collectionQueries.productsInfinite({
       handle: params.handle,
-      sortBy: sortBy,
-      sortDirection: sortDirection,
+      sortBy,
+      sortDirection,
       filters: urlFilters,
       first: COLLECTION_PAGE_SIZE,
-      after: page === 1 ? undefined : cursor,
     }),
     refetchOnMount: false,
   });
 
-  const products = collection?.products.nodes ?? [];
+  const collection = query.data.pages[0];
+  const products = query.data.pages.flatMap(
+    (page) => page?.products.nodes ?? [],
+  );
   const filters = collection?.products.filters ?? [];
-
-  const activePage = page;
-  const hasNextPage = collection?.products.pageInfo.hasNextPage ?? false;
+  const hasNextPage = query.hasNextPage;
+  const isFetchingNextPage = query.isFetchingNextPage;
+  const canLoadMore = hasNextPage && !isFetchingNextPage;
 
   const runWithLoading = async ({
     setLoading,
@@ -77,8 +77,6 @@ function useInternalStore() {
             sortBy: nextSortBy,
             sortDirection: nextSortBy === "relevance" ? "desc" : sortDirection,
             filters: urlFilters,
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -97,8 +95,6 @@ function useInternalStore() {
             sortBy: sortBy,
             sortDirection: nextSortDirection,
             filters: urlFilters,
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -115,8 +111,6 @@ function useInternalStore() {
             sortBy: sortBy,
             sortDirection: sortDirection,
             filters: toggleFilter(urlFilters, input),
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -137,33 +131,17 @@ function useInternalStore() {
               min,
               max,
             }),
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
   };
 
-  const onPageChange = async (nextPage: number) => {
-    if (nextPage < 1 || nextPage === activePage) {
+  const fetchNextPage = async () => {
+    if (!canLoadMore) {
       return;
     }
 
-    if (nextPage > activePage && hasNextPage === false) {
-      return;
-    }
-
-    await navigate({
-      to: "/collections/$handle",
-      params: { handle: params.handle },
-      search: {
-        sortBy: sortBy,
-        sortDirection: sortDirection,
-        filters: urlFilters,
-        page: nextPage,
-        cursor: undefined,
-      },
-    });
+    await query.fetchNextPage();
   };
 
   const isFiltering = isFilterNavigationLoading || isPriceApplyLoading;
@@ -172,15 +150,16 @@ function useInternalStore() {
     collection,
     products,
     filters,
-    activePage,
     hasNextPage,
+    isFetchingNextPage,
+    canLoadMore,
     isFiltering,
     isPriceApplyLoading,
     onSortByChange,
     onSortDirectionChange,
     onToggleFilter,
     onApplyPriceRange,
-    onPageChange,
+    fetchNextPage,
   };
 }
 

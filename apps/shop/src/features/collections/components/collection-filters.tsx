@@ -32,7 +32,7 @@ export function CollectionFilters() {
   return (
     <aside className="lg:border-border hidden lg:sticky lg:top-26 lg:block lg:h-fit lg:pr-8 xl:top-36">
       <div className="space-y-5">
-        <h1 className="font-bold">{title}</h1>
+        <h1 className="text-sm font-bold">{title}</h1>
 
         <div>
           <div className="space-y-2.5">

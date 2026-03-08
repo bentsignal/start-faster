@@ -1,77 +1,39 @@
+import { Loader } from "lucide-react";
+
 import { Button } from "@acme/ui/button";
-import { cn } from "@acme/ui/utils";
 
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
 
 export function CollectionPagination() {
-  const activePage = useCollectionPageStore((store) => store.activePage);
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
-  const onPageChange = useCollectionPageStore((store) => store.onPageChange);
   const hasNextPage = useCollectionPageStore((store) => store.hasNextPage);
-  const isAtFirstPage = activePage <= 1;
-  const isAtLastPage = hasNextPage === false;
-  const isBusy = isFiltering;
-
-  const shouldHidePagination = isAtFirstPage && isAtLastPage;
-  if (shouldHidePagination) {
-    return null;
-  }
+  const canLoadMore = useCollectionPageStore((store) => store.canLoadMore);
+  const isFetchingNextPage = useCollectionPageStore(
+    (store) => store.isFetchingNextPage,
+  );
+  const fetchNextPage = useCollectionPageStore((store) => store.fetchNextPage);
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-1.5">
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={isAtFirstPage || isBusy}
-        className={cn((isAtFirstPage || isBusy) && "opacity-50")}
-        render={(props) => (
-          <button
-            type="button"
-            {...props}
-            disabled={isAtFirstPage || isBusy}
-            onClick={(event) => {
-              props.onClick?.(event);
-              if (isAtFirstPage || isBusy) {
-                return;
-              }
-              void onPageChange(activePage - 1);
+    <div className="flex min-h-12 justify-center">
+      <div className="flex items-center">
+        {hasNextPage ? (
+          <Button
+            variant="outline"
+            onClick={() => {
+              void fetchNextPage();
             }}
+            disabled={!canLoadMore}
+            className="min-w-32"
           >
-            Prev
-          </button>
+            {isFetchingNextPage ? (
+              <Loader className="size-4 animate-spin" />
+            ) : (
+              "Load more"
+            )}
+          </Button>
+        ) : (
+          <div aria-hidden className="h-9 min-w-32" />
         )}
-      >
-        Prev
-      </Button>
-
-      <Button variant="outline" size="sm" disabled>
-        Page {activePage}
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={isAtLastPage || isBusy}
-        className={cn((isAtLastPage || isBusy) && "opacity-50")}
-        render={(props) => (
-          <button
-            type="button"
-            {...props}
-            disabled={isAtLastPage || isBusy}
-            onClick={(event) => {
-              props.onClick?.(event);
-              if (isAtLastPage || isBusy) {
-                return;
-              }
-              void onPageChange(activePage + 1);
-            }}
-          >
-            Next
-          </button>
-        )}
-      >
-        Next
-      </Button>
-    </nav>
+      </div>
+    </div>
   );
 }

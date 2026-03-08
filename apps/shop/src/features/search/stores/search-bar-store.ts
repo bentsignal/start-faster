@@ -47,7 +47,6 @@ function useInternalStore({
           sortBy: "relevance",
           sortDirection: "desc",
           filters: [],
-          page: 1,
         },
       })
       .catch((error: unknown) => {
@@ -78,7 +77,6 @@ function useInternalStore({
         sortBy: "relevance",
         sortDirection: "desc",
         filters: [],
-        page: 1,
       },
     });
     setIsPredictiveOpen(false);

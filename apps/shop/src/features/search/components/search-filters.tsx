@@ -269,7 +269,7 @@ function PriceRangeFilterContent({
           value={priceMin}
           placeholder="Min"
           disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-sm leading-6"
           onChange={(event) => setPriceMin(event.target.value)}
         />
         <textarea
@@ -278,7 +278,7 @@ function PriceRangeFilterContent({
           value={priceMax}
           placeholder="Max"
           disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-sm leading-6"
           onChange={(event) => setPriceMax(event.target.value)}
         />
       </div>

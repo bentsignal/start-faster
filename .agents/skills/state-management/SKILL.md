@@ -5,7 +5,7 @@ description: Guides correct usage of the Rostra state management library (create
 
 # State management
 
-The big idea with Rastra is that you can define your state at the top and then pull it in at lower levels exactly where it's needed. You don't want to be drilling down the state from higher up unless it explicitly makes sense to. Like if you're passing something to each item in a list, stuff like that.
+The big idea with Rostra is that you can define your state at the top and then pull it in at lower levels exactly where it's needed. You don't want to be drilling down the state from higher up unless it explicitly makes sense to. Like if you're passing something to each item in a list, stuff like that.
 
 ## Core rules (Rostra)
 

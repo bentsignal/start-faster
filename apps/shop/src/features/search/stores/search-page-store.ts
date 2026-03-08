@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
@@ -25,23 +25,26 @@ function useInternalStore() {
     useState(false);
   const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
 
-  const { data } = useSuspenseQuery({
-    ...searchQueries.products({
+  const query = useSuspenseInfiniteQuery({
+    ...searchQueries.productsInfinite({
       query: search.q,
       sortBy: search.sortBy,
       sortDirection: search.sortDirection,
       filters: search.filters,
       first: SEARCH_PAGE_SIZE,
-      after: search.page === 1 ? undefined : search.cursor,
     }),
     refetchOnMount: false,
   });
-  const products =
-    data?.nodes.filter((node) => node.__typename === "Product") ?? [];
+
+  const data = query.data.pages[0];
+  const products = query.data.pages.flatMap((page) =>
+    (page?.nodes ?? []).filter((node) => node.__typename === "Product"),
+  );
 
   const totalCount = data?.totalCount ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / SEARCH_PAGE_SIZE));
-  const activePage = Math.min(search.page, totalPages);
+  const hasNextPage = query.hasNextPage;
+  const isFetchingNextPage = query.isFetchingNextPage;
+  const canLoadMore = hasNextPage && !isFetchingNextPage;
 
   const runWithLoading = async ({
     setLoading,
@@ -68,8 +71,6 @@ function useInternalStore() {
             sortDirection:
               nextSortBy === "relevance" ? "desc" : search.sortDirection,
             filters: search.filters,
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -86,8 +87,6 @@ function useInternalStore() {
             sortBy: search.sortBy,
             sortDirection: nextSortDirection,
             filters: search.filters,
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -104,8 +103,6 @@ function useInternalStore() {
             sortBy: search.sortBy,
             sortDirection: search.sortDirection,
             filters: toggleFilter(search.filters, input),
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
@@ -126,29 +123,17 @@ function useInternalStore() {
               min,
               max,
             }),
-            page: 1,
-            cursor: undefined,
           },
         }),
     });
   };
 
-  const onPageChange = async (nextPage: number) => {
-    if (nextPage < 1 || nextPage > totalPages || nextPage === activePage) {
+  const fetchNextPage = async () => {
+    if (!canLoadMore) {
       return;
     }
 
-    await navigate({
-      to: "/search",
-      search: {
-        q: search.q,
-        sortBy: search.sortBy,
-        sortDirection: search.sortDirection,
-        filters: search.filters,
-        page: nextPage,
-        cursor: undefined,
-      },
-    });
+    await query.fetchNextPage();
   };
 
   const isFiltering = isFilterNavigationLoading || isPriceApplyLoading;
@@ -159,15 +144,16 @@ function useInternalStore() {
     data,
     products,
     totalCount,
-    totalPages,
-    activePage,
+    hasNextPage,
+    isFetchingNextPage,
+    canLoadMore,
     isFiltering,
     isPriceApplyLoading,
     onSortByChange,
     onSortDirectionChange,
     onToggleFilter,
     onApplyPriceRange,
-    onPageChange,
+    fetchNextPage,
   };
 }
 
