@@ -1,7 +1,31 @@
 export const getProductsByCollection = `#graphql
-  query get($handle: String!, $first: Int!) {
+  query GetProductsByCollection(
+    $handle: String!
+    $first: Int!
+    $after: String
+    $before: String
+    $sortKey: ProductCollectionSortKeys
+    $reverse: Boolean
+    $filters: [ProductFilter!]
+  ) {
     collection(handle: $handle) {
-      products(first: $first) {
+      id
+      title
+      handle
+      image {
+        url
+        altText
+        width
+        height
+      }
+      products(
+        first: $first
+        after: $after
+        before: $before
+        sortKey: $sortKey
+        reverse: $reverse
+        filters: $filters
+      ) {
         nodes {
           id
           title
@@ -34,6 +58,24 @@ export const getProductsByCollection = `#graphql
               name
               value
             }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        filters {
+          id
+          label
+          type
+          presentation
+          values {
+            id
+            label
+            count
+            input
           }
         }
       }

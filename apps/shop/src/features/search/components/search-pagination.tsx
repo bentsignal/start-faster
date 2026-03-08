@@ -1,115 +1,38 @@
-import { Button } from "@acme/ui/button";
-import { cn } from "@acme/ui/utils";
+import { Loader } from "lucide-react";
 
-import { Link } from "~/components/link";
-import { getPageWindow } from "~/features/search/lib/search-pagination";
+import { Button } from "@acme/ui/button";
+
 import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
 export function SearchPagination() {
-  const activePage = useSearchPageStore((store) => store.activePage);
-  const totalPages = useSearchPageStore((store) => store.totalPages);
-  const isFiltering = useSearchPageStore((store) => store.isFiltering);
-  const onPageChange = useSearchPageStore((store) => store.onPageChange);
-  const search = useSearchPageStore((store) => store.search);
-  const isAtFirstPage = activePage <= 1;
-  const isAtLastPage = activePage >= totalPages;
-  const isBusy = isFiltering;
-
-  const getSearchForPage = (page: number) => ({
-    q: search.q,
-    sortBy: search.sortBy,
-    sortDirection: search.sortDirection,
-    filters: search.filters,
-    page,
-    cursor: undefined,
-  });
-
-  if (totalPages <= 1) {
+  const hasNextPage = useSearchPageStore((store) => store.hasNextPage);
+  const canLoadMore = useSearchPageStore((store) => store.canLoadMore);
+  const isFetchingNextPage = useSearchPageStore(
+    (store) => store.isFetchingNextPage,
+  );
+  const fetchNextPage = useSearchPageStore((store) => store.fetchNextPage);
+  if (!hasNextPage) {
     return null;
   }
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-1.5">
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={isAtFirstPage || isBusy}
-        className={cn((isAtFirstPage || isBusy) && "opacity-50")}
-        render={(props) => (
-          <Link
-            to="/search"
-            search={getSearchForPage(activePage - 1)}
-            preload="intent"
-            {...props}
-            disabled={isAtFirstPage || isBusy}
-            onClick={(event) => {
-              event.preventDefault();
-              if (isAtFirstPage || isBusy) {
-                return;
-              }
-              void onPageChange(activePage - 1);
-            }}
-          >
-            Prev
-          </Link>
-        )}
-      >
-        Prev
-      </Button>
-
-      {getPageWindow(activePage, totalPages, 5).map((page) => (
+    <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
         <Button
-          key={page}
-          variant={page === activePage ? "default" : "ghost"}
-          size="sm"
-          disabled={isBusy || page === activePage}
-          render={(props) => (
-            <Link
-              to="/search"
-              search={getSearchForPage(page)}
-              preload="intent"
-              {...props}
-              onClick={(event) => {
-                event.preventDefault();
-                if (isBusy || page === activePage) {
-                  return;
-                }
-                void onPageChange(page);
-              }}
-            >
-              {page}
-            </Link>
-          )}
+          variant="outline"
+          onClick={() => {
+            void fetchNextPage();
+          }}
+          disabled={!canLoadMore}
+          className="min-w-32"
         >
-          {page}
+          {isFetchingNextPage ? (
+            <Loader className="size-4 animate-spin" />
+          ) : (
+            "Load more"
+          )}
         </Button>
-      ))}
-
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={isAtLastPage || isBusy}
-        className={cn((isAtLastPage || isBusy) && "opacity-50")}
-        render={(props) => (
-          <Link
-            to="/search"
-            search={getSearchForPage(activePage + 1)}
-            preload="intent"
-            {...props}
-            onClick={(event) => {
-              event.preventDefault();
-              if (isAtLastPage || isBusy) {
-                return;
-              }
-              void onPageChange(activePage + 1);
-            }}
-          >
-            Next
-          </Link>
-        )}
-      >
-        Next
-      </Button>
-    </nav>
+      </div>
+    </div>
   );
 }

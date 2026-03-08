@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 
-import type { GetQueryVariables } from "@acme/shopify/storefront/generated";
+import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storefront/generated";
 import {
   getProduct,
   getProductsByCollection,
@@ -22,13 +22,15 @@ export const productQueries = {
       return product;
     },
   }),
-  productsFromCollection: (variables: GetQueryVariables) => ({
-    queryKey: ["products", "collection", variables.handle, variables.first],
+  getProductsByCollection: (
+    variables: GetProductsByCollectionQueryVariables,
+  ) => ({
+    queryKey: ["products", "collection", variables],
     queryFn: async () => {
       const response = await shopify.request(getProductsByCollection, {
         variables,
       });
-      return response.data?.collection?.products.nodes ?? [];
+      return response.data?.collection ?? null;
     },
   }),
 };

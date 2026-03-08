@@ -7,7 +7,6 @@ import { SearchPagination } from "~/features/search/components/search-pagination
 import { SearchResultsHeader } from "~/features/search/components/search-results-header";
 import { sanitizeProductFilters } from "~/features/search/lib/search-filter-utils";
 import {
-  MAX_SEARCH_PAGE,
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
@@ -23,8 +22,6 @@ export const Route = createFileRoute("/search")({
       .optional()
       .default([])
       .transform((value) => sanitizeProductFilters(value)),
-    page: z.coerce.number().int().min(1).default(1),
-    cursor: z.string().optional(),
   }),
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
@@ -35,73 +32,13 @@ export const Route = createFileRoute("/search")({
     }
 
     const filters = deps.filters;
-    if (deps.page > MAX_SEARCH_PAGE) {
-      throw redirect({
-        to: "/search",
-        search: {
-          q: query,
-          sortBy: deps.sortBy,
-          sortDirection: deps.sortDirection,
-          filters,
-          page: MAX_SEARCH_PAGE,
-          cursor: undefined,
-        },
-      });
-    }
-
-    const hasCursorInSearch = deps.cursor !== undefined;
-    let cursor = deps.cursor;
-
-    if (deps.page === 1) {
-      cursor = undefined;
-    }
-
-    if (deps.page > 1 && cursor === undefined) {
-      cursor = await searchQueries.resolveCursorForPage({
-        queryClient,
-        page: deps.page,
-        query,
-        sortBy: deps.sortBy,
-        sortDirection: deps.sortDirection,
-        filters,
-      });
-    }
-
-    if (deps.page > 1 && cursor === undefined) {
-      throw redirect({
-        to: "/search",
-        search: {
-          q: query,
-          sortBy: deps.sortBy,
-          sortDirection: deps.sortDirection,
-          filters,
-          page: 1,
-        },
-      });
-    }
-
-    if (deps.page > 1 && !hasCursorInSearch && cursor !== undefined) {
-      throw redirect({
-        to: "/search",
-        search: {
-          q: query,
-          sortBy: deps.sortBy,
-          sortDirection: deps.sortDirection,
-          filters,
-          page: deps.page,
-          cursor,
-        },
-      });
-    }
-
-    await queryClient.ensureQueryData(
-      searchQueries.products({
+    await queryClient.ensureInfiniteQueryData(
+      searchQueries.productsInfinite({
         query,
         sortBy: deps.sortBy,
         sortDirection: deps.sortDirection,
         filters,
         first: SEARCH_PAGE_SIZE,
-        after: cursor,
       }),
     );
   },

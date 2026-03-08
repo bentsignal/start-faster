@@ -16,6 +16,7 @@ import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopHandleRouteImport } from './app/shop/$handle'
+import { Route as CollectionsHandleRouteImport } from './app/collections/$handle'
 import { Route as AuthenticatedSettingsRouteImport } from './app/_authenticated/settings'
 import { Route as AuthenticatedOrdersRouteImport } from './app/_authenticated/orders'
 import { Route as AuthenticatedAccountRouteImport } from './app/_authenticated/account'
@@ -56,6 +57,11 @@ const ShopHandleRoute = ShopHandleRouteImport.update({
   path: '/shop/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsHandleRoute = CollectionsHandleRouteImport.update({
+  id: '/collections/$handle',
+  path: '/collections/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$handle': typeof CollectionsHandleRoute
   '/shop/$handle': typeof ShopHandleRoute
 }
 export interface FileRoutesByTo {
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$handle': typeof CollectionsHandleRoute
   '/shop/$handle': typeof ShopHandleRoute
 }
 export interface FileRoutesById {
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$handle': typeof CollectionsHandleRoute
   '/shop/$handle': typeof ShopHandleRoute
 }
 export interface FileRouteTypes {
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/orders'
     | '/settings'
+    | '/collections/$handle'
     | '/shop/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/orders'
     | '/settings'
+    | '/collections/$handle'
     | '/shop/$handle'
   id:
     | '__root__'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/orders'
     | '/_authenticated/settings'
+    | '/collections/$handle'
     | '/shop/$handle'
   fileRoutesById: FileRoutesById
 }
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
+  CollectionsHandleRoute: typeof CollectionsHandleRoute
   ShopHandleRoute: typeof ShopHandleRoute
 }
 
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/$handle'
       fullPath: '/shop/$handle'
       preLoaderRoute: typeof ShopHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$handle': {
+      id: '/collections/$handle'
+      path: '/collections/$handle'
+      fullPath: '/collections/$handle'
+      preLoaderRoute: typeof CollectionsHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
@@ -292,6 +312,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsOfServiceRoute: TermsOfServiceRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
+  CollectionsHandleRoute: CollectionsHandleRoute,
   ShopHandleRoute: ShopHandleRoute,
 }
 export const routeTree = rootRouteImport

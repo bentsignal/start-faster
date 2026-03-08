@@ -6,13 +6,13 @@ import {
   CarouselPrevious,
 } from "@acme/ui/carousel";
 
-import type { HomeCollectionProductNode } from "~/features/product/types";
+import type { CollectionProductNode } from "~/features/product/types";
 import { SearchResultProductCard } from "~/features/search/components/product-results/search-result-product-card";
 
-export function HomepageCollectionCarousel({
+export function ProductCarousel({
   products,
 }: {
-  products: HomeCollectionProductNode[];
+  products: CollectionProductNode[];
 }) {
   if (products.length === 0) {
     return null;
@@ -20,7 +20,7 @@ export function HomepageCollectionCarousel({
 
   return (
     <Carousel className="w-full px-10 sm:px-12 lg:px-14">
-      <CarouselContent className="-ml-3 sm:-ml-4">
+      <CarouselContent className="-ml-3 px-2 sm:-ml-4">
         {products.map((product) => (
           <CarouselItem
             key={product.id}

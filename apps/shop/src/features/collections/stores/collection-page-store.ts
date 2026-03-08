@@ -1,47 +1,54 @@
 import { useState } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
 import type { ProductFilter } from "@acme/shopify/storefront/types";
 
 import type {
-  SearchSortBy,
-  SearchSortDirection,
-} from "~/features/search/lib/search-queries";
+  CollectionSortBy,
+  CollectionSortDirection,
+} from "~/features/collections/lib/collection-queries";
 import {
   applyPriceRangeFilter,
   toggleFilter,
-} from "~/features/search/lib/search-filter-utils";
+} from "~/features/collections/lib/collection-filter-utils";
 import {
-  SEARCH_PAGE_SIZE,
-  searchQueries,
-} from "~/features/search/lib/search-queries";
+  COLLECTION_PAGE_SIZE,
+  collectionQueries,
+} from "~/features/collections/lib/collection-queries";
 
 function useInternalStore() {
-  const navigate = useNavigate({ from: "/search" });
-  const search = useSearch({ from: "/search" });
+  const navigate = useNavigate({ from: "/collections/$handle" });
+  const params = useParams({ from: "/collections/$handle" });
+  const { sortBy, sortDirection, urlFilters } = useSearch({
+    from: "/collections/$handle",
+    select: (search) => ({
+      sortBy: search.sortBy,
+      sortDirection: search.sortDirection,
+      urlFilters: search.filters,
+    }),
+  });
   const [isFilterNavigationLoading, setIsFilterNavigationLoading] =
     useState(false);
   const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
 
   const query = useSuspenseInfiniteQuery({
-    ...searchQueries.productsInfinite({
-      query: search.q,
-      sortBy: search.sortBy,
-      sortDirection: search.sortDirection,
-      filters: search.filters,
-      first: SEARCH_PAGE_SIZE,
+    ...collectionQueries.productsInfinite({
+      handle: params.handle,
+      sortBy,
+      sortDirection,
+      filters: urlFilters,
+      first: COLLECTION_PAGE_SIZE,
     }),
     refetchOnMount: false,
   });
 
-  const data = query.data.pages[0];
-  const products = query.data.pages.flatMap((page) =>
-    (page?.nodes ?? []).filter((node) => node.__typename === "Product"),
+  const collection = query.data.pages[0];
+  const products = query.data.pages.flatMap(
+    (page) => page?.products.nodes ?? [],
   );
-
-  const totalCount = data?.totalCount ?? 0;
+  const filters = collection?.products.filters ?? [];
   const hasNextPage = query.hasNextPage;
   const isFetchingNextPage = query.isFetchingNextPage;
   const canLoadMore = hasNextPage && !isFetchingNextPage;
@@ -59,34 +66,35 @@ function useInternalStore() {
     });
   };
 
-  const onSortByChange = (nextSortBy: SearchSortBy) => {
+  const onSortByChange = (nextSortBy: CollectionSortBy) => {
     void runWithLoading({
       setLoading: setIsFilterNavigationLoading,
       action: () =>
         navigate({
-          to: "/search",
+          to: "/collections/$handle",
+          params: { handle: params.handle },
           search: {
-            q: search.q,
             sortBy: nextSortBy,
-            sortDirection:
-              nextSortBy === "relevance" ? "desc" : search.sortDirection,
-            filters: search.filters,
+            sortDirection: nextSortBy === "relevance" ? "desc" : sortDirection,
+            filters: urlFilters,
           },
         }),
     });
   };
 
-  const onSortDirectionChange = (nextSortDirection: SearchSortDirection) => {
+  const onSortDirectionChange = (
+    nextSortDirection: CollectionSortDirection,
+  ) => {
     void runWithLoading({
       setLoading: setIsFilterNavigationLoading,
       action: () =>
         navigate({
-          to: "/search",
+          to: "/collections/$handle",
+          params: { handle: params.handle },
           search: {
-            q: search.q,
-            sortBy: search.sortBy,
+            sortBy: sortBy,
             sortDirection: nextSortDirection,
-            filters: search.filters,
+            filters: urlFilters,
           },
         }),
     });
@@ -97,12 +105,12 @@ function useInternalStore() {
       setLoading: setIsFilterNavigationLoading,
       action: () =>
         navigate({
-          to: "/search",
+          to: "/collections/$handle",
+          params: { handle: params.handle },
           search: {
-            q: search.q,
-            sortBy: search.sortBy,
-            sortDirection: search.sortDirection,
-            filters: toggleFilter(search.filters, input),
+            sortBy: sortBy,
+            sortDirection: sortDirection,
+            filters: toggleFilter(urlFilters, input),
           },
         }),
     });
@@ -113,13 +121,13 @@ function useInternalStore() {
       setLoading: setIsPriceApplyLoading,
       action: () =>
         navigate({
-          to: "/search",
+          to: "/collections/$handle",
+          params: { handle: params.handle },
           search: {
-            q: search.q,
-            sortBy: search.sortBy,
-            sortDirection: search.sortDirection,
+            sortBy: sortBy,
+            sortDirection: sortDirection,
             filters: applyPriceRangeFilter({
-              filters: search.filters,
+              filters: urlFilters,
               min,
               max,
             }),
@@ -139,11 +147,9 @@ function useInternalStore() {
   const isFiltering = isFilterNavigationLoading || isPriceApplyLoading;
 
   return {
-    search,
-    filters: search.filters,
-    data,
+    collection,
     products,
-    totalCount,
+    filters,
     hasNextPage,
     isFetchingNextPage,
     canLoadMore,
@@ -157,5 +163,5 @@ function useInternalStore() {
   };
 }
 
-export const { Store: SearchPageStore, useStore: useSearchPageStore } =
+export const { Store: CollectionPageStore, useStore: useCollectionPageStore } =
   createStore(useInternalStore);
