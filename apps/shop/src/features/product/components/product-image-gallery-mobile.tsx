@@ -60,8 +60,8 @@ function MobileImageSlide({
           width={image.width ?? 1200}
           height={image.height ?? 1200}
           sizes="100vw"
-          loading="eager"
-          fetchPriority="high"
+          loading={index === 0 ? "eager" : undefined}
+          fetchPriority={index === 0 ? "high" : undefined}
           className="h-full w-full object-contain"
         />
       </div>
