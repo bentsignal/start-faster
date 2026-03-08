@@ -55,7 +55,7 @@ export const Route = createFileRoute("/collections/$handle")({
 function CollectionPage() {
   return (
     <CollectionPageStore>
-      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 xl:px-16">
+      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 lg:py-14 xl:px-16">
         <CollectionResultsHeader />
 
         <section className="space-y-8 lg:hidden">
@@ -65,7 +65,7 @@ function CollectionPage() {
         </section>
 
         <div className="hidden lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
-          <CollectionHeroImage className="lg:col-start-2 lg:pb-8" />
+          <CollectionHeroImage className="lg:col-start-2 lg:pb-14" />
 
           <CollectionFilters />
 

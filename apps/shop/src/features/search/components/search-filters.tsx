@@ -40,7 +40,7 @@ export function SearchFilters() {
   const isFiltering = useSearchPageStore((store) => store.isFiltering);
 
   return (
-    <aside className="lg:border-border hidden lg:sticky lg:top-26 lg:block lg:h-fit lg:pr-8 xl:top-36">
+    <aside className="lg:border-border hidden lg:sticky lg:top-32 lg:block lg:h-fit lg:pr-8 xl:top-42">
       <div className="space-y-5">
         <div className="">
           <p className="text-muted-foreground text-sm">

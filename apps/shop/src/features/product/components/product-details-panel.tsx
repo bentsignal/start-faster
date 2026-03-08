@@ -14,7 +14,7 @@ export function ProductDetailsPanel() {
   return (
     <aside
       className={cn(
-        "px-6 py-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0",
+        "px-6 pb-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0",
         stickyHeaderTokens.spacer,
       )}
     >
