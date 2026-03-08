@@ -11,17 +11,20 @@ function SortSelect<TValue extends string>({
   className,
   disabled,
   options,
+  ariaLabel,
 }: {
   value: TValue;
   onChange: (value: TValue) => void;
   className?: string;
   disabled: boolean;
   options: { value: TValue; label: string }[];
+  ariaLabel: string;
 }) {
   return (
     <div className="relative">
       <select
         value={value}
+        aria-label={ariaLabel}
         disabled={disabled}
         className={cn(
           "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
@@ -67,6 +70,7 @@ export function CollectionSortByControl({
         { value: "relevance", label: "Featured" },
         { value: "price", label: "Price" },
       ]}
+      ariaLabel="Sort by"
       onChange={onSortByChange}
     />
   );
@@ -101,6 +105,7 @@ export function CollectionSortDirectionControl({
         { value: "asc", label: "Low to high" },
         { value: "desc", label: "High to low" },
       ]}
+      ariaLabel="Sort direction"
       onChange={onSortDirectionChange}
     />
   );

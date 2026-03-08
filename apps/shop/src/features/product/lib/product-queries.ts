@@ -25,7 +25,7 @@ export const productQueries = {
   getProductsByCollection: (
     variables: GetProductsByCollectionQueryVariables,
   ) => ({
-    queryKey: ["products", "collection", variables.handle, variables.first],
+    queryKey: ["products", "collection", variables],
     queryFn: async () => {
       const response = await shopify.request(getProductsByCollection, {
         variables,

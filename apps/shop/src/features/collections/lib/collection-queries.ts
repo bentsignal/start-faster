@@ -46,7 +46,7 @@ export const collectionQueries = {
       "products",
       handle,
       sortBy,
-      sortDirection,
+      sortBy === "price" ? sortDirection : undefined,
       filters,
       first,
       after,

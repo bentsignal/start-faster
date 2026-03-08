@@ -1,7 +1,6 @@
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
 
-import { Link } from "~/components/link";
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
 
 export function CollectionPagination() {
@@ -9,10 +8,6 @@ export function CollectionPagination() {
   const isFiltering = useCollectionPageStore((store) => store.isFiltering);
   const onPageChange = useCollectionPageStore((store) => store.onPageChange);
   const hasNextPage = useCollectionPageStore((store) => store.hasNextPage);
-  const collectionHandle = useCollectionPageStore(
-    (store) => store.collection?.handle ?? "",
-  );
-
   const isAtFirstPage = activePage <= 1;
   const isAtLastPage = hasNextPage === false;
   const isBusy = isFiltering;
@@ -30,19 +25,12 @@ export function CollectionPagination() {
         disabled={isAtFirstPage || isBusy}
         className={cn((isAtFirstPage || isBusy) && "opacity-50")}
         render={(props) => (
-          <Link
-            to="/collections/$handle"
-            params={{ handle: collectionHandle }}
-            search={(prev) => ({
-              ...prev,
-              page: activePage - 1,
-              cursor: undefined,
-            })}
-            preload="intent"
+          <button
+            type="button"
             {...props}
             disabled={isAtFirstPage || isBusy}
             onClick={(event) => {
-              event.preventDefault();
+              props.onClick?.(event);
               if (isAtFirstPage || isBusy) {
                 return;
               }
@@ -50,7 +38,7 @@ export function CollectionPagination() {
             }}
           >
             Prev
-          </Link>
+          </button>
         )}
       >
         Prev
@@ -66,18 +54,12 @@ export function CollectionPagination() {
         disabled={isAtLastPage || isBusy}
         className={cn((isAtLastPage || isBusy) && "opacity-50")}
         render={(props) => (
-          <Link
-            to="/collections/$handle"
-            params={{ handle: collectionHandle }}
-            search={(prev) => ({
-              ...prev,
-              page: activePage + 1,
-              cursor: undefined,
-            })}
-            preload="intent"
+          <button
+            type="button"
             {...props}
+            disabled={isAtLastPage || isBusy}
             onClick={(event) => {
-              event.preventDefault();
+              props.onClick?.(event);
               if (isAtLastPage || isBusy) {
                 return;
               }
@@ -85,7 +67,7 @@ export function CollectionPagination() {
             }}
           >
             Next
-          </Link>
+          </button>
         )}
       >
         Next

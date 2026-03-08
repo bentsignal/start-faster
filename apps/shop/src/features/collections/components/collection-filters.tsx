@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useSearch } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
-import type { ProductFilter } from "@acme/shopify/storefront/types";
 import {
   Accordion,
   AccordionContent,
@@ -19,6 +18,7 @@ import {
 import {
   getPriceRangeFromFilters,
   hasSelectedFilterValue,
+  parseCollectionFilter,
 } from "~/features/collections/lib/collection-filter-utils";
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
 
@@ -63,9 +63,7 @@ export function CollectionFiltersContent({
       return true;
     }
 
-    return filter.values.some(
-      (value) => typeof value.input === "object" && value.input !== null,
-    );
+    return filter.values.some((value) => parseCollectionFilter(value.input));
   });
 
   if (mode === "mobile") {
@@ -146,17 +144,17 @@ function FilterSectionContent({ filter }: { filter: CollectionFilter }) {
     <section className="space-y-2">
       <div className="space-y-0.5">
         {filter.values.map((value) => {
-          if (typeof value.input !== "object" || value.input === null) {
+          const input = parseCollectionFilter(value.input);
+          if (input === undefined) {
             return null;
           }
-
-          const input = value.input as ProductFilter;
           const active = hasSelectedFilterValue(selectedFilters, input);
 
           return (
             <button
               key={value.id}
               type="button"
+              aria-pressed={active}
               disabled={isFiltering}
               className={`flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-sm transition-colors ${
                 active
@@ -199,22 +197,26 @@ function PriceRangeFilterContent({
   return (
     <section className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        <textarea
+        <input
+          type="text"
+          inputMode="decimal"
           name={`price-min-${filterId}`}
-          rows={1}
+          aria-label={`Minimum price for ${filterId}`}
           value={priceMin}
           placeholder="Min"
           disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
           onChange={(event) => setPriceMin(event.target.value)}
         />
-        <textarea
+        <input
+          type="text"
+          inputMode="decimal"
           name={`price-max-${filterId}`}
-          rows={1}
+          aria-label={`Maximum price for ${filterId}`}
           value={priceMax}
           placeholder="Max"
           disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-base leading-6"
+          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
           onChange={(event) => setPriceMax(event.target.value)}
         />
       </div>

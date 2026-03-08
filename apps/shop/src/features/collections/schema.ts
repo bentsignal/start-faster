@@ -6,7 +6,16 @@ const priceFilterSchema = z
     max: z.number().min(0).optional(),
   })
   .strict()
-  .refine((value) => value.min !== undefined || value.max !== undefined);
+  .refine((value) => value.min !== undefined || value.max !== undefined, {
+    message: "at least one bound is required",
+  })
+  .refine(
+    (value) =>
+      value.min === undefined ||
+      value.max === undefined ||
+      value.min <= value.max,
+    { message: "min must be <= max" },
+  );
 
 const variantOptionFilterSchema = z
   .object({

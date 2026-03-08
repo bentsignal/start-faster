@@ -103,7 +103,16 @@ export function applyPriceRangeFilter({
 export function isSupportedProductFilter(
   value: unknown,
 ): value is ProductFilter {
-  return supportedCollectionFilterSchema.safeParse(value).success;
+  return parseCollectionFilter(value) !== undefined;
+}
+
+export function parseCollectionFilter(value: unknown) {
+  const parsedResult = supportedCollectionFilterSchema.safeParse(value);
+  if (parsedResult.success === false) {
+    return undefined;
+  }
+
+  return parsedResult.data;
 }
 
 export function sanitizeCollectionFilters(value: unknown) {
@@ -114,8 +123,9 @@ export function sanitizeCollectionFilters(value: unknown) {
   const validFilters = [];
 
   for (const rawFilter of value) {
-    if (isSupportedProductFilter(rawFilter)) {
-      validFilters.push(rawFilter);
+    const parsedFilter = parseCollectionFilter(rawFilter);
+    if (parsedFilter) {
+      validFilters.push(parsedFilter);
     }
   }
 
