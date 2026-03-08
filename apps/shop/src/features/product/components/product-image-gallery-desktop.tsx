@@ -154,8 +154,8 @@ function GalleryImage({
           width={image.width ?? 1600}
           height={image.height ?? 1600}
           sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
-          loading={imageIndex < 2 ? "eager" : undefined}
-          fetchPriority={imageIndex < 2 ? "high" : undefined}
+          loading="eager"
+          fetchPriority="high"
           className="h-full w-full object-cover"
         />
       </div>
