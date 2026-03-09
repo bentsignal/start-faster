@@ -115,7 +115,7 @@ function RootComponent() {
           <CartStore>
             <ThemeStore
               attribute="class"
-              defaultTheme="dark"
+              defaultTheme="light"
               disableTransitionOnChange
               initialTheme={context.theme}
             >
