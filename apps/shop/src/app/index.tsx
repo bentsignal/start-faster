@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storefront/generated";
 
+import { Hero } from "~/components/hero";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
 import { productQueries } from "~/features/product/lib/product-queries";
 
@@ -27,13 +28,9 @@ function RouteComponent() {
   const products = collection?.products.nodes ?? [];
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-12">
-      <section className="flex flex-col gap-3">
-        {collection?.title && (
-          <h2 className="mb-3 w-full text-center text-xl font-medium">
-            {collection.title}
-          </h2>
-        )}
+    <div className="flex w-full flex-col">
+      <Hero />
+      <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-4 py-16 sm:px-8 xl:px-24">
         <ProductCarousel products={products} />
       </section>
     </div>
