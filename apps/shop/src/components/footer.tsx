@@ -45,34 +45,42 @@ export function Footer() {
             <ul className="space-y-2.5">
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/bentsignal/"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Instagram
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://x.com/bentsignal"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   X (Twitter)
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/bentsignal"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  TikTok
+                  Github
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://discord.gg/Ep9YsvhZ"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Pinterest
+                  Discord
                 </a>
               </li>
             </ul>
