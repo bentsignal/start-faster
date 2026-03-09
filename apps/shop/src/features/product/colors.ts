@@ -18,6 +18,8 @@ const KNOWN_COLORS: Record<string, string> = {
   Navy: "#04142A",
   Plum: "#2F202A",
   Orchid: "#E3DDE3",
+  "Heather Grey": "#CDD1D6",
+  Sandshell: "#E8E2D0",
 } as const;
 
 /**
