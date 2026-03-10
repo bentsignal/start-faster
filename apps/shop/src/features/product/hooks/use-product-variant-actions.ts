@@ -67,6 +67,7 @@ export function useProductVariantActions({
         ...previousSearch,
         variant: nextVariant.id,
       }),
+      replace: true,
       resetScroll: shouldResetScroll,
     });
   }
