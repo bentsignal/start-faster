@@ -166,7 +166,7 @@ function GalleryImage({
           width={image.width ?? 1600}
           height={image.height ?? 1600}
           sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
-          loading="eager"
+          loading={imageIndex <= 1 ? "eager" : "lazy"}
           fetchPriority={imageIndex <= 1 ? "high" : "auto"}
           className="h-full w-full object-cover"
         />
