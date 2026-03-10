@@ -68,8 +68,7 @@ function useInternalStore() {
           search: {
             q: search.q,
             sortBy: nextSortBy,
-            sortDirection:
-              nextSortBy === "relevance" ? "desc" : search.sortDirection,
+            sortDirection: search.sortDirection,
             filters: search.filters,
           },
         }),

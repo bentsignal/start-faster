@@ -75,7 +75,7 @@ function useInternalStore() {
           params: { handle: params.handle },
           search: {
             sortBy: nextSortBy,
-            sortDirection: nextSortBy === "relevance" ? "desc" : sortDirection,
+            sortDirection,
             filters: urlFilters,
           },
         }),

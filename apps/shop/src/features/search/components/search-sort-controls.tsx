@@ -7,18 +7,18 @@ import type {
   SearchSortDirection,
 } from "~/features/search/lib/search-queries";
 
-function SortSelect({
+function SortSelect<TValue extends string>({
   value,
   onChange,
   className,
   disabled,
   options,
 }: {
-  value: string;
-  onChange: (value: string) => void;
+  value: TValue;
+  onChange: (value: TValue) => void;
   className?: string;
   disabled: boolean;
-  options: { value: string; label: string }[];
+  options: { value: TValue; label: string }[];
 }) {
   return (
     <div className="relative">
@@ -26,11 +26,16 @@ function SortSelect({
         value={value}
         disabled={disabled}
         className={cn(
-          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
+          "text-foreground disabled:text-muted-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
           className,
         )}
         onChange={(event) => {
-          onChange(event.target.value);
+          const nextValue = options.find(
+            (option) => option.value === event.target.value,
+          )?.value;
+          if (nextValue !== undefined) {
+            onChange(nextValue);
+          }
         }}
       >
         {options.map((option) => (
@@ -64,7 +69,7 @@ export function SortByControl({
         { value: "relevance", label: "Relevance" },
         { value: "price", label: "Price" },
       ]}
-      onChange={(value) => onSortByChange(value as SearchSortBy)}
+      onChange={onSortByChange}
     />
   );
 }
@@ -89,7 +94,7 @@ export function SortDirectionControl({
         { value: "asc", label: "Low to high" },
         { value: "desc", label: "High to low" },
       ]}
-      onChange={(value) => onSortDirectionChange(value as SearchSortDirection)}
+      onChange={onSortDirectionChange}
     />
   );
 }

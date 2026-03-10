@@ -41,7 +41,7 @@ export const collectionQueries = {
         "products",
         handle,
         sortBy,
-        sortBy === "price" ? sortDirection : undefined,
+        sortDirection,
         filters,
         first,
       ] as const,
@@ -51,7 +51,7 @@ export const collectionQueries = {
           variables: {
             handle,
             sortKey: getCollectionSortKey(sortBy),
-            reverse: sortBy === "price" ? sortDirection === "desc" : false,
+            reverse: sortDirection === "desc",
             filters,
             first,
             after: pageParam,

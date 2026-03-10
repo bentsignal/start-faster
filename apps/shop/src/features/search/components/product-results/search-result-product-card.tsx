@@ -52,7 +52,7 @@ function ListProductCard() {
 function GridProductCard() {
   return (
     <article className="group">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-xl">
         <SearchResultProductCardImage
           width={400}
           height={500}

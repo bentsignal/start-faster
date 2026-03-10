@@ -27,11 +27,16 @@ function SortSelect<TValue extends string>({
         aria-label={ariaLabel}
         disabled={disabled}
         className={cn(
-          "text-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
+          "text-foreground disabled:text-muted-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
           className,
         )}
         onChange={(event) => {
-          onChange(event.target.value as TValue);
+          const nextValue = options.find(
+            (option) => option.value === event.target.value,
+          )?.value;
+          if (nextValue !== undefined) {
+            onChange(nextValue);
+          }
         }}
       >
         {options.map((option) => (
@@ -83,10 +88,6 @@ export function CollectionSortDirectionControl({
   className?: string;
   disabled?: boolean;
 }) {
-  const sortBy = useSearch({
-    from: "/collections/$handle",
-    select: (search) => search.sortBy,
-  });
   const sortDirection = useSearch({
     from: "/collections/$handle",
     select: (search) => search.sortDirection,
@@ -99,7 +100,7 @@ export function CollectionSortDirectionControl({
   return (
     <SortSelect
       value={sortDirection}
-      disabled={disabled || isFiltering || sortBy === "relevance"}
+      disabled={disabled || isFiltering}
       className={className}
       options={[
         { value: "asc", label: "Low to high" },

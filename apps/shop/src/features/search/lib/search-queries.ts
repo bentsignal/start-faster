@@ -68,7 +68,7 @@ export const searchQueries = {
           variables: {
             query,
             sortKey: getSearchSortKey(sortBy),
-            reverse: sortBy === "price" ? sortDirection === "desc" : false,
+            reverse: sortDirection === "desc",
             productFilters: filters,
             first,
             after: pageParam,
