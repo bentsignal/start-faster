@@ -36,6 +36,7 @@ export function Hero() {
         </div>
 
         <Button
+          nativeButton={false}
           size="lg"
           variant="secondary"
           className="rounded-full px-8 text-sm font-medium tracking-wide uppercase"
