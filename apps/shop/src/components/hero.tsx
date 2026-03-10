@@ -4,12 +4,15 @@ import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
 
+export const heroImageUrl =
+  "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30";
+
 export function Hero() {
   return (
     <section className="grid w-full grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)]">
       <div className="w-full">
         <Image
-          src="https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30"
+          src={heroImageUrl}
           alt="Lifestyle photos from the launch collection"
           width={1440}
           height={720}

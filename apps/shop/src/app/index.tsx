@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storefront/generated";
 
-import { Hero } from "~/components/hero";
+import { Hero, heroImageUrl } from "~/components/hero";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
 import { productQueries } from "~/features/product/lib/product-queries";
 
@@ -19,6 +19,15 @@ export const Route = createFileRoute("/")({
     );
   },
   component: RouteComponent,
+  head: () => ({
+    links: [
+      {
+        rel: "preload",
+        as: "image",
+        href: heroImageUrl,
+      },
+    ],
+  }),
 });
 
 function RouteComponent() {

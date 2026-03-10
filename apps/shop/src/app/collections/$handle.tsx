@@ -48,7 +48,23 @@ export const Route = createFileRoute("/collections/$handle")({
     if (collection === null || collection === undefined) {
       throw notFound();
     }
+
+    return {
+      heroImageUrl: collection.image?.url,
+    };
   },
+  head: ({ loaderData }) => ({
+    links:
+      loaderData?.heroImageUrl === undefined
+        ? []
+        : [
+            {
+              rel: "preload",
+              as: "image",
+              href: loaderData.heroImageUrl,
+            },
+          ],
+  }),
   component: CollectionPage,
 });
 
