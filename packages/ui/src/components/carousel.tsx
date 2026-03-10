@@ -114,13 +114,26 @@ function Carousel({
   const getRenderedIndexFromScroll = React.useCallback(() => {
     const viewport = viewportRef.current;
     const viewportSize = getViewportSize();
+    const pageCount = slideCountRef.current;
 
-    if (!viewport || viewportSize <= 0) return 0;
+    if (!viewport || viewportSize <= 0 || pageCount <= 1) return 0;
 
     const scrollPosition =
       orientation === "horizontal" ? viewport.scrollLeft : viewport.scrollTop;
+    const contentSize =
+      orientation === "horizontal"
+        ? viewport.scrollWidth
+        : viewport.scrollHeight;
+    const maxScrollPosition = Math.max(0, contentSize - viewportSize);
 
-    return Math.round(scrollPosition / viewportSize);
+    if (maxScrollPosition <= 0) {
+      return 0;
+    }
+
+    const normalizedScroll = scrollPosition / maxScrollPosition;
+    const renderedIndex = Math.round(normalizedScroll * (pageCount - 1));
+
+    return Math.max(0, Math.min(pageCount - 1, renderedIndex));
   }, [getViewportSize, orientation]);
 
   const updateSelectionState = React.useCallback((renderedIndex: number) => {
