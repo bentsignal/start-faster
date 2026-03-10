@@ -37,6 +37,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         href: "https://cdn.shopify.com",
         crossOrigin: "anonymous",
       },
+      {
+        rel: "dns-prefetch",
+        href: "https://lcjw4hjenc.ufs.sh",
+      },
+      {
+        rel: "preconnect",
+        href: "https://lcjw4hjenc.ufs.sh",
+        crossOrigin: "anonymous",
+      },
     ],
     meta: [
       { charSet: "utf-8" },
