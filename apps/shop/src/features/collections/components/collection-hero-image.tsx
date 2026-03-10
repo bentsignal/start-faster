@@ -43,6 +43,9 @@ export function CollectionHeroImageContent({ url }: { url: string }) {
       alt={image?.altText ?? `${title} collection`}
       width={image?.width ?? 1400}
       height={image?.height ?? 560}
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
       className="bg-muted w-full rounded-xl object-cover"
     />
   );
