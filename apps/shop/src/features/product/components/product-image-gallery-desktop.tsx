@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
@@ -31,6 +32,17 @@ function DesktopGalleryContent({
     useDesktopProductImageGallery({
       imageCount: images.length,
     });
+  const setDesktopScrollToImage = useProductPageStore(
+    (store) => store.setDesktopScrollToImage,
+  );
+
+  useEffect(() => {
+    setDesktopScrollToImage(scrollToImage);
+
+    return () => {
+      setDesktopScrollToImage(null);
+    };
+  }, [scrollToImage, setDesktopScrollToImage]);
 
   return (
     <div
@@ -155,7 +167,7 @@ function GalleryImage({
           height={image.height ?? 1600}
           sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
           loading="eager"
-          fetchPriority="high"
+          fetchPriority={imageIndex <= 1 ? "high" : "auto"}
           className="h-full w-full object-cover"
         />
       </div>

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { createStore } from "rostra";
 
 import type { CarouselApi } from "@acme/ui/carousel";
@@ -17,23 +17,34 @@ interface ProductPageStoreProps {
 
 function useInternalStore({ product, variant }: ProductPageStoreProps) {
   const variants = product.variants.nodes;
-  const options = useProductOptions(product);
+  const [initialVariantId] = useState(variant);
   const carouselApiRef = useRef<CarouselApi | null>(null);
+  const desktopScrollToImageRef = useRef<((index: number) => void) | null>(
+    null,
+  );
+  const galleryOrdering = useProductGalleryImages({
+    product,
+    variants,
+    initialVariantId,
+  });
+  const options = useProductOptions(product, galleryOrdering.colorOrder);
   const setCarouselApi = (carouselApi: CarouselApi) => {
     carouselApiRef.current = carouselApi;
+  };
+  const setDesktopScrollToImage = (
+    scrollToImage: ((index: number) => void) | null,
+  ) => {
+    desktopScrollToImageRef.current = scrollToImage;
   };
   const { selectedVariant, selectedOptions } = useSelectedProductVariant({
     variants,
     variantId: variant,
   });
-  const galleryImages = useProductGalleryImages({
-    product,
-    variants,
-    selectedVariantId: selectedVariant?.id,
-  });
   const { selectOption, addToCart, wasAddedToCart, buyNow, isBuyingNow } =
     useProductVariantActions({
       carouselApi: carouselApiRef,
+      scrollDesktopGalleryToImage: desktopScrollToImageRef,
+      variantImageIndexById: galleryOrdering.variantImageIndexById,
       variants,
       productTitle: product.title,
       productHandle: product.handle,
@@ -48,7 +59,7 @@ function useInternalStore({ product, variant }: ProductPageStoreProps) {
   const storeValue = {
     product,
     options,
-    galleryImages,
+    galleryImages: galleryOrdering.images,
     price,
     selectedVariant,
     selectedOptions,
@@ -58,6 +69,7 @@ function useInternalStore({ product, variant }: ProductPageStoreProps) {
     buyNow,
     isBuyingNow,
     setCarouselApi,
+    setDesktopScrollToImage,
   };
 
   return storeValue;

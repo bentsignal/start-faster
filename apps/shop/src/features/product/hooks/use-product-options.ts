@@ -1,8 +1,27 @@
 import { useMemo } from "react";
 
 import type { Product } from "~/features/product/types";
+import {
+  isColorOptionName,
+  isSizeOptionName,
+} from "~/features/product/lib/option-names";
 
-function getOrderedProductOptions(product: Product) {
+function getOptionSortRank(optionName: string) {
+  if (isColorOptionName(optionName)) {
+    return 0;
+  }
+
+  if (isSizeOptionName(optionName)) {
+    return 1;
+  }
+
+  return 2;
+}
+
+function getOrderedProductOptions(
+  product: Product,
+  canonicalColorOrder: string[],
+) {
   const optionValuesByName = new Map<string, string[]>();
   const optionValueSetsByName = new Map<string, Set<string>>();
 
@@ -29,20 +48,47 @@ function getOrderedProductOptions(product: Product) {
     }
   }
 
-  return product.options.map((option) => {
-    const orderedValues = optionValuesByName.get(option.name) ?? [];
+  const orderedOptions = product.options.map((option, optionIndex) => {
+    const variantOrderedValues = optionValuesByName.get(option.name) ?? [];
+    const orderedValues = isColorOptionName(option.name)
+      ? canonicalColorOrder.filter((color) =>
+          variantOrderedValues.includes(color),
+        )
+      : variantOrderedValues;
     const orderedValueSet = new Set(orderedValues);
     const remainingValues = option.values.filter(
       (value) => !orderedValueSet.has(value),
     );
 
+    const sortRank = getOptionSortRank(option.name);
+
     return {
       ...option,
       values: [...orderedValues, ...remainingValues],
+      sortRank,
+      optionIndex,
     };
   });
+
+  return orderedOptions
+    .sort((left, right) => {
+      if (left.sortRank !== right.sortRank) {
+        return left.sortRank - right.sortRank;
+      }
+
+      return left.optionIndex - right.optionIndex;
+    })
+    .map(({ sortRank: _sortRank, optionIndex: _optionIndex, ...option }) => ({
+      ...option,
+    }));
 }
 
-export function useProductOptions(product: Product) {
-  return useMemo(() => getOrderedProductOptions(product), [product]);
+export function useProductOptions(
+  product: Product,
+  canonicalColorOrder: string[],
+) {
+  return useMemo(
+    () => getOrderedProductOptions(product, canonicalColorOrder),
+    [canonicalColorOrder, product],
+  );
 }

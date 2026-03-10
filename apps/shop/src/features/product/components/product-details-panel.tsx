@@ -8,6 +8,7 @@ import { stickyHeaderTokens } from "~/components/header/header";
 import { getKnownColorHex } from "~/features/product/colors";
 import { ColorSwatch } from "~/features/product/components/color-swatch";
 import { getOptionValueAvailability } from "~/features/product/lib/option-availability";
+import { isColorOptionName } from "~/features/product/lib/option-names";
 import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductDetailsPanel() {
@@ -75,9 +76,7 @@ function ProductOptionSelector() {
   return (
     <div className="mb-8 space-y-6">
       {options.map((option) => {
-        const isColorOption =
-          option.name.toLowerCase() === "color" ||
-          option.name.toLowerCase() === "colour";
+        const isColorOption = isColorOptionName(option.name);
 
         if (isColorOption) {
           return (

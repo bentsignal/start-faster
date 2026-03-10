@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { CarouselApi } from "@acme/ui/carousel";
 
 import type { Product } from "~/features/product/types";
+import { isColorOptionName } from "~/features/product/lib/option-names";
 import { useIsMobile } from "~/hooks/use-is-mobile";
 import { useProductPurchaseActions } from "./use-product-purchase-actions";
 
@@ -14,6 +15,8 @@ interface UseProductVariantActionsArgs {
   selectedVariant: Product["variants"]["nodes"][number] | null;
   selectedOptions: Record<string, string>;
   carouselApi: RefObject<CarouselApi | null>;
+  scrollDesktopGalleryToImage: RefObject<((index: number) => void) | null>;
+  variantImageIndexById: Record<string, number>;
 }
 
 export function useProductVariantActions({
@@ -23,6 +26,8 @@ export function useProductVariantActions({
   selectedVariant,
   selectedOptions,
   carouselApi,
+  scrollDesktopGalleryToImage,
+  variantImageIndexById,
 }: UseProductVariantActionsArgs) {
   const navigate = useNavigate({ from: "/shop/$handle" });
   const isMobile = useIsMobile();
@@ -53,13 +58,19 @@ export function useProductVariantActions({
       return;
     }
 
-    if (optionName === "Color") {
+    const isColorOption = isColorOptionName(optionName);
+    const targetImageIndex = variantImageIndexById[nextVariant.id];
+
+    if (isColorOption && targetImageIndex !== undefined) {
       window.requestAnimationFrame(() => {
-        carouselApi.current?.scrollTo(0, "auto");
+        if (isMobile) {
+          carouselApi.current?.scrollTo(targetImageIndex, "smooth");
+          return;
+        }
+
+        scrollDesktopGalleryToImage.current?.(targetImageIndex);
       });
     }
-
-    const shouldResetScroll = isMobile === false && optionName === "Color";
 
     void navigate({
       to: ".",
@@ -68,7 +79,7 @@ export function useProductVariantActions({
         variant: nextVariant.id,
       }),
       replace: true,
-      resetScroll: shouldResetScroll,
+      resetScroll: false,
     });
   }
 
