@@ -34,7 +34,6 @@ export const getCustomerOrders = `#graphql
               variantTitle
               variantId
               quantity
-              vendor
               productId
               image {
                 url

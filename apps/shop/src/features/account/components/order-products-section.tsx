@@ -141,11 +141,6 @@ function OrderProductText({
   return (
     <div className="min-w-0 flex-1">
       <div className="space-y-1">
-        {lineItem.vendor ? (
-          <p className="text-muted-foreground text-[11px] font-medium tracking-[0.18em] uppercase">
-            {lineItem.vendor}
-          </p>
-        ) : null}
         {isLinkedTitle ? (
           <p className="line-clamp-2 text-sm leading-snug font-medium underline-offset-4 group-hover:underline">
             {title}
