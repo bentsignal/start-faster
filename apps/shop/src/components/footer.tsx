@@ -88,7 +88,15 @@ export function Footer() {
         </div>
         <div className="text-muted-foreground mt-14 text-center text-xs">
           <p>
-            &copy; {new Date().getFullYear()} Start Faster. All Rights Reserved.
+            &copy; {new Date().getFullYear()} Start Faster, by{" "}
+            <a
+              href="https://bentsignal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              bentsignal
+            </a>
+            . All Rights Reserved.
           </p>
         </div>
       </div>
