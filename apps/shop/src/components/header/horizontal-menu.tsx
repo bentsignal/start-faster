@@ -71,8 +71,8 @@ export function HorizontalMenu() {
                 <NavigationMenuTrigger
                   className={cn(
                     item.label === "Sale"
-                      ? "rounded-none bg-transparent text-red-400 hover:bg-transparent hover:text-red-500 data-open:bg-transparent data-open:text-red-500"
-                      : "text-muted-foreground hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent",
+                      ? "rounded-none bg-transparent text-red-700 hover:bg-transparent hover:text-red-800 data-open:bg-transparent data-open:text-red-800 dark:text-red-400 dark:hover:text-red-400"
+                      : "text-foreground/80 hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent",
                   )}
                 >
                   {/* <item.icon className="mr-2 h-4 w-4" /> */}

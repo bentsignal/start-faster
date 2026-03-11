@@ -444,7 +444,7 @@ function CarouselDots({
   activeDotClassName?: string;
   fallbackDotCount?: number;
 }) {
-  const { scrollSnaps, selectedIndex, scrollTo } = useCarousel();
+  const { scrollSnaps, selectedIndex } = useCarousel();
   const dots =
     scrollSnaps.length > 0
       ? scrollSnaps
@@ -455,25 +455,19 @@ function CarouselDots({
   return (
     <div
       data-slot="carousel-dots"
+      aria-hidden="true"
       className={cn("flex items-center justify-center gap-2", className)}
       {...props}
     >
       {dots.map((_, index) => (
-        <button
+        <span
           key={index}
-          type="button"
-          aria-label={`Go to slide ${index + 1}`}
-          aria-current={selectedIndex === index ? "true" : undefined}
           className={cn(
-            "h-2 rounded-full transition-all duration-300",
+            "block h-2 rounded-full transition-all duration-300",
             selectedIndex === index
               ? cn("bg-foreground w-6", activeDotClassName)
-              : cn(
-                  "bg-foreground/25 hover:bg-foreground/40 focus-visible:bg-foreground/40 w-2",
-                  dotClassName,
-                ),
+              : cn("bg-foreground/25 w-2", dotClassName),
           )}
-          onClick={() => scrollTo(index)}
         />
       ))}
     </div>

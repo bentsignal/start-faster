@@ -68,6 +68,7 @@ export function TopRightControls() {
       </button>
       <HoverCard>
         <HoverCardTrigger
+          render={<button type="button" />}
           aria-label="Open resources menu"
           delay={0}
           className="hover:text-primary hidden items-center transition-colors xl:flex"
