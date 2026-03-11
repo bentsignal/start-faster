@@ -8,27 +8,20 @@ export function ThemeToggle() {
   const currentTheme = useThemeStore((s) => s.theme);
   const changeTheme = useThemeStore((s) => s.changeTheme);
 
-  if (currentTheme === "light") {
-    return (
-      <Button
-        variant="ghost"
-        className="h-11 w-full justify-center rounded-2xl px-4 text-base sm:h-10 sm:w-auto sm:justify-start sm:text-sm"
-        onClick={() => changeTheme("dark")}
-      >
-        <MoonIcon />
-        Switch to Dark Mode
-      </Button>
-    );
+  function handleClick() {
+    changeTheme(currentTheme === "light" ? "dark" : "light");
   }
 
   return (
     <Button
       variant="ghost"
-      className="h-11 w-full justify-center rounded-2xl px-4 text-base sm:h-10 sm:w-auto sm:justify-start sm:text-sm"
-      onClick={() => changeTheme("light")}
+      className="w-full justify-center rounded-xl px-4 text-base sm:h-10 sm:w-auto sm:justify-start sm:text-sm"
+      onClick={handleClick}
     >
-      <SunIcon />
-      Switch to Light Mode
+      {currentTheme === "light" ? <SunIcon /> : <MoonIcon />}
+      {currentTheme === "light"
+        ? "Switch to Dark Mode"
+        : "Switch to Light Mode"}
     </Button>
   );
 }

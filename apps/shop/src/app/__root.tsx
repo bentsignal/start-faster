@@ -24,6 +24,7 @@ import { getAuthState } from "~/features/auth/server/get-auth-state";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { CartStore } from "~/features/cart/store";
+import { DEFAULT_THEME } from "~/features/theme/default";
 import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
 
@@ -124,7 +125,7 @@ function RootComponent() {
           <CartStore>
             <ThemeStore
               attribute="class"
-              defaultTheme="light"
+              defaultTheme={DEFAULT_THEME}
               disableTransitionOnChange
               initialTheme={context.theme}
             >
