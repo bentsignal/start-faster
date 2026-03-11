@@ -37,11 +37,11 @@ function RouteComponent() {
   const products = collection?.products.nodes ?? [];
 
   return (
-    <div className="flex w-full flex-col">
+    <main className="flex w-full flex-col">
       <Hero />
       <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-4 py-16 sm:px-8 xl:px-24">
         <ProductCarousel products={products} />
       </section>
-    </div>
+    </main>
   );
 }
