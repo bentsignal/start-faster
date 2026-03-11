@@ -85,7 +85,7 @@ export function TopRightControls() {
               {secondaryLink}
             </Button>
           ))}
-          <ThemeToggle />
+          <ThemeToggle className="w-full" />
         </HoverCardContent>
       </HoverCard>
       <VerticalMenu />
