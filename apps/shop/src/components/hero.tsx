@@ -1,9 +1,8 @@
-import { Image } from "@unpic/react";
-
 import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
 import { env } from "~/env";
+import { Image } from "~/features/image";
 
 export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;
 
@@ -16,6 +15,7 @@ export function Hero() {
           alt="Lifestyle photos from the launch collection"
           width={1440}
           height={720}
+          sizes="(min-width: 1280px) 60vw, 100vw"
           fetchPriority="high"
           loading="eager"
           className="block h-auto w-full"

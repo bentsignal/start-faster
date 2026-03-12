@@ -16,9 +16,36 @@ export const useVercelOptimizedImageProps = (
   src: string,
   width: number,
   height: number,
+  sizes?: string,
 ) =>
   useMemo(() => {
-    if (env.VITE_NODE_ENV === "development") return { src, width, height };
+    if (env.VITE_NODE_ENV === "development") {
+      return { src, width, height, sizes };
+    }
+
+    if (sizes) {
+      const responsiveWidths = imageWidths.filter((candidateWidth) => {
+        return candidateWidth <= width;
+      });
+      const widths: [ImgWidth, ...ImgWidth[]] =
+        responsiveWidths.length > 0
+          ? (responsiveWidths as [ImgWidth, ...ImgWidth[]])
+          : [largestImageWidth];
+      const largestRequestedWidth = widths.at(-1) ?? largestImageWidth;
+
+      return {
+        src: getVercelOptimizedUrl(src, largestRequestedWidth),
+        srcSet: widths
+          .map((candidateWidth) => {
+            return `${getVercelOptimizedUrl(src, candidateWidth)} ${candidateWidth}w`;
+          })
+          .join(", "),
+        sizes,
+        width,
+        height,
+      };
+    }
+
     const widths = [
       ...new Set(
         [width, width * 2, width * 3].map(
@@ -33,4 +60,4 @@ export const useVercelOptimizedImageProps = (
       width: widths[0],
       height: Math.round((widths[0] * height) / width),
     };
-  }, [src, width, height]);
+  }, [src, width, height, sizes]);

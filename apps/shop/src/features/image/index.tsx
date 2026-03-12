@@ -13,9 +13,10 @@ export function Image({
   src,
   width,
   height,
+  sizes,
   loading = "lazy",
   ...props
 }: ImageProps) {
-  const imgProps = useVercelOptimizedImageProps(src, width, height);
+  const imgProps = useVercelOptimizedImageProps(src, width, height, sizes);
   return <img loading={loading} {...imgProps} {...props} />;
 }

@@ -13,8 +13,9 @@ export default defineConfig(async ({ mode }) => {
 
   const { imageWidths } = await import("./src/features/image/sizes");
   const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
+  const uploadthingDomain = new URL(env.VITE_UT_URL).hostname;
   const imageConfig = {
-    domains: [env.VITE_UT_URL],
+    domains: [uploadthingDomain],
     sizes: [...imageWidths],
     minimumCacheTTL: 60,
     formats: imageFormats,
