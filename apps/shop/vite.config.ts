@@ -28,7 +28,7 @@ export default defineConfig(async ({ mode }) => {
       {
         protocol: "https" as const,
         hostname: "cdn.shopify.com",
-        pathname: "/s/files/1/0733/1030/6460/**",
+        pathname: `/s/files/1/${env.VITE_SHOPIFY_IMAGE_URL_STORE_ID}/**`,
       },
     ],
   };

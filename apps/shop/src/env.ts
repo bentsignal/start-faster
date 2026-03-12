@@ -28,6 +28,7 @@ export const env = createEnv({
     VITE_DEV_ALLOWED_HOST: z.string().optional(),
     VITE_SHOPIFY_STORE_DOMAIN: z.string().min(1),
     VITE_SHOPIFY_PUBLIC_TOKEN: z.string().min(1),
+    VITE_SHOPIFY_IMAGE_URL_STORE_ID: z.string().min(1),
     VITE_UT_URL: z.url(),
   },
   runtimeEnv,
