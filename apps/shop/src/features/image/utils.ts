@@ -21,7 +21,7 @@ export const useVercelOptimizedImageProps = (
     if (env.VITE_NODE_ENV === "development") return { src, width, height };
     const widths = [
       ...new Set(
-        [width, width * 2].map(
+        [width, width * 2, width * 3].map(
           (w) => imageWidths.find((p) => p >= w) ?? largestImageWidth,
         ),
       ),
