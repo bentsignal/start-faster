@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Image } from "@unpic/react";
 
 import {
   NavigationMenu,
@@ -11,6 +10,7 @@ import {
 import { cn } from "@acme/ui/utils";
 
 import { navItems } from "~/components/header/nav-data";
+import { Image } from "~/features/image";
 
 const fallbackPromoImage =
   "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5";

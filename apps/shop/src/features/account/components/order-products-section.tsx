@@ -1,11 +1,10 @@
-import { Image } from "@unpic/react";
-
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type {
   CustomerOrderLineItem,
   LiveOrderProducts,
 } from "~/features/account/types";
 import { Link } from "~/components/link";
+import { Image } from "~/features/image";
 
 function formatMoney(amount: number | string, currencyCode: string) {
   const parsedAmount =

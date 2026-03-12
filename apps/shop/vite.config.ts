@@ -13,13 +13,24 @@ export default defineConfig(async ({ mode }) => {
 
   const { imageWidths } = await import("./src/features/image/sizes");
   const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
-  const uploadthingDomain = new URL(env.VITE_UT_URL).hostname;
   const imageConfig = {
-    domains: [uploadthingDomain],
     sizes: [...imageWidths],
+    domains: [],
     minimumCacheTTL: 60,
     formats: imageFormats,
     localPatterns: [{ pathname: "^/.*$", search: "" }],
+    remotePatterns: [
+      {
+        protocol: "https" as const,
+        hostname: new URL(env.VITE_UT_URL).hostname,
+        pathname: "/f/**",
+      },
+      {
+        protocol: "https" as const,
+        hostname: "cdn.shopify.com",
+        pathname: "/s/files/1/0733/1030/6460/**",
+      },
+    ],
   };
 
   return {

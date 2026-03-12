@@ -1,7 +1,6 @@
-import { Image } from "@unpic/react";
-
 import { Link } from "~/components/link";
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { Image } from "~/features/image";
 
 export function CollectionHeroImage({ className }: { className?: string }) {
   const imageURL = useCollectionPageStore(

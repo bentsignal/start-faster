@@ -29,7 +29,6 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
-    "@unpic/react": "^0.1.14",
     "great-time": "^1.0.0",
     "jose": "^6.1.3",
     "lucide-react": "catalog:",

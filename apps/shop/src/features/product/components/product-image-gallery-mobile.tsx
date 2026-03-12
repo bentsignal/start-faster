@@ -1,5 +1,3 @@
-import { Image } from "@unpic/react";
-
 import {
   Carousel,
   CarouselContent,
@@ -8,6 +6,7 @@ import {
 } from "@acme/ui/carousel";
 
 import type { ProductGalleryImage } from "../types";
+import { Image } from "~/features/image";
 import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductImageGalleryMobile() {

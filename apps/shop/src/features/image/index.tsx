@@ -1,6 +1,6 @@
 import type { ImgHTMLAttributes } from "react";
 
-import { useVercelOptimizedImageProps } from "./utils";
+import { useVercelOptimizedImageProps } from "./use-vercel-image";
 
 interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   src: string;

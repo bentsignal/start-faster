@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Image } from "@unpic/react";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
 
 import { Link } from "~/components/link";
+import { Image } from "~/features/image";
 import { formatPrice } from "~/features/product/lib/price";
 import {
   PREDICTIVE_SEARCH_PAGE_SIZE,

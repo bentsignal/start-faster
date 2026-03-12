@@ -1,11 +1,10 @@
-import { Image } from "@unpic/react";
-
 import type { ProductResultNode } from "~/features/product/types";
 // import { Loader, ShoppingBag } from "lucide-react";
 
 // import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
+import { Image } from "~/features/image";
 import {
   ProductResultStore,
   useProductResultStore,

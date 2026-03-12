@@ -1,9 +1,9 @@
-import { Image } from "@unpic/react";
 import { Minus, Plus } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 
 import type { CartLine } from "~/features/cart/types";
+import { Image } from "~/features/image";
 import { formatPrice } from "~/features/product/lib/price";
 import { useCartStore } from "../store";
 

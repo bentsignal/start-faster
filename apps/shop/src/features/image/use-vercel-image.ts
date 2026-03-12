@@ -24,8 +24,9 @@ export const useVercelOptimizedImageProps = (
     }
 
     if (sizes) {
+      const maxResponsiveWidth = Math.min(width * 2, largestImageWidth);
       const responsiveWidths = imageWidths.filter((candidateWidth) => {
-        return candidateWidth <= width;
+        return candidateWidth <= maxResponsiveWidth;
       });
       const widths: [ImgWidth, ...ImgWidth[]] =
         responsiveWidths.length > 0
