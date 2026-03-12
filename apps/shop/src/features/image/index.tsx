@@ -9,7 +9,7 @@ interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   alt: string;
 }
 
-export function Image({
+export function VImage({
   src,
   width,
   height,

@@ -2,7 +2,7 @@ import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
 import { env } from "~/env";
-import { Image } from "~/features/image";
+import { VImage } from "~/features/image";
 
 export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;
 
@@ -10,7 +10,7 @@ export function Hero() {
   return (
     <section className="grid w-full grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)]">
       <div className="w-full">
-        <Image
+        <VImage
           src={heroImageUrl}
           alt="Lifestyle photos from the launch collection"
           width={1440}
