@@ -5,7 +5,7 @@ import { cn } from "@acme/ui/utils";
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
 import { Link } from "~/components/link";
-import { VImage } from "~/features/image";
+import { Image } from "~/features/image";
 import { PredictiveSearchDropdown } from "~/features/search/components/predictive-search-dropdown";
 import { SearchClearButton } from "~/features/search/components/search-bar/clear-button";
 import { SearchBarContainer } from "~/features/search/components/search-bar/container";
@@ -36,7 +36,7 @@ export function Header() {
     >
       <div className="sm:border-border flex items-center justify-between px-4 py-4 sm:border-b sm:px-8 xl:px-24">
         <Link to="/" className="w-48">
-          <VImage
+          <Image
             src="/logo.webp"
             alt="Start Faster Logo"
             width={40}

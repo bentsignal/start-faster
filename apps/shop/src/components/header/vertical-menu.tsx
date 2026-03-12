@@ -18,7 +18,7 @@ import {
 } from "@acme/ui/sheet";
 
 import { navItems, secondaryNavLinks } from "~/components/header/nav-data";
-import { VImage } from "~/features/image";
+import { Image } from "~/features/image";
 
 export function VerticalMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +44,7 @@ export function VerticalMenu() {
         </SheetHeader>
         <div className="flex items-center justify-between p-4">
           <div>
-            <VImage
+            <Image
               src="/logo.webp"
               alt="Start Faster Logo"
               width={32}
