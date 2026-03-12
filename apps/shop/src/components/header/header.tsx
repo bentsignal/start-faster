@@ -1,11 +1,11 @@
 import { useSearch } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 
 import { cn } from "@acme/ui/utils";
 
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
 import { Link } from "~/components/link";
+import { Image } from "~/features/image";
 import { PredictiveSearchDropdown } from "~/features/search/components/predictive-search-dropdown";
 import { SearchClearButton } from "~/features/search/components/search-bar/clear-button";
 import { SearchBarContainer } from "~/features/search/components/search-bar/container";
@@ -39,8 +39,8 @@ export function Header() {
           <Image
             src="/logo.webp"
             alt="Start Faster Logo"
-            width={36}
-            height={36}
+            width={40}
+            height={40}
           />
         </Link>
         <SearchBarStore initialSearchTerm={searchParam}>

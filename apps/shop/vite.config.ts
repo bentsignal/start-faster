@@ -11,6 +11,16 @@ export default defineConfig(async ({ mode }) => {
   const isDevelopment =
     mode === "development" || env.VITE_NODE_ENV === "development";
 
+  const { imageWidths } = await import("./src/features/image/sizes");
+  const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
+  const imageConfig = {
+    domains: [env.VITE_UT_URL],
+    sizes: [...imageWidths],
+    minimumCacheTTL: 60,
+    formats: imageFormats,
+    localPatterns: [{ pathname: "^/.*$", search: "" }],
+  };
+
   return {
     server: {
       port: 3000,
@@ -33,7 +43,14 @@ export default defineConfig(async ({ mode }) => {
           plugins: ["babel-plugin-react-compiler"],
         },
       }),
-      nitro(),
+      nitro({
+        vercel: {
+          config: {
+            version: 3,
+            images: imageConfig,
+          },
+        },
+      }),
     ],
   };
 });

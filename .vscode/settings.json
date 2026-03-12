@@ -40,6 +40,7 @@
     "**/dist": true,
     "**/build": true,
     "**/.env": true,
+    ".env": true,
     "**/*.schema.json": true,
     "pnpm-lock.yaml": true,
     "**/_generated/*.types.d.ts": true

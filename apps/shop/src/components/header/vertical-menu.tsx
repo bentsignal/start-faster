@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Image } from "@unpic/react";
 import { Menu, X } from "lucide-react";
 
 import {
@@ -19,6 +18,7 @@ import {
 } from "@acme/ui/sheet";
 
 import { navItems, secondaryNavLinks } from "~/components/header/nav-data";
+import { Image } from "~/features/image";
 
 export function VerticalMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,9 +47,8 @@ export function VerticalMenu() {
             <Image
               src="/logo.webp"
               alt="Start Faster Logo"
-              width={200}
-              height={200}
-              className="h-6 xl:h-12"
+              width={32}
+              height={32}
             />
           </div>
           <button

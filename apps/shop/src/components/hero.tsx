@@ -3,9 +3,9 @@ import { Image } from "@unpic/react";
 import { Button } from "@acme/ui/button";
 
 import { Link } from "~/components/link";
+import { env } from "~/env";
 
-export const heroImageUrl =
-  "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30";
+export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;
 
 export function Hero() {
   return (

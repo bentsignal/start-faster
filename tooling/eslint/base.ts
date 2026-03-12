@@ -23,6 +23,15 @@ export const restrictEnvAccess = defineConfig(
             "Use `import { env } from '~/env'` instead to ensure validated types.",
         },
       ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "MemberExpression[object.type='MetaProperty'][object.meta.name='import'][object.property.name='meta'][property.name='env']",
+          message:
+            "Use `import { env } from '~/env'` instead to ensure validated types.",
+        },
+      ],
       "no-restricted-imports": [
         "error",
         {

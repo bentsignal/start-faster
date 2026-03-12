@@ -40,11 +40,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         rel: "dns-prefetch",
-        href: "https://lcjw4hjenc.ufs.sh",
+        href: env.VITE_UT_URL,
       },
       {
         rel: "preconnect",
-        href: "https://lcjw4hjenc.ufs.sh",
+        href: env.VITE_UT_URL,
         crossOrigin: "anonymous",
       },
     ],
