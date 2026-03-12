@@ -28,7 +28,7 @@ export const navItems = [
     icon: Sparkles,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "New arrivals featured promotion",
     },
     items: [
@@ -81,7 +81,7 @@ export const navItems = [
     icon: Shirt,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "Women's collection promotion",
     },
     items: [
@@ -138,7 +138,7 @@ export const navItems = [
     icon: Footprints,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "Shoes and footwear promotion",
     },
     items: [
@@ -169,7 +169,7 @@ export const navItems = [
     icon: ShoppingBag,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "Accessories promotion",
     },
     items: [
@@ -196,7 +196,7 @@ export const navItems = [
     icon: Gift,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "Gifts promotion",
     },
     items: [
@@ -231,7 +231,7 @@ export const navItems = [
     icon: Tag,
     ad: {
       image:
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+        "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5",
       alt: "Sale promotion",
     },
     items: [

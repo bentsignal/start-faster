@@ -13,7 +13,7 @@ import { cn } from "@acme/ui/utils";
 import { navItems } from "~/components/header/nav-data";
 
 const fallbackPromoImage =
-  "https://assets.gardeners.com/m/7ef302a1548259ad/High_Res_JPG-cat_hero_24A19a_BirdiesSale.jpg";
+  "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5";
 
 const prefetchedPromoImages = new Set<string>();
 
