@@ -38,7 +38,6 @@
     "@graphql-codegen/cli": "^5.0.7",
     "@shopify/api-codegen-preset": "1.2.2",
     "@types/node": "catalog:",
-    "@types/react": "catalog:react19",
     "concurrently": "^9.2.1",
     "eslint": "catalog:",
     "graphql-config": "^5.1.5",
