@@ -2,6 +2,7 @@ import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import viteReact from "@vitejs/plugin-react";
+import { convert } from "great-time";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -13,22 +14,26 @@ export default defineConfig(async ({ mode }) => {
 
   const { imageWidths } = await import("./src/features/image/sizes");
   const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
+  const imageQualities = [75] as const;
   const imageConfig = {
     sizes: [...imageWidths],
+    qualities: [...imageQualities],
     domains: [],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: convert(24, "hours", "to seconds"),
     formats: imageFormats,
-    localPatterns: [{ pathname: "^/.*$", search: "" }],
+    localPatterns: [{ pathname: "/**", search: "" }],
     remotePatterns: [
       {
         protocol: "https" as const,
         hostname: new URL(env.VITE_UT_URL).hostname,
         pathname: "/f/**",
+        search: "",
       },
       {
         protocol: "https" as const,
         hostname: "cdn.shopify.com",
         pathname: `/s/files/1/${env.VITE_SHOPIFY_IMAGE_URL_STORE_ID}/**`,
+        search: "",
       },
     ],
   };
