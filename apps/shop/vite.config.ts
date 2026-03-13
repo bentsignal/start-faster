@@ -21,7 +21,7 @@ export default defineConfig(async ({ mode }) => {
     domains: [],
     minimumCacheTTL: convert(24, "hours", "to seconds"),
     formats: imageFormats,
-    localPatterns: [{ pathname: "/**", search: "" }],
+    localPatterns: [{ pathname: "^/.*$", search: "" }],
     remotePatterns: [
       {
         protocol: "https" as const,
