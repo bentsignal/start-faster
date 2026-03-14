@@ -1,5 +1,3 @@
-import { getRequestUrl } from "@tanstack/react-start/server";
-
 const SITE_NAME = "Start Faster";
 const DEFAULT_DESCRIPTION = "The fastest shopping experience you've ever seen.";
 const MAX_DESCRIPTION_LENGTH = 160;
@@ -29,11 +27,7 @@ function getRuntimeOrigin() {
     return window.location.origin;
   }
 
-  try {
-    return getRequestUrl().origin;
-  } catch {
-    return undefined;
-  }
+  return undefined;
 }
 
 export function absoluteUrlFromPath(path: string) {
