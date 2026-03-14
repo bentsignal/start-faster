@@ -14,6 +14,7 @@ import { SearchBarContainer } from "~/features/search/components/search-bar/cont
 import { SearchIcon } from "~/features/search/components/search-bar/icon";
 import { SearchInput } from "~/features/search/components/search-bar/input";
 import { SearchBarStore } from "~/features/search/stores/search-bar-store";
+import { useIsHydrated } from "~/hooks/use-is-hydrated";
 
 export const stickyHeaderTokens = {
   headerHeight: "lg:h-18 xl:h-28",
@@ -23,16 +24,20 @@ export const stickyHeaderTokens = {
 };
 
 export function Header() {
+  const isHydrated = useIsHydrated();
   const screen = useScreenStore((store) => store.screen);
   const searchParam = useSearch({
     from: "/search",
     shouldThrow: false,
     select: (search) => search.q,
   });
-  const showDesktopSearch =
-    screen.size === undefined ? true : screen.isBiggerThan(ScreenSize.SM);
-  const showMobileSearch =
-    screen.size === undefined ? true : !screen.isBiggerThan(ScreenSize.SM);
+  const shouldRenderSingleSearchBar = isHydrated && screen.size !== undefined;
+  const showDesktopSearch = shouldRenderSingleSearchBar
+    ? screen.isBiggerThan(ScreenSize.SM)
+    : true;
+  const showMobileSearch = shouldRenderSingleSearchBar
+    ? !screen.isBiggerThan(ScreenSize.SM)
+    : true;
 
   return (
     <header

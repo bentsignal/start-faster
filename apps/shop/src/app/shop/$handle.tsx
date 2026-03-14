@@ -11,6 +11,7 @@ import { productQueries } from "~/features/product/lib/product-queries";
 import { ProductPageStore } from "~/features/product/stores/product-page-store";
 import { ScreenSize } from "~/features/screen/sizes";
 import { useScreenStore } from "~/features/screen/store";
+import { useIsHydrated } from "~/hooks/use-is-hydrated";
 import {
   buildSeoHead,
   defaultSeoDescription,
@@ -94,16 +95,20 @@ export const Route = createFileRoute("/shop/$handle")({
 });
 
 function ProductPage() {
+  const isHydrated = useIsHydrated();
   const screen = useScreenStore((store) => store.screen);
   const { handle } = Route.useParams();
   const variant = Route.useSearch({ select: (search) => search.variant });
   const { data: product } = useSuspenseQuery(
     productQueries.productByHandle(handle),
   );
-  const showDesktopGallery =
-    screen.size === undefined ? true : screen.isBiggerThan(ScreenSize.LG);
-  const showMobileGallery =
-    screen.size === undefined ? true : !screen.isBiggerThan(ScreenSize.LG);
+  const shouldRenderSingleGallery = isHydrated && screen.size !== undefined;
+  const showDesktopGallery = shouldRenderSingleGallery
+    ? screen.isBiggerThan(ScreenSize.LG)
+    : true;
+  const showMobileGallery = shouldRenderSingleGallery
+    ? !screen.isBiggerThan(ScreenSize.LG)
+    : true;
 
   return (
     <ProductPageStore variant={variant} product={product}>
