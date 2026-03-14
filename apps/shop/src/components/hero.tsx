@@ -13,8 +13,8 @@ export function Hero() {
         <Image
           src={heroImageUrl}
           alt="Lifestyle photos from the launch collection"
-          width={1200}
-          height={600}
+          width={1440}
+          height={720}
           sizes="(min-width: 1280px) 60vw, 100vw"
           fetchPriority="high"
           loading="eager"
