@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
 import { heroImageUrl } from "~/components/hero";
+import { env } from "~/env";
 import { CollectionFilters } from "~/features/collections/components/collection-filters";
 import { CollectionHeroImage } from "~/features/collections/components/collection-hero-image";
 import { CollectionPagination } from "~/features/collections/components/collection-pagination";
@@ -14,7 +15,6 @@ import {
 } from "~/features/collections/lib/collection-queries";
 import { CollectionPageStore } from "~/features/collections/stores/collection-page-store";
 import {
-  absoluteUrlFromPath,
   buildSeoHead,
   defaultSeoDescription,
   toSeoDescription,
@@ -69,7 +69,7 @@ export const Route = createFileRoute("/collections/$handle")({
       return buildSeoHead({
         title: "Collections",
         description: defaultSeoDescription,
-        canonicalUrl: absoluteUrlFromPath("/collections"),
+        canonicalUrl: `${env.VITE_SITE_URL}/collections`,
         imageUrl: heroImageUrl,
       });
     }
@@ -80,7 +80,7 @@ export const Route = createFileRoute("/collections/$handle")({
         loaderData.description,
         `Shop the ${loaderData.title} collection at Start Faster.`,
       ),
-      canonicalUrl: absoluteUrlFromPath(loaderData.canonicalPath),
+      canonicalUrl: `${env.VITE_SITE_URL}${loaderData.canonicalPath}`,
       imageUrl: loaderData.imageUrl,
       imageAlt: loaderData.imageAlt,
     });

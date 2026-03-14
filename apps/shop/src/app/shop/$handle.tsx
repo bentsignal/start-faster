@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
 import { heroImageUrl } from "~/components/hero";
+import { env } from "~/env";
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
@@ -11,7 +12,6 @@ import { ProductPageStore } from "~/features/product/stores/product-page-store";
 import { ScreenSize } from "~/features/screen/sizes";
 import { useScreenStore } from "~/features/screen/store";
 import {
-  absoluteUrlFromPath,
   buildSeoHead,
   defaultSeoDescription,
   jsonLdScript,
@@ -55,11 +55,11 @@ export const Route = createFileRoute("/shop/$handle")({
         title: "Product",
         description: defaultSeoDescription,
         imageUrl: heroImageUrl,
-        canonicalUrl: absoluteUrlFromPath("/shop"),
+        canonicalUrl: `${env.VITE_SITE_URL}/shop`,
       });
     }
 
-    const canonicalUrl = absoluteUrlFromPath(loaderData.canonicalPath);
+    const canonicalUrl = `${env.VITE_SITE_URL}${loaderData.canonicalPath}`;
     const description = toSeoDescription(
       loaderData.description,
       `Shop ${loaderData.title} at Start Faster.`,

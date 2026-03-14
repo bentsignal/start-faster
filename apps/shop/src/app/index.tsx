@@ -4,13 +4,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storefront/generated";
 
 import { Hero, heroImageUrl } from "~/components/hero";
+import { env } from "~/env";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
 import { productQueries } from "~/features/product/lib/product-queries";
-import {
-  absoluteUrlFromPath,
-  buildSeoHead,
-  defaultSeoDescription,
-} from "~/lib/seo";
+import { buildSeoHead, defaultSeoDescription } from "~/lib/seo";
 
 const args = {
   handle: "frontpage",
@@ -28,7 +25,7 @@ export const Route = createFileRoute("/")({
     buildSeoHead({
       title: "Start Faster",
       description: defaultSeoDescription,
-      canonicalUrl: absoluteUrlFromPath("/"),
+      canonicalUrl: `${env.VITE_SITE_URL}/`,
       imageUrl: heroImageUrl,
       imageAlt: "Lifestyle photos from the launch collection",
     }),

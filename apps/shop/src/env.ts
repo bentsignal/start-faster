@@ -25,6 +25,7 @@ export const env = createEnv({
   },
   client: {
     VITE_NODE_ENV: z.enum(["development", "production"]).default("production"),
+    VITE_SITE_URL: z.url(),
     VITE_DEV_ALLOWED_HOST: z.string().optional(),
     VITE_SHOPIFY_STORE_DOMAIN: z.string().min(1),
     VITE_SHOPIFY_PUBLIC_TOKEN: z.string().min(1),

@@ -14,33 +14,6 @@ interface SeoScriptTag {
   children?: string;
 }
 
-function ensureLeadingSlash(path: string) {
-  if (path.length === 0) {
-    return "/";
-  }
-
-  return path.startsWith("/") ? path : `/${path}`;
-}
-
-function getRuntimeOrigin() {
-  if (typeof window !== "undefined") {
-    return window.location.origin;
-  }
-
-  return undefined;
-}
-
-export function absoluteUrlFromPath(path: string) {
-  const origin = getRuntimeOrigin();
-  const normalizedPath = ensureLeadingSlash(path);
-
-  if (origin === undefined) {
-    return normalizedPath;
-  }
-
-  return new URL(normalizedPath, origin).toString();
-}
-
 export function toSeoDescription(
   description: string | null | undefined,
   fallback: string,
