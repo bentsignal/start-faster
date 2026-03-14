@@ -165,7 +165,7 @@ function GalleryImage({
           alt={image.altText ?? `${productTitle} image ${imageIndex + 1}`}
           width={image.width ?? 1600}
           height={image.height ?? 1600}
-          sizes="(min-width: 1280px) 768px, (min-width: 1024px) 640px, 100vw"
+          sizes="(min-width: 1280px) 920px, (min-width: 1024px) 760px, 100vw"
           loading={imageIndex <= 1 ? "eager" : "lazy"}
           fetchPriority={imageIndex <= 1 ? "high" : "auto"}
           className="h-full w-full object-cover"
