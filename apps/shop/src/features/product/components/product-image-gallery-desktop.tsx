@@ -126,8 +126,8 @@ function GalleryThumbnail({
           width={thumbnailWidth}
           height={thumbnailHeight}
           sizes="80px"
-          loading={imageIndex <= 10 ? "eager" : "lazy"}
-          fetchPriority={imageIndex <= 10 ? "high" : "auto"}
+          loading="lazy"
+          fetchPriority="auto"
           className={cn(
             "h-full w-full object-cover transition-opacity duration-150",
             isActive
@@ -166,8 +166,8 @@ function GalleryImage({
           width={image.width ?? 1600}
           height={image.height ?? 1600}
           sizes="(min-width: 1280px) 920px, (min-width: 1024px) 760px, 100vw"
-          loading={imageIndex <= 1 ? "eager" : "lazy"}
-          fetchPriority={imageIndex <= 1 ? "high" : "auto"}
+          loading={imageIndex === 0 ? "eager" : "lazy"}
+          fetchPriority={imageIndex === 0 ? "high" : "auto"}
           className="h-full w-full object-cover"
         />
       </div>

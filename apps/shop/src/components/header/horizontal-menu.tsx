@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,8 +12,6 @@ import { Image } from "~/features/image";
 
 const fallbackPromoImage =
   "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5";
-
-const prefetchedPromoImages = new Set<string>();
 
 function HorizontalMenuItem({
   label,
@@ -36,31 +32,6 @@ function HorizontalMenuItem({
 }
 
 export function HorizontalMenu() {
-  useEffect(() => {
-    const preloadImage = (src: string) => {
-      if (prefetchedPromoImages.has(src)) {
-        return;
-      }
-
-      const image = new window.Image();
-      image.decoding = "async";
-      image.src = src;
-      prefetchedPromoImages.add(src);
-    };
-
-    const imageSources = new Set(
-      navItems.map((item) => item.ad?.image ?? fallbackPromoImage),
-    );
-
-    const timeoutId = window.setTimeout(() => {
-      imageSources.forEach(preloadImage);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
-
   return (
     <div className="border-border bg-background hidden border-b xl:block">
       <div className="container flex items-center justify-center px-6">
@@ -87,8 +58,8 @@ export function HorizontalMenu() {
                         width={960}
                         height={720}
                         sizes="(min-width: 1280px) 432px, 35vw"
-                        loading="eager"
-                        fetchPriority="high"
+                        loading="lazy"
+                        fetchPriority="auto"
                         className="h-auto w-full rounded-md object-cover"
                       />
                     </div>
