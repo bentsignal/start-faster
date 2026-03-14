@@ -54,6 +54,7 @@ export function Header() {
             alt="Start Faster Logo"
             width={40}
             height={40}
+            loading="eager"
           />
         </Link>
         {showDesktopSearch ? (

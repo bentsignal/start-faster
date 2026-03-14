@@ -22,11 +22,13 @@ export function SearchProductResultsView() {
           isFiltering ? "pointer-events-none opacity-50" : "opacity-100"
         }`}
       >
-        {products.map((product) => (
+        {products.map((product, index) => (
           <SearchResultProductCard
             key={product.id}
             product={product}
             mode="list"
+            imageLoading={index <= 5 ? "eager" : "lazy"}
+            imageFetchPriority={index <= 5 ? "high" : "auto"}
           />
         ))}
       </div>
@@ -35,11 +37,13 @@ export function SearchProductResultsView() {
           isFiltering ? "pointer-events-none opacity-50" : "opacity-100"
         }`}
       >
-        {products.map((product) => (
+        {products.map((product, index) => (
           <SearchResultProductCard
             key={product.id}
             product={product}
             mode="grid"
+            imageLoading={index <= 6 ? "eager" : "lazy"}
+            imageFetchPriority={index <= 6 ? "high" : "auto"}
           />
         ))}
       </div>

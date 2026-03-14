@@ -13,24 +13,46 @@ import {
 export function SearchResultProductCard({
   product,
   mode,
+  imageLoading = "lazy",
+  imageFetchPriority = "auto",
 }: {
   product: ProductResultNode;
   mode: "grid" | "list";
+  imageLoading?: "lazy" | "eager";
+  imageFetchPriority?: "high" | "auto";
 }) {
   return (
     <ProductResultStore product={product}>
-      {mode === "list" ? <ListProductCard /> : <GridProductCard />}
+      {mode === "list" ? (
+        <ListProductCard
+          imageLoading={imageLoading}
+          imageFetchPriority={imageFetchPriority}
+        />
+      ) : (
+        <GridProductCard
+          imageLoading={imageLoading}
+          imageFetchPriority={imageFetchPriority}
+        />
+      )}
     </ProductResultStore>
   );
 }
 
-function ListProductCard() {
+function ListProductCard({
+  imageLoading,
+  imageFetchPriority,
+}: {
+  imageLoading: "lazy" | "eager";
+  imageFetchPriority: "high" | "auto";
+}) {
   return (
     <article className="group flex gap-3 p-3">
       <div className="shrink-0 overflow-hidden rounded-xl">
         <SearchResultProductCardImage
           width={132}
           height={132}
+          loading={imageLoading}
+          fetchPriority={imageFetchPriority}
           className="bg-muted aspect-square size-[132px] object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
       </div>
@@ -48,13 +70,21 @@ function ListProductCard() {
   );
 }
 
-function GridProductCard() {
+function GridProductCard({
+  imageLoading,
+  imageFetchPriority,
+}: {
+  imageLoading: "lazy" | "eager";
+  imageFetchPriority: "high" | "auto";
+}) {
   return (
     <article className="group">
       <div className="relative overflow-hidden rounded-xl">
         <SearchResultProductCardImage
           width={400}
           height={500}
+          loading={imageLoading}
+          fetchPriority={imageFetchPriority}
           className="bg-muted aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         {/* <SearchResultProductCardQuickAddButton /> */}
@@ -72,10 +102,14 @@ function GridProductCard() {
 function SearchResultProductCardImage({
   width,
   height,
+  loading,
+  fetchPriority,
   className,
 }: {
   width: number;
   height: number;
+  loading: "lazy" | "eager";
+  fetchPriority: "high" | "auto";
   className: string;
 }) {
   const handle = useProductResultStore((store) => store.product.handle);
@@ -92,6 +126,8 @@ function SearchResultProductCardImage({
           alt={featuredImage.altText ?? title}
           width={width}
           height={height}
+          loading={loading}
+          fetchPriority={fetchPriority}
           className={className}
         />
       ) : (
