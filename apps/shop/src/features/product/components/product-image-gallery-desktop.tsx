@@ -126,8 +126,8 @@ function GalleryThumbnail({
           width={thumbnailWidth}
           height={thumbnailHeight}
           sizes="80px"
-          loading="eager"
-          fetchPriority="high"
+          loading={imageIndex <= 10 ? "eager" : "lazy"}
+          fetchPriority={imageIndex <= 10 ? "high" : "auto"}
           className={cn(
             "h-full w-full object-cover transition-opacity duration-150",
             isActive
