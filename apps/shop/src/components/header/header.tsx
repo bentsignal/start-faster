@@ -6,6 +6,8 @@ import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
 import { Link } from "~/components/link";
 import { Image } from "~/features/image";
+import { ScreenSize } from "~/features/screen/sizes";
+import { useScreenStore } from "~/features/screen/store";
 import { PredictiveSearchDropdown } from "~/features/search/components/predictive-search-dropdown";
 import { SearchClearButton } from "~/features/search/components/search-bar/clear-button";
 import { SearchBarContainer } from "~/features/search/components/search-bar/container";
@@ -21,11 +23,17 @@ export const stickyHeaderTokens = {
 };
 
 export function Header() {
+  const screen = useScreenStore((store) => store.screen);
   const searchParam = useSearch({
     from: "/search",
     shouldThrow: false,
     select: (search) => search.q,
   });
+  const showDesktopSearch =
+    screen.size === undefined ? true : screen.isBiggerThan(ScreenSize.SM);
+  const showMobileSearch =
+    screen.size === undefined ? true : !screen.isBiggerThan(ScreenSize.SM);
+
   return (
     <header
       data-site-header
@@ -43,26 +51,30 @@ export function Header() {
             height={40}
           />
         </Link>
-        <SearchBarStore initialSearchTerm={searchParam}>
-          <SearchBarContainer className="hidden w-96 sm:flex">
-            <SearchIcon />
-            <SearchInput />
-            <SearchClearButton />
-            <PredictiveSearchDropdown />
-          </SearchBarContainer>
-        </SearchBarStore>
+        {showDesktopSearch ? (
+          <SearchBarStore initialSearchTerm={searchParam}>
+            <SearchBarContainer className="hidden w-96 sm:flex">
+              <SearchIcon />
+              <SearchInput />
+              <SearchClearButton />
+              <PredictiveSearchDropdown />
+            </SearchBarContainer>
+          </SearchBarStore>
+        ) : null}
         <TopRightControls />
       </div>
-      <div className="px-4 pb-4 sm:hidden">
-        <SearchBarStore initialSearchTerm={searchParam}>
-          <SearchBarContainer>
-            <SearchIcon />
-            <SearchInput />
-            <SearchClearButton />
-            <PredictiveSearchDropdown />
-          </SearchBarContainer>
-        </SearchBarStore>
-      </div>
+      {showMobileSearch ? (
+        <div className="px-4 pb-4 sm:hidden">
+          <SearchBarStore initialSearchTerm={searchParam}>
+            <SearchBarContainer>
+              <SearchIcon />
+              <SearchInput />
+              <SearchClearButton />
+              <PredictiveSearchDropdown />
+            </SearchBarContainer>
+          </SearchBarStore>
+        </div>
+      ) : null}
       <HorizontalMenu />
     </header>
   );

@@ -24,6 +24,7 @@ import { getAuthState } from "~/features/auth/server/get-auth-state";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { CartStore } from "~/features/cart/store";
+import { ScreenStore } from "~/features/screen/store";
 import { DEFAULT_THEME } from "~/features/theme/default";
 import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
 import { ThemeStore } from "~/features/theme/store";
@@ -122,34 +123,36 @@ function RootComponent() {
         )}
       >
         <QueryClientProvider client={context.queryClient}>
-          <CartStore>
-            <ThemeStore
-              attribute="class"
-              defaultTheme={DEFAULT_THEME}
-              disableTransitionOnChange
-              initialTheme={context.theme}
-            >
-              <Header />
-              <CartSheet />
-              <LoginModal />
-              <Outlet />
-              <MailingList />
-              <Footer />
-              <TanStackDevtools
-                config={{
-                  position: "bottom-left",
-                  inspectHotkey: ["Control", "Shift", "I"],
-                }}
-                plugins={[
-                  {
-                    name: "react-router",
-                    render: <TanStackRouterDevtoolsPanel />,
-                  },
-                ]}
-              />
-              <Toaster />
-            </ThemeStore>
-          </CartStore>
+          <ScreenStore>
+            <CartStore>
+              <ThemeStore
+                attribute="class"
+                defaultTheme={DEFAULT_THEME}
+                disableTransitionOnChange
+                initialTheme={context.theme}
+              >
+                <Header />
+                <CartSheet />
+                <LoginModal />
+                <Outlet />
+                <MailingList />
+                <Footer />
+                <TanStackDevtools
+                  config={{
+                    position: "bottom-left",
+                    inspectHotkey: ["Control", "Shift", "I"],
+                  }}
+                  plugins={[
+                    {
+                      name: "react-router",
+                      render: <TanStackRouterDevtoolsPanel />,
+                    },
+                  ]}
+                />
+                <Toaster />
+              </ThemeStore>
+            </CartStore>
+          </ScreenStore>
           <Scripts />
         </QueryClientProvider>
       </body>

@@ -5,7 +5,8 @@ import type { CarouselApi } from "@acme/ui/carousel";
 
 import type { Product } from "~/features/product/types";
 import { isColorOptionName } from "~/features/product/lib/option-names";
-import { useIsMobile } from "~/hooks/use-is-mobile";
+import { ScreenSize } from "~/features/screen/sizes";
+import { useScreenStore } from "~/features/screen/store";
 import { useProductPurchaseActions } from "./use-product-purchase-actions";
 
 interface UseProductVariantActionsArgs {
@@ -30,7 +31,7 @@ export function useProductVariantActions({
   variantImageIndexById,
 }: UseProductVariantActionsArgs) {
   const navigate = useNavigate({ from: "/shop/$handle" });
-  const isMobile = useIsMobile();
+  const screen = useScreenStore((store) => store.screen);
   const purchaseActions = useProductPurchaseActions({
     productTitle,
     productHandle,
@@ -63,7 +64,7 @@ export function useProductVariantActions({
 
     if (isColorOption && targetImageIndex !== undefined) {
       window.requestAnimationFrame(() => {
-        if (isMobile) {
+        if (screen.isSmallerThan(ScreenSize.MD)) {
           carouselApi.current?.scrollTo(targetImageIndex, "smooth");
           return;
         }

@@ -24,7 +24,8 @@ import {
 } from "@acme/ui/drawer";
 
 import { Link } from "~/components/link";
-import { useIsMobile } from "~/hooks/use-is-mobile";
+import { ScreenSize } from "~/features/screen/sizes";
+import { useScreenStore } from "~/features/screen/store";
 
 function LoginButton() {
   const returnTo = useSearch({
@@ -101,7 +102,7 @@ function LoginModalContent() {
 }
 
 export function LoginModal() {
-  const isMobile = useIsMobile();
+  const screen = useScreenStore((store) => store.screen);
   const navigate = useNavigate();
 
   const isLoggedIn = useRouteContext({
@@ -129,7 +130,7 @@ export function LoginModal() {
 
   const showLogin = urlSaysShowLogin && isLoggedIn === false ? true : false;
 
-  if (isMobile) {
+  if (screen.isSmallerThan(ScreenSize.MD)) {
     return (
       <Drawer open={showLogin} onOpenChange={handleOpenChange}>
         <DrawerContent>
