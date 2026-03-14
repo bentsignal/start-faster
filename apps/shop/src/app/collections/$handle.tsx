@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
+import { heroImageUrl } from "~/components/hero";
 import { CollectionFilters } from "~/features/collections/components/collection-filters";
 import { CollectionHeroImage } from "~/features/collections/components/collection-hero-image";
 import { CollectionPagination } from "~/features/collections/components/collection-pagination";
@@ -12,6 +13,12 @@ import {
   collectionQueries,
 } from "~/features/collections/lib/collection-queries";
 import { CollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import {
+  absoluteUrlFromPath,
+  buildSeoHead,
+  defaultSeoDescription,
+  toSeoDescription,
+} from "~/lib/seo";
 
 export const Route = createFileRoute("/collections/$handle")({
   params: z.object({
@@ -50,21 +57,34 @@ export const Route = createFileRoute("/collections/$handle")({
     }
 
     return {
-      heroImageUrl: collection.image?.url,
+      title: collection.title,
+      description: collection.description,
+      canonicalPath: `/collections/${encodeURIComponent(params.handle)}`,
+      imageUrl: collection.image?.url ?? heroImageUrl,
+      imageAlt: collection.image?.altText ?? undefined,
     };
   },
-  head: ({ loaderData }) => ({
-    links:
-      loaderData?.heroImageUrl === undefined
-        ? []
-        : [
-            {
-              rel: "preload",
-              as: "image",
-              href: loaderData.heroImageUrl,
-            },
-          ],
-  }),
+  head: ({ loaderData }) => {
+    if (loaderData === undefined) {
+      return buildSeoHead({
+        title: "Collections",
+        description: defaultSeoDescription,
+        canonicalUrl: absoluteUrlFromPath("/collections"),
+        imageUrl: heroImageUrl,
+      });
+    }
+
+    return buildSeoHead({
+      title: loaderData.title,
+      description: toSeoDescription(
+        loaderData.description,
+        `Shop the ${loaderData.title} collection at Start Faster.`,
+      ),
+      canonicalUrl: absoluteUrlFromPath(loaderData.canonicalPath),
+      imageUrl: loaderData.imageUrl,
+      imageAlt: loaderData.imageAlt,
+    });
+  },
   component: CollectionPage,
 });
 

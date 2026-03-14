@@ -6,6 +6,11 @@ import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storef
 import { Hero, heroImageUrl } from "~/components/hero";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
 import { productQueries } from "~/features/product/lib/product-queries";
+import {
+  absoluteUrlFromPath,
+  buildSeoHead,
+  defaultSeoDescription,
+} from "~/lib/seo";
 
 const args = {
   handle: "frontpage",
@@ -19,15 +24,14 @@ export const Route = createFileRoute("/")({
     );
   },
   component: RouteComponent,
-  head: () => ({
-    links: [
-      {
-        rel: "preload",
-        as: "image",
-        href: heroImageUrl,
-      },
-    ],
-  }),
+  head: () =>
+    buildSeoHead({
+      title: "Start Faster",
+      description: defaultSeoDescription,
+      canonicalUrl: absoluteUrlFromPath("/"),
+      imageUrl: heroImageUrl,
+      imageAlt: "Lifestyle photos from the launch collection",
+    }),
 });
 
 function RouteComponent() {

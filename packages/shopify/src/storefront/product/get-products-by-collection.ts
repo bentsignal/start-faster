@@ -12,6 +12,7 @@ export const getProductsByCollection = `#graphql
       id
       title
       handle
+      description
       image {
         url
         altText
