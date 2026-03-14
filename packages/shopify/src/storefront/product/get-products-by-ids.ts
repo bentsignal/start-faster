@@ -9,6 +9,12 @@ export const getProductsByIds = `#graphql
         variants(first: 100) {
           nodes {
             id
+            image {
+              url
+              altText
+              width
+              height
+            }
           }
         }
         featuredImage {

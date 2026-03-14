@@ -6,6 +6,13 @@ import type {
 import { Link } from "~/components/link";
 import { Image } from "~/features/image";
 
+type LiveOrderProduct = Extract<
+  NonNullable<LiveOrderProducts[number]>,
+  { __typename: "Product" }
+>;
+
+type ProductImage = CustomerOrderLineItem["image"] | null;
+
 function formatMoney(amount: number | string, currencyCode: string) {
   const parsedAmount =
     typeof amount === "number" ? amount : Number.parseFloat(amount);
@@ -22,9 +29,9 @@ function formatMoney(amount: number | string, currencyCode: string) {
 function getLiveProduct(
   lineItem: CustomerOrderLineItem,
   liveProducts: LiveOrderProducts | undefined,
-) {
+): LiveOrderProduct | undefined {
   return liveProducts?.find(
-    (product) =>
+    (product): product is LiveOrderProduct =>
       product?.__typename === "Product" && product.id === lineItem.productId,
   );
 }
@@ -52,16 +59,16 @@ function OrderProductTile({
   liveProducts: LiveOrderProducts | undefined;
 }) {
   const liveProduct = getLiveProduct(lineItem, liveProducts);
-  const image =
-    liveProduct?.__typename === "Product"
-      ? (liveProduct.featuredImage ?? lineItem.image)
-      : lineItem.image;
-  const title =
-    liveProduct?.__typename === "Product" ? liveProduct.title : lineItem.title;
+  const liveVariantImage = liveProduct?.variants.nodes.find(
+    (variant) => variant.id === lineItem.variantId,
+  )?.image;
+  const image: ProductImage =
+    liveVariantImage ?? lineItem.image ?? liveProduct?.featuredImage ?? null;
+  const title = liveProduct?.title ?? lineItem.title;
   const price = getDisplayedMoney(lineItem, liveProducts);
   const shouldShowVariant =
     lineItem.variantTitle !== null && lineItem.variantTitle !== "Default Title";
-  const isLiveProduct = liveProduct?.__typename === "Product";
+  const isLiveProduct = liveProduct !== undefined;
 
   if (isLiveProduct) {
     return (
@@ -102,7 +109,7 @@ function OrderProductImage({
   image,
   title,
 }: {
-  image: CustomerOrderLineItem["image"] | null;
+  image: ProductImage;
   title: string;
 }) {
   if (image?.url) {
@@ -182,7 +189,7 @@ function OrderProductContent({
   isUnavailable,
   price,
 }: {
-  image: CustomerOrderLineItem["image"] | null;
+  image: ProductImage;
   title: string;
   lineItem: CustomerOrderLineItem;
   shouldShowVariant: boolean;
