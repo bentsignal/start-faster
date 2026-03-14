@@ -133,6 +133,7 @@ function PredictiveProductRow({
           height={48}
           loading="eager"
           className="bg-muted size-12 shrink-0 rounded-md object-cover"
+          disableReveal={true}
         />
       ) : (
         <div className="bg-muted size-12 shrink-0 rounded-md" />
