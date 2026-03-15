@@ -16,7 +16,7 @@ export const env = createEnv({
     WORKOS_API_KEY: z.string().min(1),
     WORKOS_COOKIE_PASSWORD: z.string().min(32),
     WORKOS_REDIRECT_URI: z.url(),
-    CONVEX_DEPLOY_KEY: z.string().min(1),
+    CONVEX_DEPLOY_KEY: z.string().min(1).optional(),
   },
   client: {
     VITE_NODE_ENV: z
