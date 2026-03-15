@@ -113,6 +113,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   const context = Route.useRouteContext();
 
+  console.log("test");
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
