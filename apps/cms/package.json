@@ -1,5 +1,5 @@
 {
-  "name": "@acme/shop",
+  "name": "@acme/cms",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,12 +14,12 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@acme/convex": "workspace:*",
     "@acme/shopify": "workspace:*",
     "@acme/ui": "workspace:*",
+    "@convex-dev/react-query": "^0.1.0",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
-    "@shopify/hydrogen": "catalog:",
-    "@shopify/storefront-api-client": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "@tanstack/devtools-vite": "catalog:",
     "@tanstack/react-devtools": "catalog:",
@@ -29,6 +29,8 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@workos/authkit-tanstack-react-start": "0.5.0",
+    "convex": "catalog:",
     "great-time": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
