@@ -5,6 +5,7 @@ export default defineSchema(
   {
     products: defineTable({
       name: v.string(),
+      description: v.string(),
     }),
   },
   { schemaValidation: true },
