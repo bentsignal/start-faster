@@ -1,13 +1,14 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod/v4";
 
-const runtimeEnv = import.meta.env.SSR
-  ? ((
-      globalThis as unknown as {
-        process?: { env?: Record<string, string | undefined> };
-      }
-    ).process?.env ?? {})
-  : import.meta.env;
+const runtimeEnv =
+  typeof window === "undefined"
+    ? ((
+        globalThis as {
+          process?: { env?: Record<string, string | undefined> };
+        }
+      ).process?.env ?? import.meta.env)
+    : import.meta.env;
 
 export const env = createEnv({
   clientPrefix: "VITE_",

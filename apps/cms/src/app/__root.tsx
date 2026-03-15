@@ -23,9 +23,7 @@ import { getTheme } from "~/features/theme/utils";
 
 const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
   const themeCookie = getCookie("theme");
-  return {
-    theme: getTheme(themeCookie),
-  };
+  return getTheme(themeCookie);
 });
 
 const fetchWorkosAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -68,12 +66,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   beforeLoad: async ({ context }) => {
-    const auth = await context.queryClient.fetchQuery({
-      queryKey: ["workos-auth"],
-      queryFn: async () => await fetchWorkosAuth(),
-      staleTime: convert(50, "minutes", "to ms"),
-      gcTime: Infinity,
-    });
+    const [auth, theme] = await Promise.all([
+      context.queryClient.fetchQuery({
+        queryKey: ["workos-auth"],
+        queryFn: async () => await fetchWorkosAuth(),
+        staleTime: convert(50, "minutes", "to ms"),
+        gcTime: Infinity,
+      }),
+      context.queryClient.fetchQuery({
+        queryKey: ["theme"],
+        queryFn: async () => await getThemeFromCookie(),
+        staleTime: Infinity,
+        gcTime: Infinity,
+      }),
+    ]);
     // all queries, mutations and actions through TanStack Query will be
     // authenticated during SSR if we have a valid token
     if (auth.isSignedIn) {
@@ -81,13 +87,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       // set the auth token to make HTTP queries with.
       context.convexQueryClient.serverHttpClient?.setAuth(auth.token);
     }
-
-    const { theme } = await context.queryClient.fetchQuery({
-      queryKey: ["theme"],
-      queryFn: async () => await getThemeFromCookie(),
-      staleTime: Infinity,
-      gcTime: Infinity,
-    });
 
     const { token: _, ...rest } = auth;
 
@@ -124,6 +123,7 @@ function RootComponent() {
             <TanStackDevtools
               config={{
                 position: "bottom-right",
+                inspectHotkey: ["Control", "Shift", "I"],
               }}
               plugins={[
                 {

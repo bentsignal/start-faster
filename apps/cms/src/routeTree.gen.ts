@@ -11,9 +11,7 @@
 import { Route as rootRouteImport } from './app/__root'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
-import { Route as ShopRouteRouteImport } from './app/shop/route'
 import { Route as IndexRouteImport } from './app/index'
-import { Route as ShopItemRouteImport } from './app/shop/$item'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/_authenticated/settings/route'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings/account'
 
@@ -26,20 +24,10 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopRouteRoute = ShopRouteRouteImport.update({
-  id: '/shop',
-  path: '/shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ShopItemRoute = ShopItemRouteImport.update({
-  id: '/$item',
-  path: '/$item',
-  getParentRoute: () => ShopRouteRoute,
 } as any)
 const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
@@ -56,61 +44,40 @@ const AuthenticatedSettingsAccountRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/callback': typeof CallbackRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/shop/$item': typeof ShopItemRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/shop': typeof ShopRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/shop/$item': typeof ShopItemRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/shop'
-    | '/callback'
-    | '/settings'
-    | '/shop/$item'
-    | '/settings/account'
+  fullPaths: '/' | '/callback' | '/settings' | '/settings/account'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/shop'
-    | '/callback'
-    | '/settings'
-    | '/shop/$item'
-    | '/settings/account'
+  to: '/' | '/callback' | '/settings' | '/settings/account'
   id:
     | '__root__'
     | '/'
-    | '/shop'
     | '/_authenticated'
     | '/callback'
     | '/_authenticated/settings'
-    | '/shop/$item'
     | '/_authenticated/settings/account'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ShopRouteRoute: typeof ShopRouteRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
 }
@@ -131,26 +98,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/shop/$item': {
-      id: '/shop/$item'
-      path: '/$item'
-      fullPath: '/shop/$item'
-      preLoaderRoute: typeof ShopItemRouteImport
-      parentRoute: typeof ShopRouteRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -168,18 +121,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface ShopRouteRouteChildren {
-  ShopItemRoute: typeof ShopItemRoute
-}
-
-const ShopRouteRouteChildren: ShopRouteRouteChildren = {
-  ShopItemRoute: ShopItemRoute,
-}
-
-const ShopRouteRouteWithChildren = ShopRouteRoute._addFileChildren(
-  ShopRouteRouteChildren,
-)
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
@@ -209,7 +150,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ShopRouteRoute: ShopRouteRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
 }

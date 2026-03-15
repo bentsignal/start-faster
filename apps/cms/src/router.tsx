@@ -41,7 +41,6 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     defaultPreload: "intent",
-    defaultPreloadStaleTime: 0,
     context: {
       convex,
       queryClient,
