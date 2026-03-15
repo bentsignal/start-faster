@@ -12,12 +12,14 @@ export function Error(props: ErrorComponentProps) {
       <p className="text-muted-foreground">
         Something went wrong while loading this page.
       </p>
-      <Button asChild className="mt-1">
-        <Link to="/">
-          <House className="size-4" />
-          Back to home
-        </Link>
-      </Button>
+      <Button
+        render={() => (
+          <Link to="/">
+            <House className="size-4" />
+            Back to home
+          </Link>
+        )}
+      />
     </div>
   );
 }
