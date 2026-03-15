@@ -14,6 +14,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@acme/features": "workspace:*",
     "@acme/shopify": "workspace:*",
     "@acme/ui": "workspace:*",
     "@fontsource-variable/geist": "catalog:",

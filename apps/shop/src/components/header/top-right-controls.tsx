@@ -1,6 +1,8 @@
-import { Link as TanstackLink, useRouteContext } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 
+import { QuickLink } from "@acme/features/quick-link";
+import { ThemeToggle } from "@acme/features/theme";
 import { Button } from "@acme/ui/button";
 import {
   HoverCard,
@@ -10,9 +12,7 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
-import { Link } from "~/components/link";
 import { useCartStore } from "~/features/cart/store";
-import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
 function AccountIcon() {
   return (
@@ -34,11 +34,14 @@ export function TopRightControls() {
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">
       {isSignedIn ? (
-        <Link to="/orders" className="hover:text-primary transition-colors">
+        <QuickLink
+          to="/orders"
+          className="hover:text-primary transition-colors"
+        >
           <AccountIcon />
-        </Link>
+        </QuickLink>
       ) : (
-        <TanstackLink
+        <Link
           to="."
           search={(previousSearch) => ({
             ...previousSearch,
@@ -49,7 +52,7 @@ export function TopRightControls() {
           resetScroll={false}
         >
           <AccountIcon />
-        </TanstackLink>
+        </Link>
       )}
       <button
         type="button"

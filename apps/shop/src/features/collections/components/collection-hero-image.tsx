@@ -1,6 +1,7 @@
-import { Link } from "~/components/link";
+import { QuickLink } from "@acme/features/quick-link";
+import { Image } from "@acme/ui/image";
+
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
-import { Image } from "~/features/image";
 
 export function CollectionHeroImage({ className }: { className?: string }) {
   const imageURL = useCollectionPageStore(
@@ -15,9 +16,13 @@ export function CollectionHeroImage({ className }: { className?: string }) {
   return (
     <div className={className}>
       {handle ? (
-        <Link to="/collections/$handle" params={{ handle }} className="block">
+        <QuickLink
+          to="/collections/$handle"
+          params={{ handle }}
+          className="block"
+        >
           <CollectionHeroImageContent url={imageURL} />
-        </Link>
+        </QuickLink>
       ) : (
         <CollectionHeroImageContent url={imageURL} />
       )}

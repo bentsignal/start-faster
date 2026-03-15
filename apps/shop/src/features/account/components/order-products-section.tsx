@@ -1,10 +1,11 @@
+import { QuickLink } from "@acme/features/quick-link";
+import { Image } from "@acme/ui/image";
+
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type {
   CustomerOrderLineItem,
   LiveOrderProducts,
 } from "~/features/account/types";
-import { Link } from "~/components/link";
-import { Image } from "~/features/image";
 
 type LiveOrderProduct = Extract<
   NonNullable<LiveOrderProducts[number]>,
@@ -72,7 +73,7 @@ function OrderProductTile({
 
   if (isLiveProduct) {
     return (
-      <Link
+      <QuickLink
         to="/shop/$handle"
         params={{ handle: liveProduct.handle }}
         className="group flex items-center gap-4"
@@ -86,7 +87,7 @@ function OrderProductTile({
           isUnavailable={false}
           price={price}
         />
-      </Link>
+      </QuickLink>
     );
   }
 

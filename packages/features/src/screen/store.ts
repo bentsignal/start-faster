@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { createStore } from "rostra";
 
-import type { ScreenSizeValue } from "~/features/screen/sizes";
-import { SCREEN_ORDER } from "~/features/screen/sizes";
-import { getScreenSizeFromWidth } from "~/features/screen/utils";
+import type { ScreenSizeValue } from "./sizes";
+import { SCREEN_ORDER } from "./sizes";
+import { getScreenSizeFromWidth } from "./utils";
 
 function useInternalStore() {
   const [size, setSize] = useState<ScreenSizeValue | undefined>(undefined);

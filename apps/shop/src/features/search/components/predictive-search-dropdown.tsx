@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
+import { QuickLink } from "@acme/features/quick-link";
+import { Image } from "@acme/ui/image";
 
-import { Link } from "~/components/link";
-import { Image } from "~/features/image";
 import { formatPrice } from "~/features/product/lib/price";
 import {
   PREDICTIVE_SEARCH_PAGE_SIZE,
@@ -89,7 +89,7 @@ function PredictiveProductRow({
   }
 
   return (
-    <Link
+    <QuickLink
       to="/shop/$handle"
       params={{ handle: product.handle }}
       className="hover:bg-muted flex items-center gap-3 rounded-lg px-2 py-2"
@@ -112,7 +112,7 @@ function PredictiveProductRow({
         <p className="line-clamp-1 text-sm">{product.title}</p>
         <p className="text-muted-foreground text-xs">{price}</p>
       </div>
-    </Link>
+    </QuickLink>
   );
 }
 
@@ -126,7 +126,7 @@ function ViewAllResultsLink() {
 
   return (
     <div className="border-t pt-2">
-      <Link
+      <QuickLink
         to="/search"
         search={{
           q: activeQuery,
@@ -138,7 +138,7 @@ function ViewAllResultsLink() {
         onClick={onSelect}
       >
         View all results
-      </Link>
+      </QuickLink>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
 
-import { useThemeStore } from "../store";
+import { useThemeStore } from "./store";
 
 export function ThemeToggle({ className }: { className?: string }) {
   const currentTheme = useThemeStore((s) => s.theme);

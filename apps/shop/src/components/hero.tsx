@@ -1,8 +1,8 @@
+import { QuickLink } from "@acme/features/quick-link";
 import { Button } from "@acme/ui/button";
+import { Image } from "@acme/ui/image";
 
-import { Link } from "~/components/link";
 import { env } from "~/env";
-import { Image } from "~/features/image";
 
 export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;
 
@@ -41,13 +41,13 @@ export function Hero() {
           variant="secondary"
           className="rounded-full px-8 text-sm font-medium tracking-wide uppercase"
           render={(props) => (
-            <Link
+            <QuickLink
               to="/collections/$handle"
               params={{ handle: "launch" }}
               {...props}
             >
               Shop Now
-            </Link>
+            </QuickLink>
           )}
         />
       </div>

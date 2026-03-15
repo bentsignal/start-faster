@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-router";
 import { ArrowRight, Loader, LockKeyhole } from "lucide-react";
 
+import { QuickLink } from "@acme/features/quick-link";
+import { ScreenSize, useScreenStore } from "@acme/features/screen";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
@@ -22,10 +24,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@acme/ui/drawer";
-
-import { Link } from "~/components/link";
-import { ScreenSize } from "~/features/screen/sizes";
-import { useScreenStore } from "~/features/screen/store";
 
 function LoginButton() {
   const returnTo = useSearch({
@@ -82,19 +80,19 @@ function LoginModalContent() {
       <LoginButton />
       <p className="text-muted-foreground mx-4 text-center text-xs">
         By signing in, you agree to our{" "}
-        <Link
+        <QuickLink
           className="hover:text-primary transition-colors"
           to="/terms-of-service"
         >
           terms of service
-        </Link>{" "}
+        </QuickLink>{" "}
         and{" "}
-        <Link
+        <QuickLink
           className="hover:text-primary transition-colors"
           to="/privacy-policy"
         >
           privacy policy
-        </Link>
+        </QuickLink>
         .
       </p>
     </>

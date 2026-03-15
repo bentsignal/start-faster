@@ -1,10 +1,11 @@
-import type { ProductResultNode } from "~/features/product/types";
 // import { Loader, ShoppingBag } from "lucide-react";
 
 // import { Button } from "@acme/ui/button";
 
-import { Link } from "~/components/link";
-import { Image } from "~/features/image";
+import { QuickLink } from "@acme/features/quick-link";
+import { Image } from "@acme/ui/image";
+
+import type { ProductResultNode } from "~/features/product/types";
 import {
   ProductResultStore,
   useProductResultStore,
@@ -119,7 +120,7 @@ function SearchResultProductCardImage({
   );
 
   return (
-    <Link to="/shop/$handle" params={{ handle }} className="block">
+    <QuickLink to="/shop/$handle" params={{ handle }} className="block">
       {featuredImage?.url ? (
         <Image
           src={featuredImage.url}
@@ -133,7 +134,7 @@ function SearchResultProductCardImage({
       ) : (
         <div className={className} />
       )}
-    </Link>
+    </QuickLink>
   );
 }
 
@@ -142,9 +143,9 @@ function SearchResultProductCardTitle({ className }: { className: string }) {
   const title = useProductResultStore((store) => store.product.title);
 
   return (
-    <Link to="/shop/$handle" params={{ handle }} className={className}>
+    <QuickLink to="/shop/$handle" params={{ handle }} className={className}>
       {title}
-    </Link>
+    </QuickLink>
   );
 }
 

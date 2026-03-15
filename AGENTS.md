@@ -42,6 +42,7 @@ Then summarize changes for the user.
 
 - **_IMPORTANT_**: Do not over-memoize, React Compiler is enabled. useMemo and useCallback are not usually needed.
 - Don't write enormous components or functions, keep things small and composable.
+- When creating an internal link between pages, use the `QuickLink` component from `@acme/features/quick-link`. It is a customized version of TanStack Start's link with some performance optimizations.
 
 ### Error Handling and Control Flow
 

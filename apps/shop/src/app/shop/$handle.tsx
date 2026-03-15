@@ -2,6 +2,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
+import { ScreenSize, useScreenStore } from "@acme/features/screen";
+
 import { heroImageUrl } from "~/components/hero";
 import { env } from "~/env";
 import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
@@ -9,8 +11,6 @@ import { ProductImageGalleryDesktop } from "~/features/product/components/produc
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
 import { productQueries } from "~/features/product/lib/product-queries";
 import { ProductPageStore } from "~/features/product/stores/product-page-store";
-import { ScreenSize } from "~/features/screen/sizes";
-import { useScreenStore } from "~/features/screen/store";
 import { useIsHydrated } from "~/hooks/use-is-hydrated";
 import {
   buildSeoHead,

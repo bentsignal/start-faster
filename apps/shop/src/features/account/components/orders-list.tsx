@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader, Package } from "lucide-react";
 
 import type { CartLineInput } from "@acme/shopify/storefront/types";
+import { QuickLink } from "@acme/features/quick-link";
 import { cartCreateForCheckout } from "@acme/shopify/storefront/cart";
 import { Button, buttonVariants } from "@acme/ui/button";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
@@ -9,7 +10,6 @@ import { toast } from "@acme/ui/toaster";
 
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type { LiveOrderProducts } from "~/features/account/types";
-import { Link } from "~/components/link";
 import { OrderProductsSection } from "~/features/account/components/order-products-section";
 import { shopify } from "~/lib/shopify";
 
@@ -217,9 +217,9 @@ export function OrdersList({
             When you place an order, it will show up here.
           </p>
         </div>
-        <Link to="/" className={buttonVariants()}>
+        <QuickLink to="/" className={buttonVariants()}>
           Start shopping
-        </Link>
+        </QuickLink>
       </div>
     );
   }

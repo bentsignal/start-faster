@@ -1,9 +1,7 @@
 import type { ImgWidth } from "./sizes";
-import { env } from "~/env";
 import { imageWidths, largestImageWidth } from "./sizes";
 
 const imageQuality = 75;
-const uploadThingHostname = new URL(env.VITE_UT_URL).hostname;
 
 const getVercelOptimizedUrl = (url: string, width: ImgWidth) => {
   const searchParams = new URLSearchParams();
@@ -22,14 +20,6 @@ const normalizeImageSourceUrl = (src: string) => {
     const url = new URL(src);
     url.hash = "";
 
-    if (
-      url.hostname === "cdn.shopify.com" ||
-      url.hostname === uploadThingHostname
-    ) {
-      // Canonicalize remote URLs so query noise cannot create unbounded cache keys.
-      url.search = "";
-    }
-
     return url.toString();
   } catch {
     return src.split("#")[0] ?? src;
@@ -44,7 +34,7 @@ export const useVercelOptimizedImageProps = (
 ) => {
   const normalizedSrc = normalizeImageSourceUrl(src);
 
-  if (env.VITE_NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development") {
     return { src, width, height, sizes };
   }
 

@@ -7,12 +7,12 @@ import {
 } from "@tanstack/react-router";
 import { Package, Settings, User } from "lucide-react";
 
+import { QuickLink } from "@acme/features/quick-link";
 import { buttonVariants } from "@acme/ui/button";
 import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { cn } from "@acme/ui/utils";
 
 import { stickyHeaderTokens } from "~/components/header/header";
-import { Link } from "~/components/link";
 import { SignOutButton } from "~/features/auth/components/sign-out-button";
 
 const navItems = [
@@ -84,7 +84,7 @@ function RouteComponent() {
               const isActive = pathname.startsWith(item.to);
 
               return (
-                <Link
+                <QuickLink
                   key={item.to}
                   to={item.to}
                   className={cn(
@@ -96,7 +96,7 @@ function RouteComponent() {
                 >
                   <item.icon className="size-4" />
                   {item.label}
-                </Link>
+                </QuickLink>
               );
             })}
           </nav>

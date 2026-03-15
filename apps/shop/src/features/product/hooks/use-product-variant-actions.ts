@@ -2,11 +2,10 @@ import type { RefObject } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import type { CarouselApi } from "@acme/ui/carousel";
+import { ScreenSize, useScreenStore } from "@acme/features/screen";
 
 import type { Product } from "~/features/product/types";
 import { isColorOptionName } from "~/features/product/lib/option-names";
-import { ScreenSize } from "~/features/screen/sizes";
-import { useScreenStore } from "~/features/screen/store";
 import { useProductPurchaseActions } from "./use-product-purchase-actions";
 
 interface UseProductVariantActionsArgs {

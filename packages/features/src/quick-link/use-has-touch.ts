@@ -28,7 +28,7 @@ function getServerSnapshot() {
   return undefined;
 }
 
-export function usePointerCapability() {
+export function useHasTouch() {
   const capability = React.useSyncExternalStore(
     subscribeToPointerCapability,
     getPointerSnapshot,

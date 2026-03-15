@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@acme/convex": "workspace:*",
+    "@acme/features": "workspace:*",
     "@acme/shopify": "workspace:*",
     "@acme/ui": "workspace:*",
     "@convex-dev/react-query": "^0.1.0",

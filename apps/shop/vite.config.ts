@@ -12,7 +12,7 @@ export default defineConfig(async ({ mode }) => {
   const isDevelopment =
     mode === "development" || env.VITE_NODE_ENV === "development";
 
-  const { imageWidths } = await import("./src/features/image/sizes");
+  const { imageWidths } = await import("@acme/ui/image/sizes");
   const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
   const imageQualities = [75] as const;
   const imageConfig = {

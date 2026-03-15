@@ -1,9 +1,8 @@
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { House } from "lucide-react";
 
+import { QuickLink } from "@acme/features/quick-link";
 import { Button } from "@acme/ui/button";
-
-import { Link } from "~/components/link";
 
 export function Error(props: ErrorComponentProps) {
   console.log(props);
@@ -16,10 +15,10 @@ export function Error(props: ErrorComponentProps) {
       <Button
         className="mt-1"
         render={(props) => (
-          <Link to="/" {...props}>
+          <QuickLink to="/" {...props}>
             <House className="size-4" />
             Back to home
-          </Link>
+          </QuickLink>
         )}
       />
     </div>

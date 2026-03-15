@@ -7,7 +7,7 @@ import type {
 import { forwardRef, useRef } from "react";
 import { createLink } from "@tanstack/react-router";
 
-import { usePointerCapability } from "~/hooks/use-pointer-capability";
+import { useHasTouch } from "./use-has-touch";
 
 function canQuickNavigate(
   event: MouseEvent<HTMLAnchorElement>,
@@ -86,8 +86,8 @@ QuickAnchor.displayName = "QuickAnchor";
 
 const CreatedLink = createLink(QuickAnchor);
 
-export const Link: LinkComponent<typeof QuickAnchor> = (props) => {
-  const { isTouchPrimary, isKnown } = usePointerCapability();
+export const QuickLink: LinkComponent<typeof QuickAnchor> = (props) => {
+  const { isTouchPrimary, isKnown } = useHasTouch();
   const preload =
     props.preload ?? (isKnown && isTouchPrimary ? "viewport" : "intent");
 

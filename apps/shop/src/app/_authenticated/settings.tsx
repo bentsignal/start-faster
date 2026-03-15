@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { ThemeToggle } from "@acme/features/theme";
 import {
   Card,
   CardContent,
@@ -7,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-
-import { ThemeToggle } from "~/features/theme/atoms/theme-toggle";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: RouteComponent,

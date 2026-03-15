@@ -10,6 +10,12 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { convert } from "great-time";
 import { z } from "zod";
 
+import { ScreenStore } from "@acme/features/screen";
+import {
+  DEFAULT_THEME,
+  getThemeFromCookie,
+  ThemeStore,
+} from "@acme/features/theme";
 import { Toaster } from "@acme/ui/toaster";
 import { cn } from "@acme/ui/utils";
 
@@ -24,10 +30,6 @@ import { getAuthState } from "~/features/auth/server/get-auth-state";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { CartStore } from "~/features/cart/store";
-import { ScreenStore } from "~/features/screen/store";
-import { DEFAULT_THEME } from "~/features/theme/default";
-import { getThemeFromCookie } from "~/features/theme/server/theme-cookie";
-import { ThemeStore } from "~/features/theme/store";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({

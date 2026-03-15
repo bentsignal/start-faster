@@ -8,23 +8,20 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie } from "@tanstack/react-start/server";
 import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { convert } from "great-time";
 
+import {
+  DEFAULT_THEME,
+  getThemeFromCookie,
+  ThemeStore,
+} from "@acme/features/theme";
 import { Toaster } from "@acme/ui/toaster";
 import { cn } from "@acme/ui/utils";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";
 import { env } from "~/env";
-import { ThemeStore } from "~/features/theme/store";
-import { getTheme } from "~/features/theme/utils";
-
-const getThemeFromCookie = createServerFn({ method: "GET" }).handler(() => {
-  const themeCookie = getCookie("theme");
-  return getTheme(themeCookie);
-});
 
 const fetchWorkosAuth = createServerFn({ method: "GET" }).handler(async () => {
   const auth = await getAuth();
@@ -115,7 +112,7 @@ function RootComponent() {
         <QueryClientProvider client={context.queryClient}>
           <ThemeStore
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme={DEFAULT_THEME}
             disableTransitionOnChange
             initialTheme={context.theme}
           >
