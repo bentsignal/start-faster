@@ -19,6 +19,7 @@ const normalizeImageSourceUrl = (src: string) => {
   try {
     const url = new URL(src);
     url.hash = "";
+    url.search = "";
 
     return url.toString();
   } catch {
