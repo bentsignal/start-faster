@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
@@ -43,38 +42,9 @@ function PredictiveProductsSection() {
     enabled: queryText.length >= 2,
     select: (data) => data?.products ?? [],
   });
-  const [visibleResult, setVisibleResult] = useState<{
-    query: string;
-    products: PredictiveSearchProduct[];
-  } | null>(null);
-  const swapTokenRef = useRef(0);
-
-  useEffect(() => {
-    swapTokenRef.current += 1;
-  }, [queryText]);
-
-  useEffect(() => {
-    if (!products || isFetching) {
-      return;
-    }
-
-    const token = swapTokenRef.current + 1;
-    swapTokenRef.current = token;
-
-    void preloadProductImages(products).then(() => {
-      if (swapTokenRef.current !== token) {
-        return;
-      }
-
-      setVisibleResult({
-        query: queryText,
-        products,
-      });
-    });
-  }, [products, isFetching, queryText]);
 
   const visibleProducts =
-    visibleResult?.query === rawQueryText ? visibleResult.products : null;
+    rawQueryText === queryText ? (products ?? null) : null;
   const shouldShowPlaceholder =
     rawQueryText.length >= 2 &&
     (rawQueryText !== queryText || isFetching || visibleProducts === null);
@@ -133,7 +103,6 @@ function PredictiveProductRow({
           height={48}
           loading="eager"
           className="bg-muted size-12 shrink-0 rounded-md object-cover"
-          disableReveal={true}
         />
       ) : (
         <div className="bg-muted size-12 shrink-0 rounded-md" />
@@ -191,32 +160,4 @@ function PredictiveProductsPlaceholder() {
       ))}
     </section>
   );
-}
-
-function preloadProductImages(products: PredictiveSearchProduct[]) {
-  const imageUrls = products
-    .map((product) => product.featuredImage?.url)
-    .filter((url): url is string => Boolean(url));
-
-  if (imageUrls.length === 0) {
-    return Promise.resolve();
-  }
-
-  return Promise.all(imageUrls.map((url) => preloadImage(url))).then(
-    () => undefined,
-  );
-}
-
-function preloadImage(url: string) {
-  return new Promise<void>((resolve) => {
-    const image = new window.Image();
-
-    image.onload = () => resolve();
-    image.onerror = () => resolve();
-    image.src = url;
-
-    if (image.complete) {
-      resolve();
-    }
-  });
 }
