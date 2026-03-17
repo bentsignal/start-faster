@@ -20,6 +20,7 @@ export const getCustomerOrders = `#graphql
           fulfillments(first: 10) {
             nodes {
               id
+              latestShipmentStatus
               trackingInformation {
                 company
                 number

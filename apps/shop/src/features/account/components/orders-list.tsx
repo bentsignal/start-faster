@@ -39,16 +39,18 @@ function StatusPill({
   tone = "secondary",
 }: {
   label: string;
-  tone?: "primary" | "secondary" | "success";
+  tone?: "primary" | "secondary" | "accent" | "success";
 }) {
   return (
     <span
       className={
         tone === "primary"
           ? "bg-foreground text-background rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
-          : tone === "success"
-            ? "rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-emerald-800 uppercase ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-500/18 dark:text-emerald-200 dark:ring-emerald-400/30"
-            : "bg-muted text-muted-foreground rounded-full px-2.5 py-1 text-xs font-medium"
+          : tone === "accent"
+            ? "rounded-full bg-sky-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-sky-800 uppercase ring-1 ring-sky-600/20 ring-inset dark:bg-sky-500/18 dark:text-sky-200 dark:ring-sky-400/30"
+            : tone === "success"
+              ? "rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-emerald-800 uppercase ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-500/18 dark:text-emerald-200 dark:ring-emerald-400/30"
+              : "bg-muted text-muted-foreground rounded-full px-2.5 py-1 text-xs font-medium"
       }
     >
       {label}
@@ -137,28 +139,34 @@ function TrackingNumbers({ order }: { order: OrderListItem }) {
   }
 
   return (
-    <p className="text-muted-foreground text-xs">
-      Tracking:{" "}
-      {trackingEntries.map((trackingEntry, index) => (
-        <span key={`${trackingEntry.number}-${index}`}>
-          {index > 0 ? ", " : null}
-          {trackingEntry.url ? (
-            <a
-              href={trackingEntry.url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-foreground font-medium underline underline-offset-4"
-            >
-              {trackingEntry.number}
-            </a>
-          ) : (
-            <span className="text-foreground font-medium">
-              {trackingEntry.number}
-            </span>
-          )}
-        </span>
-      ))}
-    </p>
+    <div className="bg-muted/45 border-border/60 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border px-3 py-2">
+      <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.18em] uppercase">
+        Tracking
+      </span>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium">
+        {trackingEntries.map((trackingEntry, index) => (
+          <span key={`${trackingEntry.number}-${index}`} className="contents">
+            {index > 0 ? (
+              <span className="text-muted-foreground" aria-hidden="true">
+                •
+              </span>
+            ) : null}
+            {trackingEntry.url ? (
+              <a
+                href={trackingEntry.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground underline underline-offset-4"
+              >
+                {trackingEntry.number}
+              </a>
+            ) : (
+              <span className="text-foreground">{trackingEntry.number}</span>
+            )}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -234,11 +242,12 @@ export function OrdersList({
             <CardHeader className="gap-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex min-w-0 flex-col gap-4">
-                  <div>
+                  <div className="space-y-3">
                     <StatusPill
                       label={order.primaryStatusLabel}
                       tone={order.primaryStatusTone}
                     />
+                    <TrackingNumbers order={order} />
                   </div>
                   <div>
                     <p className="font-semibold">{order.name}</p>
@@ -264,12 +273,9 @@ export function OrdersList({
               </CardContent>
             ) : null}
             <CardContent className="flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusPill label={order.fulfillmentStatusLabel} />
-                  <StatusPill label={order.financialStatusLabel} />
-                </div>
-                <TrackingNumbers order={order} />
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill label={order.fulfillmentStatusLabel} />
+                <StatusPill label={order.financialStatusLabel} />
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button

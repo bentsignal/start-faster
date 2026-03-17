@@ -1,25 +1,25 @@
 import type { CustomerOrder } from "~/features/account/types";
 import {
+  getCustomerOrderStatus,
   getFinancialStatusLabel,
   getFulfillmentStatusLabel,
-  isInProgressOrder,
 } from "~/features/account/lib/order-status";
 
 export type OrderListItem = CustomerOrder & {
   primaryStatusLabel: string;
-  primaryStatusTone: "primary" | "success";
+  primaryStatusTone: "primary" | "accent" | "success";
   fulfillmentStatusLabel: string;
   financialStatusLabel: string;
 };
 
 export function getOrdersListData(orders: CustomerOrder[]): OrderListItem[] {
   return orders.map((order) => {
-    const isInProgress = isInProgressOrder(order);
+    const primaryStatus = getCustomerOrderStatus(order);
 
     return {
       ...order,
-      primaryStatusLabel: isInProgress ? "In progress" : "Completed",
-      primaryStatusTone: isInProgress ? "primary" : "success",
+      primaryStatusLabel: primaryStatus.label,
+      primaryStatusTone: primaryStatus.tone,
       fulfillmentStatusLabel: getFulfillmentStatusLabel(
         order.fulfillmentStatus,
       ),
