@@ -45,12 +45,12 @@ function StatusPill({
     <span
       className={
         tone === "primary"
-          ? "bg-foreground text-background rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
+          ? "bg-foreground text-background self-start rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
           : tone === "accent"
-            ? "rounded-full bg-sky-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-sky-800 uppercase ring-1 ring-sky-600/20 ring-inset dark:bg-sky-500/18 dark:text-sky-200 dark:ring-sky-400/30"
+            ? "self-start rounded-full bg-sky-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-sky-800 uppercase ring-1 ring-sky-600/20 ring-inset dark:bg-sky-500/18 dark:text-sky-200 dark:ring-sky-400/30"
             : tone === "success"
-              ? "rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-emerald-800 uppercase ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-500/18 dark:text-emerald-200 dark:ring-emerald-400/30"
-              : "bg-muted text-muted-foreground rounded-full px-2.5 py-1 text-xs font-medium"
+              ? "self-start rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold tracking-wide text-emerald-800 uppercase ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-500/18 dark:text-emerald-200 dark:ring-emerald-400/30"
+              : "bg-muted text-muted-foreground self-start rounded-full px-2.5 py-1 text-xs font-medium"
       }
     >
       {label}
@@ -139,11 +139,11 @@ function TrackingNumbers({ order }: { order: OrderListItem }) {
   }
 
   return (
-    <div className="bg-muted/45 border-border/60 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border px-3 py-2">
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
       <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.18em] uppercase">
         Tracking
       </span>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 font-medium">
         {trackingEntries.map((trackingEntry, index) => (
           <span key={`${trackingEntry.number}-${index}`} className="contents">
             {index > 0 ? (
@@ -241,15 +241,13 @@ export function OrdersList({
           <Card key={order.id} className="gap-0">
             <CardHeader className="gap-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex min-w-0 flex-col gap-4">
-                  <div className="space-y-3">
-                    <StatusPill
-                      label={order.primaryStatusLabel}
-                      tone={order.primaryStatusTone}
-                    />
-                    <TrackingNumbers order={order} />
-                  </div>
-                  <div>
+                <div className="flex min-w-0 flex-col gap-3">
+                  <StatusPill
+                    label={order.primaryStatusLabel}
+                    tone={order.primaryStatusTone}
+                  />
+                  <TrackingNumbers order={order} />
+                  <div className="space-y-1">
                     <p className="font-semibold">{order.name}</p>
                     <p className="text-muted-foreground text-sm">
                       Placed on {formatDate(order.processedAt)}
