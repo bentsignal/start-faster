@@ -24,6 +24,7 @@ export const env = createEnv({
       .enum(["development", "production", "test"])
       .default("production"),
     VITE_CONVEX_URL: z.url(),
+    VITE_SITE_URL: z.url(),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,
