@@ -28,6 +28,9 @@ export const checkAuthR = async (ctx: QueryCtx | MutationCtx) => {
   if (!user) {
     throw new ConvexError("Current user record not found");
   }
+  if (user.accessLevel === "unauthorized") {
+    throw new ConvexError("Unauthorized");
+  }
   return { identity, user };
 };
 
