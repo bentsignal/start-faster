@@ -5,11 +5,12 @@ import { cn } from "@acme/ui/utils";
 
 import { useVercelOptimizedImageProps } from "./use-vercel-image";
 
-interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   width: number;
   height: number;
   alt: string;
+  optimizerBaseUrl?: string;
   disableReveal?: boolean;
   errorFallbackText?: string;
 }
@@ -39,6 +40,7 @@ export function Image({
   width,
   height,
   sizes,
+  optimizerBaseUrl,
   loading = "lazy",
   disableReveal = false,
   errorFallbackText = "Failed to load image",
@@ -48,54 +50,43 @@ export function Image({
   style,
   ...props
 }: ImageProps) {
-  const imgProps = useVercelOptimizedImageProps(src, width, height, sizes);
+  const shouldReveal = !disableReveal;
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const imgProps = useVercelOptimizedImageProps(
+    src,
+    width,
+    height,
+    sizes,
+    optimizerBaseUrl,
+  );
   const imageSignature = getImageSignature({
     src: imgProps.src,
     srcSet: imgProps.srcSet,
     sizes: imgProps.sizes,
   });
 
-  return (
-    <ImageWithReveal
-      key={imageSignature}
-      imageSignature={imageSignature}
-      imgProps={imgProps}
-      loading={loading}
-      disableReveal={disableReveal}
-      errorFallbackText={errorFallbackText}
-      className={className}
-      onLoad={onLoad}
-      onError={onError}
-      style={style}
-      {...props}
-    />
-  );
-}
-
-function ImageWithReveal({
-  imageSignature,
-  imgProps,
-  loading,
-  disableReveal,
-  errorFallbackText,
-  className,
-  onLoad,
-  onError,
-  style,
-  ...props
-}: Omit<ImageProps, "src" | "width" | "height" | "sizes" | "alt"> & {
-  imageSignature: string;
-  imgProps: ReturnType<typeof useVercelOptimizedImageProps>;
-}) {
-  const shouldReveal = !disableReveal;
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  const [loadState, setLoadState] = useState<ImageLoadState>(() => {
+  const [loadState, setLoadState] = useState<{
+    signature: string;
+    state: ImageLoadState;
+  }>(() => {
     if (!shouldReveal || loadedImageSignatures.has(imageSignature)) {
-      return "ready";
+      return {
+        signature: imageSignature,
+        state: "ready",
+      };
     }
-    return "loading";
+    return {
+      signature: imageSignature,
+      state: "loading",
+    };
   });
+
+  const loadStateForCurrentImage =
+    loadState.signature === imageSignature
+      ? loadState.state
+      : !shouldReveal || loadedImageSignatures.has(imageSignature)
+        ? "ready"
+        : "loading";
 
   const setImageRef = (imageElement: HTMLImageElement | null) => {
     imageRef.current = imageElement;
@@ -103,11 +94,14 @@ function ImageWithReveal({
     if (
       imageElement !== null &&
       shouldReveal &&
-      loadState === "loading" &&
+      loadStateForCurrentImage === "loading" &&
       imageElementIsReady(imageElement)
     ) {
       if (loadedImageSignatures.has(imageSignature)) {
-        setLoadState("ready");
+        setLoadState({
+          signature: imageSignature,
+          state: "ready",
+        });
         return;
       }
 
@@ -116,7 +110,10 @@ function ImageWithReveal({
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           loadedImageSignatures.add(imageSignature);
-          setLoadState("ready");
+          setLoadState({
+            signature: imageSignature,
+            state: "ready",
+          });
         });
       });
     }
@@ -125,22 +122,30 @@ function ImageWithReveal({
   const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     if (shouldReveal) {
       loadedImageSignatures.add(imageSignature);
-      setLoadState("ready");
+      setLoadState({
+        signature: imageSignature,
+        state: "ready",
+      });
     }
     onLoad?.(event);
   };
 
   const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
     if (shouldReveal) {
-      setLoadState("error");
+      setLoadState({
+        signature: imageSignature,
+        state: "error",
+      });
     }
     onError?.(event);
   };
 
   const hideImage =
-    shouldReveal && (loadState === "loading" || loadState === "error");
+    shouldReveal &&
+    (loadStateForCurrentImage === "loading" ||
+      loadStateForCurrentImage === "error");
 
-  if (shouldReveal && loadState === "error") {
+  if (shouldReveal && loadStateForCurrentImage === "error") {
     return (
       <div
         className={cn(

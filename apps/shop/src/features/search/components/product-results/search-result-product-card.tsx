@@ -3,9 +3,9 @@
 // import { Button } from "@acme/ui/button";
 
 import { QuickLink } from "@acme/features/quick-link";
-import { Image } from "@acme/ui/image";
 
 import type { ProductResultNode } from "~/features/product/types";
+import { Image } from "~/components/image";
 import {
   ProductResultStore,
   useProductResultStore,

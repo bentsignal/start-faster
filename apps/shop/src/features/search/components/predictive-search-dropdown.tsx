@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
 import { QuickLink } from "@acme/features/quick-link";
-import { Image } from "@acme/ui/image";
 
+import { Image } from "~/components/image";
 import { formatPrice } from "~/features/product/lib/price";
 import {
   PREDICTIVE_SEARCH_PAGE_SIZE,

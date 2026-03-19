@@ -1,7 +1,7 @@
 import { QuickLink } from "@acme/features/quick-link";
 import { Button } from "@acme/ui/button";
-import { Image } from "@acme/ui/image";
 
+import { Image } from "~/components/image";
 import { env } from "~/env";
 
 export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;

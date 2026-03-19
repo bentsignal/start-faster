@@ -2,11 +2,11 @@ import { useSearch } from "@tanstack/react-router";
 
 import { QuickLink } from "@acme/features/quick-link";
 import { ScreenSize, useScreenStore } from "@acme/features/screen";
-import { Image } from "@acme/ui/image";
 import { cn } from "@acme/ui/utils";
 
 import { HorizontalMenu } from "~/components/header/horizontal-menu";
 import { TopRightControls } from "~/components/header/top-right-controls";
+import { Image } from "~/components/image";
 import { PredictiveSearchDropdown } from "~/features/search/components/predictive-search-dropdown";
 import { SearchClearButton } from "~/features/search/components/search-bar/clear-button";
 import { SearchBarContainer } from "~/features/search/components/search-bar/container";

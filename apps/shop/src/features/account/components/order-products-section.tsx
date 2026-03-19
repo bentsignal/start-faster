@@ -1,11 +1,11 @@
 import { QuickLink } from "@acme/features/quick-link";
-import { Image } from "@acme/ui/image";
 
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type {
   CustomerOrderLineItem,
   LiveOrderProducts,
 } from "~/features/account/types";
+import { Image } from "~/components/image";
 
 type LiveOrderProduct = Extract<
   NonNullable<LiveOrderProducts[number]>,

@@ -3,12 +3,28 @@ import { imageWidths, largestImageWidth } from "./sizes";
 
 const imageQuality = 75;
 
-const getVercelOptimizedUrl = (url: string, width: ImgWidth) => {
+const getVercelImageEndpoint = (optimizerBaseUrl?: string) => {
+  if (!optimizerBaseUrl) {
+    return "/_vercel/image";
+  }
+
+  try {
+    return new URL("/_vercel/image", optimizerBaseUrl).toString();
+  } catch {
+    return `${optimizerBaseUrl.replace(/\/+$/, "")}/_vercel/image`;
+  }
+};
+
+const getVercelOptimizedUrl = (
+  url: string,
+  width: ImgWidth,
+  optimizerBaseUrl?: string,
+) => {
   const searchParams = new URLSearchParams();
   searchParams.append("url", url);
   searchParams.append("w", width.toString());
   searchParams.append("q", imageQuality.toString());
-  return `/_vercel/image?${searchParams.toString()}`;
+  return `${getVercelImageEndpoint(optimizerBaseUrl)}?${searchParams.toString()}`;
 };
 
 const normalizeImageSourceUrl = (src: string) => {
@@ -32,6 +48,7 @@ export const useVercelOptimizedImageProps = (
   width: number,
   height: number,
   sizes?: string,
+  optimizerBaseUrl?: string,
 ) => {
   const normalizedSrc = normalizeImageSourceUrl(src);
 
@@ -49,10 +66,14 @@ export const useVercelOptimizedImageProps = (
     const largestRequestedWidth = widths.at(-1) ?? largestImageWidth;
 
     return {
-      src: getVercelOptimizedUrl(normalizedSrc, largestRequestedWidth),
+      src: getVercelOptimizedUrl(
+        normalizedSrc,
+        largestRequestedWidth,
+        optimizerBaseUrl,
+      ),
       srcSet: widths
         .map((candidateWidth) => {
-          return `${getVercelOptimizedUrl(normalizedSrc, candidateWidth)} ${candidateWidth}w`;
+          return `${getVercelOptimizedUrl(normalizedSrc, candidateWidth, optimizerBaseUrl)} ${candidateWidth}w`;
         })
         .join(", "),
       sizes,
@@ -70,9 +91,12 @@ export const useVercelOptimizedImageProps = (
   ] as [ImgWidth, ...ImgWidth[]];
   return {
     srcSet: widths
-      .map((w, i) => `${getVercelOptimizedUrl(normalizedSrc, w)} ${i + 1}x`)
+      .map(
+        (w, i) =>
+          `${getVercelOptimizedUrl(normalizedSrc, w, optimizerBaseUrl)} ${i + 1}x`,
+      )
       .join(", "),
-    src: getVercelOptimizedUrl(normalizedSrc, widths[0]),
+    src: getVercelOptimizedUrl(normalizedSrc, widths[0], optimizerBaseUrl),
     width: widths[0],
     height: Math.round((widths[0] * height) / width),
   };

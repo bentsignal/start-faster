@@ -2,41 +2,25 @@ import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import viteReact from "@vitejs/plugin-react";
-import { convert } from "great-time";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(async ({ mode }) => {
-  const { env } = await import("./src/env");
+  const [{ createImageConfig }, { imageWidths }, { env }] = await Promise.all([
+    import("@acme/features/image/config"),
+    import("@acme/features/image/sizes"),
+    import("./src/env"),
+  ]);
+
   const isDevelopment =
     mode === "development" || env.VITE_NODE_ENV === "development";
 
-  const { imageWidths } = await import("@acme/ui/image/sizes");
-  const imageFormats: Array<"image/webp" | "image/avif"> = ["image/webp"];
-  const imageQualities = [75] as const;
-  const imageConfig = {
+  const imageConfig = createImageConfig({
+    uploadthingUrl: env.VITE_UT_URL,
+    shopifyImageUrlStoreId: env.VITE_SHOPIFY_IMAGE_URL_STORE_ID,
     sizes: [...imageWidths],
-    qualities: [...imageQualities],
-    domains: [],
-    minimumCacheTTL: convert(24, "hours", "to seconds"),
-    formats: imageFormats,
-    localPatterns: [{ pathname: "^/.*$", search: "" }],
-    remotePatterns: [
-      {
-        protocol: "https" as const,
-        hostname: new URL(env.VITE_UT_URL).hostname,
-        pathname: "/f/**",
-        search: "",
-      },
-      {
-        protocol: "https" as const,
-        hostname: "cdn.shopify.com",
-        pathname: `/s/files/1/${env.VITE_SHOPIFY_IMAGE_URL_STORE_ID}/**`,
-        search: "",
-      },
-    ],
-  };
+  });
 
   return {
     server: {

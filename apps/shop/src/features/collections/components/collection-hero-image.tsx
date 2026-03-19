@@ -1,6 +1,6 @@
 import { QuickLink } from "@acme/features/quick-link";
-import { Image } from "@acme/ui/image";
 
+import { Image } from "~/components/image";
 import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
 
 export function CollectionHeroImage({ className }: { className?: string }) {

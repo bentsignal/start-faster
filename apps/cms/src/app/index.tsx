@@ -6,6 +6,9 @@ import { LogIn, LogOut } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 
+import { Image } from "~/components/image";
+import { env } from "~/env";
+
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
@@ -24,7 +27,17 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      <h1>Shop</h1>
+      <h1>CMS</h1>
+      <Image
+        src={`${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`}
+        alt="Lifestyle photos from the launch collection"
+        width={1440}
+        height={720}
+        sizes="(min-width: 1280px) 60vw, 100vw"
+        fetchPriority="high"
+        loading="eager"
+        className="block h-auto w-full max-w-lg"
+      />
       {auth.isSignedIn ? (
         <Button
           variant="link"

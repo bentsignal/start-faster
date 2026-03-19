@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@acme/ui/accordion";
-import { Image } from "@acme/ui/image";
 import { ScrollArea } from "@acme/ui/scroll-area";
 import {
   Sheet,
@@ -19,6 +18,7 @@ import {
 } from "@acme/ui/sheet";
 
 import { navItems, secondaryNavLinks } from "~/components/header/nav-data";
+import { Image } from "~/components/image";
 
 export function VerticalMenu() {
   const [isOpen, setIsOpen] = useState(false);

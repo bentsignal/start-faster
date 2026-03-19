@@ -3,9 +3,12 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./image": "./src/image/image.tsx",
+    "./image/config": "./src/image/create-image-config.ts",
+    "./image/sizes": "./src/image/sizes.ts",
+    "./quick-link": "./src/quick-link/quick-link.tsx",
     "./screen": "./src/screen/index.tsx",
-    "./theme": "./src/theme/index.tsx",
-    "./quick-link": "./src/quick-link/quick-link.tsx"
+    "./theme": "./src/theme/index.tsx"
   },
   "license": "MIT",
   "scripts": {
@@ -34,6 +37,7 @@
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "great-time": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:react19",
     "rostra": "catalog:"

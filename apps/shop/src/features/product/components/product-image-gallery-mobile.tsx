@@ -4,9 +4,9 @@ import {
   CarouselDots,
   CarouselItem,
 } from "@acme/ui/carousel";
-import { Image } from "@acme/ui/image";
 
 import type { ProductGalleryImage } from "../types";
+import { Image } from "~/components/image";
 import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
 export function ProductImageGalleryMobile() {

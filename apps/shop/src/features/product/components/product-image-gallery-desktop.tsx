@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-import { Image } from "@acme/ui/image";
 import { cn } from "@acme/ui/utils";
 
 import type { ProductGalleryImage } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
+import { Image } from "~/components/image";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
 import { useProductPageStore } from "~/features/product/stores/product-page-store";
 
