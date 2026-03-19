@@ -7,6 +7,30 @@ interface ProductGalleryOrdering {
   variantImageIndexById: Record<string, number>;
 }
 
+export function getDefaultVariantIdFromGalleryOrdering({
+  variants,
+  variantImageIndexById,
+}: {
+  variants: Product["variants"]["nodes"];
+  variantImageIndexById: Record<string, number>;
+}) {
+  let defaultVariantId: string | undefined;
+  let bestImageIndex = Number.POSITIVE_INFINITY;
+
+  for (const variant of variants) {
+    const imageIndex = variantImageIndexById[variant.id];
+
+    if (imageIndex === undefined || imageIndex >= bestImageIndex) {
+      continue;
+    }
+
+    bestImageIndex = imageIndex;
+    defaultVariantId = variant.id;
+  }
+
+  return defaultVariantId ?? variants[0]?.id;
+}
+
 export function getProductGalleryImages(
   product: Product,
 ): ProductGalleryImage[] {

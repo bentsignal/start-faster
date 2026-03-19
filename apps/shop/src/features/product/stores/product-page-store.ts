@@ -8,6 +8,7 @@ import { useProductGalleryImages } from "~/features/product/hooks/use-product-ga
 import { useProductOptions } from "~/features/product/hooks/use-product-options";
 import { useProductVariantActions } from "~/features/product/hooks/use-product-variant-actions";
 import { useSelectedProductVariant } from "~/features/product/hooks/use-selected-product-variant";
+import { getDefaultVariantIdFromGalleryOrdering } from "~/features/product/lib/gallery-images";
 import { formatPrice } from "~/features/product/lib/price";
 
 interface ProductPageStoreProps {
@@ -27,6 +28,10 @@ function useInternalStore({ product, variant }: ProductPageStoreProps) {
     variants,
     initialVariantId,
   });
+  const defaultVariantId = getDefaultVariantIdFromGalleryOrdering({
+    variants,
+    variantImageIndexById: galleryOrdering.variantImageIndexById,
+  });
   const options = useProductOptions(product, galleryOrdering.colorOrder);
   const setCarouselApi = (carouselApi: CarouselApi) => {
     carouselApiRef.current = carouselApi;
@@ -39,6 +44,7 @@ function useInternalStore({ product, variant }: ProductPageStoreProps) {
   const { selectedVariant, selectedOptions } = useSelectedProductVariant({
     variants,
     variantId: variant,
+    defaultVariantId,
   });
   const { selectOption, addToCart, wasAddedToCart, buyNow, isBuyingNow } =
     useProductVariantActions({
