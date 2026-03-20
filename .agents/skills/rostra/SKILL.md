@@ -1,13 +1,15 @@
 ---
-name: state-management
+name: rostra
 description: Guides correct usage of the Rostra state management library (createStore, Store, useStore), including store scoping, selectors, optional access, prop-driven initialization, and typing. Use when dealing with state management in React/React Native, or when the user mentions rostra, createStore, useStore, Store providers, or performant state.
 ---
 
-# State management
+## Overview
 
-The big idea with Rostra is that you can define your state at the top and then pull it in at lower levels exactly where it's needed. You don't want to be drilling down the state from higher up unless it explicitly makes sense to. Like if you're passing something to each item in a list, stuff like that.
+The big idea with Rostra is that you define your state at a level where it can be shared with a subtree of components, and then pull it in at lower levels exactly where it's needed. It's designed to avoid prop drilling by allowing you to pull state directly into the leaf component where it is needed, even if the store component is many nodes higher in the tree.
 
-## Core rules (Rostra)
+The TL;DR is that you write a React hook just like any other, but then Rostra turns it into a store component. Any component that is a child component of the store component can pull in pieces of the state returned from the store using fine-grained selectors.
+
+## Core rules
 
 - `useInternalStore` is only used as an argument to `createStore`. Never call it directly from components.
 - `useStore` is the only supported read/write access path for consumers.
@@ -101,6 +103,8 @@ export function Counter() {
 
 ### Strict typing (catch breaking changes early)
 
+Most stores can rely on inference. Reach for an explicit `StoreState` only when you intentionally want the store contract to be a checked public boundary and you want the internal hook to fail fast if that contract changes.
+
 ```tsx
 import { useState } from "react";
 import { createStore } from "rostra";
@@ -130,7 +134,3 @@ export function MaybeCount() {
   return <p>Count: {count}</p>;
 }
 ```
-
-## Notes
-
-- Rostra’s re-render behavior guidance assumes the React Compiler is enabled; otherwise, memoize state/derived values inside `useInternalStore` as needed. See the upstream README for details: [bentsignal/rostra](https://github.com/bentsignal/rostra).
