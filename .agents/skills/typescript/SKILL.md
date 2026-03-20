@@ -3,8 +3,18 @@ name: TypeScript
 description: Guidelines for writing production grade TypeScript.
 ---
 
-The overarching philosophy is **strong type safety through inference**. The compiler should do the heavy lifting -- not the developer manually annotating types everywhere. Explicit type definitions are a last resort, not the default.
+The overarching philosophy is strong type safety through inference. The compiler should do the heavy lifting instead of manual annotation.
 
-If you have decided that you need the TypeScript skill to complete your task, you should make sure you look at each of the rules listed in the `rules/` folder.
+## Required loading protocol
 
-**_IMPORTANT_**: Make sure you STRICTLY adhere to the principles discussed in the rules. If you think there might actually be a valid use case for breaking them, pause and confirm first with the user.
+Before proposing code, editing files, or running implementation commands, complete this loading flow in order:
+
+1. Enumerate every Markdown file in `rules/`.
+2. Read every discovered `.md` file in alphabetical order.
+3. Only continue once all rule files have been read.
+
+Do not skip any rule file, even if it seems unrelated. If any rule file is unreadable, stop and ask the user how to proceed.
+
+## Enforcement
+
+All rules are mandatory. If you believe a rule should be broken for this task, pause and confirm with the user before proceeding.

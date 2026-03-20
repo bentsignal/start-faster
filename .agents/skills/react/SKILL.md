@@ -3,8 +3,18 @@ name: React
 description: Guidelines for creating components and hooks in React
 ---
 
-Writing good React code is difficult and requires delicate precision. The rules outlined in `/rules` will help you write code that is clean, readable, and performant.
+Use this skill whenever you are writing or reviewing React code.
 
-If you have decided that you need the React skill to complete your task, you should make sure you look at each of the rules listed in the rules folder.
+## Required loading protocol
 
-**_IMPORTANT_**: Make sure you STRICTLY adhere to the principles discussed in the rules. If you think there might actually be a valid use case for breaking them, pause and confirm first with the user.
+Before proposing code, editing files, or running implementation commands, complete this loading flow in order:
+
+1. Enumerate every Markdown file in `rules/`.
+2. Read every discovered `.md` file in alphabetical order.
+3. Only continue once all rule files have been read.
+
+Do not skip any rule file.
+
+## Enforcement
+
+All rules are mandatory. If you believe a rule should be broken for this task, pause and confirm with the user before proceeding.
