@@ -1,17 +1,11 @@
 import { Loader } from "lucide-react";
 
-import type { Id } from "@acme/convex/model";
-import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
+import { QuickLink } from "@acme/features/quick-link";
 
-import type { AccessLevel } from "~/features/user-access/lib/access-utils";
 import { useUserSearchResults } from "~/features/user-access/hooks/use-user-search-results";
-import { toAccessLevel } from "~/features/user-access/lib/access-utils";
-import { useUpdateUserAccess } from "../hooks/use-update-user-access";
 
 export function UserAccessList() {
   const { users, status, sentinelRef } = useUserSearchResults();
-
-  const updateAccessLevel = useUpdateUserAccess();
 
   if (status === "LoadingFirstPage") {
     return (
@@ -39,8 +33,6 @@ export function UserAccessList() {
             userId={user._id}
             name={user.name}
             email={user.email}
-            accessLevel={user.accessLevel}
-            onAccessLevelChange={updateAccessLevel}
           />
         ))}
       </div>
@@ -60,40 +52,21 @@ export function UserAccessRow({
   userId,
   name,
   email,
-  accessLevel,
-  onAccessLevelChange,
 }: {
-  userId: Id<"users">;
+  userId: string;
   name: string;
   email: string;
-  accessLevel: AccessLevel;
-  onAccessLevelChange: (args: {
-    userId: Id<"users">;
-    accessLevel: AccessLevel;
-  }) => void;
 }) {
   return (
-    <div className="bg-card flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+    <QuickLink
+      to="/users/$id"
+      params={{ id: userId }}
+      className="bg-card hover:bg-accent/40 block rounded-2xl border px-7 py-6 transition-colors"
+    >
       <div>
-        <p className="font-medium">{name}</p>
-        <p className="text-muted-foreground text-sm">{email}</p>
+        <p className="text-base font-medium">{name}</p>
+        <p className="text-muted-foreground mt-1 text-sm">{email}</p>
       </div>
-      <NativeSelect
-        value={accessLevel}
-        className="w-full max-w-64"
-        onChange={(event) => {
-          onAccessLevelChange({
-            userId,
-            accessLevel: toAccessLevel(event.target.value),
-          });
-        }}
-        aria-label={`Access level for ${email}`}
-      >
-        <NativeSelectOption value="unauthorized">
-          unauthorized
-        </NativeSelectOption>
-        <NativeSelectOption value="authorized">authorized</NativeSelectOption>
-      </NativeSelect>
-    </div>
+    </QuickLink>
   );
 }

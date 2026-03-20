@@ -98,6 +98,27 @@ export const searchUsersPaginated = authRquery({
   },
 });
 
+export const getUserById = authRquery({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    assertAuthorizedAdmin(ctx.user.accessLevel);
+
+    const userId = ctx.db.normalizeId("users", args.userId);
+    if (userId === null) {
+      throw new ConvexError("User not found");
+    }
+
+    const user = await ctx.db.get(userId);
+    if (user === null) {
+      throw new ConvexError("User not found");
+    }
+
+    return user;
+  },
+});
+
 export const updateUserAccessLevel = authRmutation({
   args: {
     userId: v.id("users"),

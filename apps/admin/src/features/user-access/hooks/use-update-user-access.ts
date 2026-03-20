@@ -36,5 +36,21 @@ export function useUpdateUserAccess() {
         },
       );
     }
+
+    const userQueries = localStore.getAllQueries(api.users.getUserById);
+    for (const result of userQueries) {
+      if (result.value === undefined) {
+        continue;
+      }
+
+      if (result.args.userId !== args.userId) {
+        continue;
+      }
+
+      localStore.setQuery(api.users.getUserById, result.args, {
+        ...result.value,
+        accessLevel: args.accessLevel,
+      });
+    }
   });
 }

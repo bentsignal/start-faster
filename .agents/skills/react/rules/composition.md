@@ -47,7 +47,6 @@ export const Route = createFileRoute("/_authenticated/_authorized/dashboard")({
       userAccessQueries.searchFirstPage(sanitizeSearch(deps.q)),
     );
   },
-  shouldReload: false,
   validateSearch: z.object({
     q: z.string().optional(),
   }),

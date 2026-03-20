@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
-
 import { SignOutButton } from "~/components/sign-out-button";
 import { UserAccessList } from "~/features/user-access/components/user-access-list";
 import { UserSearchInput } from "~/features/user-access/components/user-search-input";
@@ -26,26 +24,16 @@ export const Route = createFileRoute("/_authenticated/_authorized/dashboard")({
 function DashboardRoute() {
   return (
     <main className="bg-background min-h-screen">
-      <div className="container py-10">
-        <header className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Admin Portal</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage access for users in your admin workspace.
-            </p>
-          </div>
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-7 px-6 py-10 sm:px-8">
+        <header className="mb-4 flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Admin Portal
+          </h1>
           <SignOutButton />
         </header>
 
-        <Card>
-          <CardHeader className="space-y-4">
-            <CardTitle>User Access</CardTitle>
-            <UserSearchInput />
-          </CardHeader>
-          <CardContent>
-            <UserAccessList />
-          </CardContent>
-        </Card>
+        <UserSearchInput />
+        <UserAccessList />
       </div>
     </main>
   );

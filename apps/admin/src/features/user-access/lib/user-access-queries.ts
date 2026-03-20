@@ -13,4 +13,8 @@ export const userAccessQueries = {
         cursor: null,
       },
     }),
+  userById: (userId: string) =>
+    convexQuery(api.users.getUserById, {
+      userId,
+    }),
 };
