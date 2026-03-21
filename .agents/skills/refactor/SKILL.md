@@ -1,19 +1,18 @@
+name: Refactor
+description: Code refactor to improve implementation details, only use when explicitly requested by user.
 ---
-name: Review
-description: Code review to improve implementation details, only use when explicitly requested by user.
----
 
-# Review
+# Refactor
 
-This skill is for a dedicated cleanup and refactor pass after implementation work already exists. It should be used to turn "working enough" code into code that is robust, maintainable, and aligned with the project's standards.
+This skill is for a dedicated cleanup and refactor pass after implementation work already exists. It should be used to turn "working enough" code into code that is robust, maintainable, coherent, and aligned with the project's standards.
 
-Do not use this skill unless the user explicitly asks for a review, audit, cleanup pass, refactor pass, or specifically asks you to use the `Review` skill.
+Do not use this skill unless the user explicitly asks for a refactor, audit, cleanup pass, refactor pass, or specifically asks you to use the `Refactor` skill.
 
 ## Goal
 
 Use the rules in this skill to audit the currently modified code and then improve it. The target is the active change set, not the entire repository.
 
-The review should answer questions like:
+The refactor should answer questions like:
 
 - Does the state management approach fit the feature, or does it need an overhaul?
 - Is the component composition clear, small, and well-factored?
@@ -23,16 +22,16 @@ The review should answer questions like:
 
 ## Required loading protocol
 
-Before proposing review feedback, editing files, or running implementation commands, complete this flow in order:
+Before proposing refactor feedback, editing files, or running implementation commands, complete this flow in order:
 
-1. Enumerate every Markdown file in `rules/\*\*/<rule>.md
+1. Enumerate through every rule in the review skills rules folder and each of the subfolders.
 2. Read every discovered rule file in alphabetical order within each folder.
 3. Do not continue until all rule files have been read.
 4. Treat every rule as mandatory unless the user explicitly approves an exception.
 
 Do not skip a rule because it seems unrelated at first glance. The purpose of this skill is to understand how the rules work together.
 
-## Review workflow
+## Refactor workflow
 
 ### 1. Internalize the rules deeply
 
@@ -43,7 +42,7 @@ Do not skim. Read the rules closely enough to understand:
 - how the React and TypeScript rules reinforce each other
 - which kinds of implementation mistakes the rules are trying to prevent
 
-This step matters because the review is not just about spotting isolated violations. It is about recognizing when the overall shape of the code is wrong.
+This step matters because the refactor is not just about spotting isolated violations. It is about recognizing when the overall shape of the code is wrong.
 
 ### 2. Inspect the active changes
 
@@ -54,7 +53,7 @@ Audit the current work by reading the change set first:
 
 Prefer reviewing the diff before reading whole files. Then read any touched files and nearby supporting files needed to understand the architecture and intent.
 
-The review target is the code that changed, plus any adjacent code that must also change to make the refactor correct and maintainable.
+The refactor target is the code that changed, plus any adjacent code that must also change to make the refactor correct and maintainable.
 
 ### 3. Build an audit plan
 
@@ -87,11 +86,11 @@ This can include:
 
 Prefer durable fixes over cosmetic edits. If several files need to change together to make the design coherent, change them together.
 
-### 5. Keep the review scoped and practical
+### 5. Keep the refactor scoped and practical
 
 Do not turn the pass into an unrelated repo-wide cleanup. Improve what is necessary to make the reviewed change set solid.
 
-Good review work is:
+Good refactor work is:
 
 - strongly opinionated about correctness and maintainability
 - willing to refactor when needed
