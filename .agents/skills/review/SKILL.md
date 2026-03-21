@@ -25,7 +25,7 @@ The review should answer questions like:
 
 Before proposing review feedback, editing files, or running implementation commands, complete this flow in order:
 
-1. Enumerate every Markdown file in `rules/react/` and `rules/typescript/`.
+1. Enumerate every Markdown file in `rules/\*\*/<rule>.md
 2. Read every discovered rule file in alphabetical order within each folder.
 3. Do not continue until all rule files have been read.
 4. Treat every rule as mandatory unless the user explicitly approves an exception.
