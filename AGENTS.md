@@ -5,13 +5,23 @@ Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
 ## Repository Summary
 
 - Turborepo monorepo.
-- Greenfield project, prefer ambitious overhauls when necessary to lay solid foundation. Rip out unused code when possible.
+- This project is very early on, proposing sweeping changes that improve long-term maintainability is encouraged.
 
-## Preparation
+## Core Priorities
 
-Before you begin, you should read through any skills that may help you complete your task. Since this project uses both TypeScript and React heavily, it's usually a good idea to utilize those skills.
+1. Performance first.
+2. Reliability first.
+3. Keep behavior predictable under load and during failures (session restarts, reconnects, partial streams).
 
-**_Important_** Make sure that you internalize the information you gain from the skills to gain a deep understanding of their intent.
+If a tradeoff is required, choose correctness and robustness over short-term convenience.
+
+## Maintainability
+
+Long term maintainability is a core priority. If you add new functionality, first check if there is shared logic that can be extracted to a separate module. Duplicate logic across multiple files is a code smell and should be avoided. Don't be afraid to change existing code. Don't take shortcuts by just adding local logic to solve a problem.
+
+## Testing
+
+Currently no testing solution is in place so don't worry about writing tests right now.
 
 ## Required Validation After Changes
 
@@ -24,4 +34,4 @@ If both of these succeed, run:
 
 3. `pnpm run format:fix`
 
-Then summarize changes for the user. Currently no testing solution is in place so don't worry about tests for now.
+Then summarize changes for the user.
