@@ -1,115 +1,46 @@
+---
 name: Refactor
 description: Code refactor to improve implementation details, only use when explicitly requested by user.
 ---
 
 # Refactor
 
-This skill is for a dedicated cleanup and refactor pass after implementation work already exists. It should be used to turn "working enough" code into code that is robust, maintainable, coherent, and aligned with the project's standards.
+This skill turns "working enough" code into code that is robust, maintainable, and aligned with the project's standards. It is activated only when the user explicitly asks for a refactor, audit, cleanup pass, or specifically asks you to use the `Refactor` skill.
 
-Do not use this skill unless the user explicitly asks for a refactor, audit, cleanup pass, refactor pass, or specifically asks you to use the `Refactor` skill.
+The target is the active change set, not the entire repository.
 
-## Goal
+Each rule file under `rules/` represents an independent concern (composition, data loading, performance, state management, TypeScript patterns, etc.). Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents -- one per rule file. Each subagent becomes a deep expert on its single rule and evaluates the current changes entirely through that lens.
 
-Use the rules in this skill to audit the currently modified code and then improve it. The target is the active change set, not the entire repository.
+## 1. Spawn one subagent per rule file
 
-The refactor should answer questions like:
+Enumerate every file under `rules/` and its subfolders. For each rule file, spawn a subagent with the following instructions:
 
-- Does the state management approach fit the feature, or does it need an overhaul?
-- Is the component composition clear, small, and well-factored?
-- Are data loading and mutations handled in the right place?
-- Is the TypeScript robust, inference-friendly, and free of unsafe escape hatches?
-- Do the changes follow the project's React and TypeScript rules as a coherent system, not as isolated style nits?
+1. **Role:** You are a senior engineer mentoring a junior teammate. You have been given one rule file that describes a coding standard the team has agreed on. Your job is to deeply internalize this rule, study the current changes, and produce a thorough assessment of how the code should be overhauled to fully align with the standard.
 
-## Required loading protocol
+2. **Read-only constraint:** Do NOT edit, create, or delete any files. Your only job is to read code, analyze it, and return findings.
 
-Before proposing refactor feedback, editing files, or running implementation commands, complete this flow in order:
+3. **Rule file:** Read the rule file at `<absolute path>` carefully and completely before doing anything else.
 
-1. Enumerate through every rule in the review skills rules folder and each of the subfolders.
-2. Read every discovered rule file in alphabetical order within each folder.
-3. Do not continue until all rule files have been read.
-4. Treat every rule as mandatory unless the user explicitly approves an exception.
+4. **Getting the diff:** Run `git diff` and `git diff --cached` to see the current change set. Also read the full contents of every changed file so you have complete context, not just the diff hunks.
 
-Do not skip a rule because it seems unrelated at first glance. The purpose of this skill is to understand how the rules work together.
+5. **What to return:** Return a thorough, ambitious assessment. Note small fixes and style nits, but do not limit yourself to them. Look for places where the implementation approach itself is wrong and needs to be overhauled. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions -- recommend ripping out the current approach and replacing it with one that properly aligns with the rule. Partial adjustments are not enough when the foundation is wrong.
 
-## Refactor workflow
+   For each finding, include:
+   - What is wrong with the current approach and why it does not satisfy the rule
+   - Where the problem is (file path and relevant code)
+   - What the correct approach looks like -- described in enough detail that someone could implement it without having to re-read the rule
+   - Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
 
-### 1. Internalize the rules deeply
+   Prioritize being correct, thorough, and detailed over finishing quickly. Do not hold back.
 
-Do not skim. Read the rules closely enough to understand:
+6. **If no issues are found:** Explicitly state that the current changes already satisfy the rule and no changes are needed.
 
-- what each rule is asking for
-- why the rule exists
-- how the React and TypeScript rules reinforce each other
-- which kinds of implementation mistakes the rules are trying to prevent
+## 2. Synthesize findings
 
-This step matters because the refactor is not just about spotting isolated violations. It is about recognizing when the overall shape of the code is wrong.
+Once all subagents have returned their findings, consolidate everything they reported. Identify overlaps, dependencies, and conflicts between findings from different rules.
 
-### 2. Inspect the active changes
+Present the combined findings to the user as a proposed plan. Ask the user questions about how they want to proceed -- which findings to act on, which to skip, and any tradeoffs between competing concerns.
 
-Audit the current work by reading the change set first:
+### Handling conflicts
 
-- staged changes
-- unstaged changes
-
-Prefer reviewing the diff before reading whole files. Then read any touched files and nearby supporting files needed to understand the architecture and intent.
-
-The refactor target is the code that changed, plus any adjacent code that must also change to make the refactor correct and maintainable.
-
-### 3. Build an audit plan
-
-After reading the rules and the diff, identify the highest-leverage improvements. Focus on structural correctness before minor cleanup.
-
-Prioritize in this order:
-
-1. Incorrect architecture or wrong state-management approach
-2. Wrong data-loading or mutation flow
-3. Unsafe or brittle TypeScript design
-4. Poor component or hook composition
-5. Performance issues caused by subscription shape, effects, or render boundaries
-6. Smaller cleanup issues
-
-If the right fix requires a broader refactor, do the broader refactor. Do not preserve a poor structure just to keep the patch small.
-
-### 4. Implement the improvements
-
-Make the code changes needed to bring the change set in line with the rules.
-
-This can include:
-
-- moving logic into better files
-- splitting large components or hooks apart
-- replacing prop drilling with a better state shape
-- moving data fetching into route loaders or query builders
-- restructuring mutations to be user-driven and colocated properly
-- removing unsafe assertions or redundant type annotations
-- rewriting control flow so the code becomes easier to verify
-
-Prefer durable fixes over cosmetic edits. If several files need to change together to make the design coherent, change them together.
-
-### 5. Keep the refactor scoped and practical
-
-Do not turn the pass into an unrelated repo-wide cleanup. Improve what is necessary to make the reviewed change set solid.
-
-Good refactor work is:
-
-- strongly opinionated about correctness and maintainability
-- willing to refactor when needed
-- not distracted by trivia
-
-### 6. Validate the result
-
-After making changes, run the repository validation steps required by the project instructions.
-
-### 7. Report what changed
-
-Summarize:
-
-- the main architectural or design problems you found
-- the improvements you made
-- any rule-driven tradeoffs or exceptions that still remain
-
-## Enforcement
-
-All rules under `rules/react/` and `rules/typescript/` are mandatory during the review pass.
-
-If you believe a rule should be broken for a specific task, stop and confirm with the user before doing so.
+Different rules will sometimes recommend incompatible approaches for the same code. When this happens, do not resolve the conflict yourself. Present the conflict to the user, explain what each rule is asking for and why they are at odds, and let the user decide. Every conflict is its own question. Do not bundle multiple conflicts into a single question and do not silently pick a side.
