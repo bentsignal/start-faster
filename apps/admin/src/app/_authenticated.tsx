@@ -13,12 +13,25 @@ export const Route = createFileRoute("/_authenticated")({
       const href = await getSignInUrl({ data: { returnPathname: path } });
       throw redirect({ href });
     }
+
+    // if user has never signed in before, a new user record in convex
+    // will be created with created for them
+    try {
+      await context.convexQueryClient.serverHttpClient?.mutation(
+        api.users.ensureUserExists,
+        {},
+      );
+    } catch (error) {
+      console.error(error);
+      throw new Error("Failed to ensure user exists");
+    }
+
     const currentUser = await context.queryClient.ensureQueryData(
       convexQuery(api.users.getCurrentUser, {}),
     );
     return {
-      user: auth.user,
-      accessLevel: currentUser?.accessLevel,
+      auth,
+      user: currentUser,
     };
   },
 });

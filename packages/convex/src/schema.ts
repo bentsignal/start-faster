@@ -1,13 +1,16 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+import { adminLevelValidator, cmsScopesValidator } from "./validators";
+
 export default defineSchema(
   {
     users: defineTable({
       name: v.string(),
       email: v.string(),
       workosUserId: v.string(),
-      accessLevel: v.union(v.literal("unauthorized"), v.literal("authorized")),
+      adminLevel: adminLevelValidator,
+      cmsScopes: cmsScopesValidator,
       searchText: v.string(),
     })
       .index("by_workos_user_id", ["workosUserId"])

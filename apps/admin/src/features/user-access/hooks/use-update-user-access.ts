@@ -1,56 +1,27 @@
 import { useMutation as useConvexMutation } from "convex/react";
 
-import { api } from "@acme/convex/api";
+import { userAccessMutations } from "~/features/user-access/lib/user-access-mutations";
 
-export function useUpdateUserAccess() {
-  return useConvexMutation(
-    api.users.updateUserAccessLevel,
-  ).withOptimisticUpdate((localStore, args) => {
-    const results = localStore.getAllQueries(api.users.searchUsersPaginated);
+export function useUpdateAdminLevel() {
+  const { convexMutation, optimisticUpdate } =
+    userAccessMutations.updateAdminLevel;
+  return useConvexMutation(convexMutation).withOptimisticUpdate(
+    optimisticUpdate,
+  );
+}
 
-    for (const result of results) {
-      if (result.value === undefined) {
-        continue;
-      }
+export function useUpdateCmsScopes() {
+  const { convexMutation, optimisticUpdate } =
+    userAccessMutations.updateCmsScopes;
+  return useConvexMutation(convexMutation).withOptimisticUpdate(
+    optimisticUpdate,
+  );
+}
 
-      const hasTargetUser = result.value.page.some(
-        (user) => user._id === args.userId,
-      );
-      if (!hasTargetUser) {
-        continue;
-      }
-
-      localStore.setQuery(
-        api.users.searchUsersPaginated,
-        {
-          searchTerm: result.args.searchTerm,
-          paginationOpts: result.args.paginationOpts,
-        },
-        {
-          ...result.value,
-          page: result.value.page.map((user) =>
-            user._id === args.userId
-              ? { ...user, accessLevel: args.accessLevel }
-              : user,
-          ),
-        },
-      );
-    }
-
-    const userQueries = localStore.getAllQueries(api.users.getUserById);
-    for (const result of userQueries) {
-      if (result.value === undefined) {
-        continue;
-      }
-
-      if (result.args.userId !== args.userId) {
-        continue;
-      }
-
-      localStore.setQuery(api.users.getUserById, result.args, {
-        ...result.value,
-        accessLevel: args.accessLevel,
-      });
-    }
-  });
+export function useRevokeAllPermissions() {
+  const { convexMutation, optimisticUpdate } =
+    userAccessMutations.revokeAllPermissions;
+  return useConvexMutation(convexMutation).withOptimisticUpdate(
+    optimisticUpdate,
+  );
 }

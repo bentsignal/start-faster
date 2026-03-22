@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(pnpm run:*)",
+      "Bash(find /Users/shawn/dev/projects/start-faster/node_modules -path */convex/browser.d.ts -o -path */convex/react.d.ts)",
+      "Bash(find /Users/shawn/dev/projects/start-faster -path */convex/dist/*.d.ts -name *react* -o -path */convex/dist/*.d.ts -name *browser*)"
+    ]
+  }
+}

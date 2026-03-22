@@ -1,85 +1,87 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
-import { authNmutation, authNquery, authRmutation, authRquery } from "./custom";
+import { mutation } from "./_generated/server";
+import { authNmutation, authNquery } from "./custom";
+import {
+  ensureCallerIsHigherThanTarget,
+  ensureMinimumAdminLevel,
+} from "./privileges";
+import {
+  adminLevelValidator,
+  cmsScopesValidator,
+  MIN_ADMIN_LEVEL,
+} from "./validators";
 
 function toSearchText(args: { name: string; email: string }) {
   return `${args.name} ${args.email}`.toLowerCase();
 }
 
-function assertAuthorizedAdmin(accessLevel: "authorized" | "unauthorized") {
-  if (accessLevel !== "authorized") {
-    throw new ConvexError("Unauthorized");
-  }
-}
-
 export const getCurrentUser = authNquery({
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_workos_user_id", (q) =>
-        q.eq("workosUserId", ctx.identity.subject),
-      )
-      .unique();
-  },
+  handler: (ctx) => ctx.user,
 });
 
-export const ensureUserExists = authNmutation({
+export const ensureUserExists = mutation({
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthenticated");
+    }
     const possibleUser = await ctx.db
       .query("users")
       .withIndex("by_workos_user_id", (q) =>
-        q.eq("workosUserId", ctx.identity.subject),
+        q.eq("workosUserId", identity.subject),
       )
       .unique();
-    const nameFromClaims = ctx.identity.name;
-    const emailFromClaims = ctx.identity.email;
+    const nameFromClaims = identity.name;
+    const emailFromClaims = identity.email;
 
-    if (possibleUser) {
-      const nextName = nameFromClaims ?? possibleUser.name;
-      const nextEmail = emailFromClaims ?? possibleUser.email;
+    if (!possibleUser) {
+      const nextName = nameFromClaims ?? "";
+      const nextEmail = emailFromClaims ?? "";
       const nextSearchText = toSearchText({
         name: nextName,
         email: nextEmail,
       });
-      if (
-        possibleUser.name !== nextName ||
-        possibleUser.email !== nextEmail ||
-        possibleUser.searchText !== nextSearchText
-      ) {
-        await ctx.db.patch(possibleUser._id, {
-          name: nextName,
-          email: nextEmail,
-          searchText: nextSearchText,
-        });
-      }
-      return true;
+      await ctx.db.insert("users", {
+        workosUserId: identity.subject,
+        name: nextName,
+        email: nextEmail,
+        adminLevel: 0,
+        cmsScopes: [],
+        searchText: nextSearchText,
+      });
+      return false;
     }
 
-    const nextName = nameFromClaims ?? "";
-    const nextEmail = emailFromClaims ?? "";
+    const nextName = nameFromClaims ?? possibleUser.name;
+    const nextEmail = emailFromClaims ?? possibleUser.email;
     const nextSearchText = toSearchText({
       name: nextName,
       email: nextEmail,
     });
-    await ctx.db.insert("users", {
-      workosUserId: ctx.identity.subject,
-      name: nextName,
-      email: nextEmail,
-      accessLevel: "unauthorized",
-      searchText: nextSearchText,
-    });
-    return false;
+    if (
+      possibleUser.name !== nextName ||
+      possibleUser.email !== nextEmail ||
+      possibleUser.searchText !== nextSearchText
+    ) {
+      await ctx.db.patch(possibleUser._id, {
+        name: nextName,
+        email: nextEmail,
+        searchText: nextSearchText,
+      });
+    }
+    return true;
   },
 });
 
-export const searchUsersPaginated = authRquery({
+export const searchUsersPaginated = authNquery({
   args: {
     searchTerm: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    assertAuthorizedAdmin(ctx.user.accessLevel);
+    ensureMinimumAdminLevel(ctx.user, MIN_ADMIN_LEVEL);
 
     const normalizedSearchTerm = args.searchTerm?.trim().toLowerCase();
     if (!normalizedSearchTerm) {
@@ -98,12 +100,12 @@ export const searchUsersPaginated = authRquery({
   },
 });
 
-export const getUserById = authRquery({
+export const getUserById = authNquery({
   args: {
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    assertAuthorizedAdmin(ctx.user.accessLevel);
+    ensureMinimumAdminLevel(ctx.user, MIN_ADMIN_LEVEL);
 
     const userId = ctx.db.normalizeId("users", args.userId);
     if (userId === null) {
@@ -119,20 +121,35 @@ export const getUserById = authRquery({
   },
 });
 
-export const updateUserAccessLevel = authRmutation({
+export const updateUserAdminLevel = authNmutation({
   args: {
     userId: v.id("users"),
-    accessLevel: v.union(v.literal("authorized"), v.literal("unauthorized")),
+    adminLevel: adminLevelValidator,
   },
   handler: async (ctx, args) => {
-    assertAuthorizedAdmin(ctx.user.accessLevel);
-    const user = await ctx.db.get(args.userId);
-    if (!user) {
-      throw new ConvexError("User not found");
-    }
+    ensureMinimumAdminLevel(ctx.user, args.adminLevel);
+    await ensureCallerIsHigherThanTarget(ctx, args.userId);
+    await ctx.db.patch(args.userId, { adminLevel: args.adminLevel });
+  },
+});
 
-    await ctx.db.patch(args.userId, {
-      accessLevel: args.accessLevel,
-    });
+export const updateUserCmsScopes = authNmutation({
+  args: {
+    userId: v.id("users"),
+    cmsScopes: cmsScopesValidator,
+  },
+  handler: async (ctx, args) => {
+    await ensureCallerIsHigherThanTarget(ctx, args.userId);
+    await ctx.db.patch(args.userId, { cmsScopes: args.cmsScopes });
+  },
+});
+
+export const revokeAllPermissions = authNmutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    await ensureCallerIsHigherThanTarget(ctx, args.userId);
+    await ctx.db.patch(args.userId, { adminLevel: 0, cmsScopes: [] });
   },
 });

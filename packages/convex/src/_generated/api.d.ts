@@ -9,7 +9,9 @@
  */
 
 import type * as custom from "../custom.js";
+import type * as privileges from "../privileges.js";
 import type * as users from "../users.js";
+import type * as validators from "../validators.js";
 
 import type {
   ApiFromModules,
@@ -19,7 +21,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   custom: typeof custom;
+  privileges: typeof privileges;
   users: typeof users;
+  validators: typeof validators;
 }>;
 
 /**

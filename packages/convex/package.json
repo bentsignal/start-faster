@@ -10,7 +10,7 @@
     "./model": {
       "types": "./src/_generated/dataModel.d.ts"
     },
-    "./types": "./src/types.ts"
+    "./types": "./src/validators.ts"
   },
   "scripts": {
     "dev": "convex dev",

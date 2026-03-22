@@ -11,7 +11,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { convert } from "great-time";
 
-import { api } from "@acme/convex/api";
 import {
   DEFAULT_THEME,
   getThemeFromCookie,
@@ -83,10 +82,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       // During SSR only (the only time serverHttpClient exists),
       // set the auth token to make HTTP queries with.
       context.convexQueryClient.serverHttpClient?.setAuth(auth.token);
-      await context.convexQueryClient.serverHttpClient?.mutation(
-        api.users.ensureUserExists,
-        {},
-      );
     }
 
     const { token: _, ...rest } = auth;
