@@ -45,7 +45,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Start Faster" },
+      { title: "CMS – Start Faster" },
       {
         name: "description",
         content: "The fastest shopping experience you've ever seen.",
