@@ -1,7 +1,7 @@
 ---
-
-## name: Refactor
+name: Refactor
 description: Code refactor to improve implementation details, only use when explicitly requested by user.
+---
 
 # Refactor
 
@@ -20,12 +20,14 @@ Enumerate every file under `rules/` and its subfolders. For each rule file, spaw
 3. **Rule file:** Read the rule file at `<absolute path>` carefully and completely before doing anything else.
 4. **Getting the diff:** Run `git diff` and `git diff --cached` to see the current change set. Also read the full contents of every changed file so you have complete context, not just the diff hunks.
 5. **What to return:** Return a thorough, ambitious assessment. Note small fixes and style nits, but do not limit yourself to them. Look for places where the implementation approach itself is wrong and needs to be overhauled. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions -- recommend ripping out the current approach and replacing it with one that properly aligns with the rule. Partial adjustments are not enough when the foundation is wrong.
-  For each finding, include:
-  - What is wrong with the current approach and why it does not satisfy the rule
-  - Where the problem is (file path and relevant code)
-  - What the correct approach looks like -- described in enough detail that someone could implement it without having to re-read the rule
-  - Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
-   Prioritize being correct, thorough, and detailed over finishing quickly. Do not hold back.
+   For each finding, include:
+
+- What is wrong with the current approach and why it does not satisfy the rule
+- Where the problem is (file path and relevant code)
+- What the correct approach looks like -- described in enough detail that someone could implement it without having to re-read the rule
+- Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
+  Prioritize being correct, thorough, and detailed over finishing quickly. Do not hold back.
+
 6. **If no issues are found:** Explicitly state that the current changes already satisfy the rule and no changes are needed.
 
 ## 2. Synthesize findings
