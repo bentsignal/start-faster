@@ -1,0 +1,115 @@
+{
+  "name": "@acme/files",
+  "private": true,
+  "description": "A convex files control component for Convex.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gilhrpenner/convex-files-control"
+  },
+  "homepage": "https://github.com/gilhrpenner/convex-files-control#readme",
+  "bugs": {
+    "url": "https://github.com/gilhrpenner/convex-files-control/issues"
+  },
+  "version": "0.5.1",
+  "license": "Apache-2.0",
+  "keywords": [
+    "convex",
+    "component",
+    "files",
+    "storage",
+    "upload",
+    "download",
+    "access-control"
+  ],
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "dev": "pnpm run dev:watch",
+    "dev:watch": "chokidar 'tsconfig*.json' 'src/**/*.ts' -i '**/*.test.ts' -c 'pnpm run build' --initial",
+    "build": "pnpm run build:ts",
+    "codegen": "pnpm exec convex codegen --component-dir ./src/component",
+    "build:codegen": "pnpm run codegen && pnpm run build:ts",
+    "build:ts": "tsc --project ./tsconfig.build.json",
+    "topo": "pnpm run build",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "typecheck": "tsc --noEmit",
+    "typecheck:all": "pnpm run typecheck",
+    "lint": "eslint src/",
+    "test": "vitest run --typecheck",
+    "test:watch": "vitest --typecheck --clearScreen false",
+    "test:debug": "vitest --inspect-brk --no-file-parallelism",
+    "test:coverage": "vitest run --coverage --coverage.reporter=text",
+    "check": "pnpm run build && pnpm run typecheck && pnpm run lint && pnpm run test"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./test": "./src/test.ts",
+    "./_generated/component.js": {
+      "types": "./dist/component/_generated/component.d.ts"
+    },
+    "./_generated/component": {
+      "types": "./dist/component/_generated/component.d.ts"
+    },
+    "./convex.config.js": {
+      "types": "./dist/component/convex.config.d.ts",
+      "default": "./dist/component/convex.config.js"
+    },
+    "./convex.config": {
+      "types": "./dist/component/convex.config.d.ts",
+      "default": "./dist/component/convex.config.js"
+    }
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.958.0",
+    "@aws-sdk/s3-request-presigner": "^3.958.0",
+    "@convex-dev/action-retrier": "^0.3.0",
+    "convex-helpers": "catalog:"
+  },
+  "peerDependencies": {
+    "convex": "catalog:",
+    "react": "catalog:react19"
+  },
+  "devDependencies": {
+    "@acme/prettier-config": "workspace:*",
+    "@convex-dev/eslint-plugin": "^1.1.1",
+    "@edge-runtime/vm": "^5.0.0",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitest/coverage-v8": "^4.0.16",
+    "chokidar-cli": "3.0.0",
+    "convex": "catalog:",
+    "convex-test": "0.0.41",
+    "eslint": "catalog:",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^16.5.0",
+    "npm-run-all2": "8.0.4",
+    "prettier": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.46.2",
+    "vite": "catalog:",
+    "vitest": "4.0.16"
+  },
+  "prettier": "@acme/prettier-config",
+  "types": "./dist/client/index.d.ts",
+  "module": "./dist/client/index.js"
+}
