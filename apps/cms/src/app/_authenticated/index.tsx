@@ -4,13 +4,12 @@ import { convexQuery } from "@convex-dev/react-query";
 import { Loader } from "lucide-react";
 
 import { api } from "@acme/convex/api";
-import { MIN_ADMIN_LEVEL } from "@acme/convex/types";
 
 import { SignOutButton } from "~/components/sign-out-button";
 
 export const Route = createFileRoute("/_authenticated/")({
   beforeLoad: ({ context }) => {
-    if (context.user.adminLevel >= MIN_ADMIN_LEVEL) {
+    if (context.user.cmsScopes.length > 0) {
       throw redirect({ href: "/dashboard" });
     }
   },
@@ -18,11 +17,11 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function RouteComponent() {
-  const { data: adminLevel } = useSuspenseQuery({
+  const { data: cmsScopes } = useSuspenseQuery({
     ...convexQuery(api.users.getCurrentUser, {}),
-    select: (data) => data.adminLevel,
+    select: (data) => data.cmsScopes,
   });
-  if (adminLevel >= MIN_ADMIN_LEVEL) {
+  if (cmsScopes.length > 0) {
     return <Navigate to="/dashboard" />;
   }
 
@@ -32,7 +31,7 @@ function RouteComponent() {
         <Loader className="size-4 animate-spin" />
         <h1 className="text-base font-medium">Waiting for access</h1>
         <p className="text-muted-foreground max-w-xs text-sm">
-          An admin needs to approve your account before you can continue.
+          An admin needs to grant you CMS permissions before you can continue.
         </p>
       </div>
       <SignOutButton />

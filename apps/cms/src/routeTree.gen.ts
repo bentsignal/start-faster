@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './app/__root'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
-import { Route as IndexRouteImport } from './app/index'
-import { Route as AuthenticatedSettingsRouteRouteImport } from './app/_authenticated/settings/route'
-import { Route as AuthenticatedSettingsAccountRouteImport } from './app/_authenticated/settings/account'
+import { Route as AuthenticatedIndexRouteImport } from './app/_authenticated/index'
+import { Route as AuthenticatedAuthorizedRouteImport } from './app/_authenticated/_authorized'
+import { Route as AuthenticatedAuthorizedDashboardRouteImport } from './app/_authenticated/_authorized/dashboard'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -24,60 +24,55 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedSettingsRouteRoute =
-  AuthenticatedSettingsRouteRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedSettingsAccountRoute =
-  AuthenticatedSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+const AuthenticatedAuthorizedRoute = AuthenticatedAuthorizedRouteImport.update({
+  id: '/_authorized',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAuthorizedDashboardRoute =
+  AuthenticatedAuthorizedDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedIndexRoute
   '/callback': typeof CallbackRoute
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/callback': typeof CallbackRoute
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/_authorized': typeof AuthenticatedAuthorizedRouteWithChildren
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/_authorized/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/callback' | '/settings' | '/settings/account'
+  fullPaths: '/' | '/callback' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/callback' | '/settings' | '/settings/account'
+  to: '/callback' | '/' | '/dashboard'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
     | '/callback'
-    | '/_authenticated/settings'
-    | '/_authenticated/settings/account'
+    | '/_authenticated/_authorized'
+    | '/_authenticated/'
+    | '/_authenticated/_authorized/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
 }
@@ -98,50 +93,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings/account': {
-      id: '/_authenticated/settings/account'
-      path: '/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    '/_authenticated/_authorized': {
+      id: '/_authenticated/_authorized'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAuthorizedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/_authorized/dashboard': {
+      id: '/_authenticated/_authorized/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedAuthorizedDashboardRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
     }
   }
 }
 
-interface AuthenticatedSettingsRouteRouteChildren {
-  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+interface AuthenticatedAuthorizedRouteChildren {
+  AuthenticatedAuthorizedDashboardRoute: typeof AuthenticatedAuthorizedDashboardRoute
 }
 
-const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
+const AuthenticatedAuthorizedRouteChildren: AuthenticatedAuthorizedRouteChildren =
   {
-    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+    AuthenticatedAuthorizedDashboardRoute:
+      AuthenticatedAuthorizedDashboardRoute,
   }
 
-const AuthenticatedSettingsRouteRouteWithChildren =
-  AuthenticatedSettingsRouteRoute._addFileChildren(
-    AuthenticatedSettingsRouteRouteChildren,
+const AuthenticatedAuthorizedRouteWithChildren =
+  AuthenticatedAuthorizedRoute._addFileChildren(
+    AuthenticatedAuthorizedRouteChildren,
   )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedAuthorizedRoute: typeof AuthenticatedAuthorizedRouteWithChildren
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedAuthorizedRoute: AuthenticatedAuthorizedRouteWithChildren,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -149,7 +147,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
 }
