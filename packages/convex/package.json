@@ -34,6 +34,7 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
+    "@acme/files": "workspace:*",
     "convex": "catalog:",
     "convex-env": "^2.5.0",
     "convex-helpers": "catalog:",
