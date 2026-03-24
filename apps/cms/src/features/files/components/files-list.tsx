@@ -44,7 +44,7 @@ export function FilesList() {
                     file.uploadedBy?.email ??
                     "Unknown user"}
                 </p>
-                <p>{formatDate(file.createdAt)}</p>
+                <p>{formatDate(file._creationTime)}</p>
               </div>
             </CardContent>
           </Card>

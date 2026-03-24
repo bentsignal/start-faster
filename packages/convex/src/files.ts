@@ -53,7 +53,6 @@ async function insertCmsFileRecord(
     size: args.metadata.size,
     sha256: args.metadata.sha256,
     uploadedByUserId: ctx.user._id,
-    createdAt: Date.now(),
   });
 }
 
