@@ -2,6 +2,7 @@ import type { ImgWidth } from "./sizes";
 import { imageWidths, largestImageWidth } from "./sizes";
 
 const imageQuality = 75;
+const maxResponsiveSrcSetCandidates = 4;
 
 const getVercelImageEndpoint = (optimizerBaseUrl?: string) => {
   if (!optimizerBaseUrl) {
@@ -43,6 +44,33 @@ const normalizeImageSourceUrl = (src: string) => {
   }
 };
 
+const pickResponsiveWidths = (
+  candidateWidths: readonly ImgWidth[],
+): [ImgWidth, ...ImgWidth[]] => {
+  if (candidateWidths.length === 0) {
+    return [largestImageWidth];
+  }
+
+  if (candidateWidths.length <= maxResponsiveSrcSetCandidates) {
+    return [...candidateWidths] as [ImgWidth, ...ImgWidth[]];
+  }
+
+  const lastIndex = candidateWidths.length - 1;
+  const selectedWidths = new Set<ImgWidth>();
+
+  for (let index = 0; index < maxResponsiveSrcSetCandidates; index += 1) {
+    const ratio = index / (maxResponsiveSrcSetCandidates - 1);
+    const candidateIndex = Math.round(lastIndex * ratio);
+    const candidateWidth = candidateWidths[candidateIndex];
+
+    if (candidateWidth !== undefined) {
+      selectedWidths.add(candidateWidth);
+    }
+  }
+
+  return [...selectedWidths] as [ImgWidth, ...ImgWidth[]];
+};
+
 export const useVercelOptimizedImageProps = (
   src: string,
   width: number,
@@ -61,8 +89,7 @@ export const useVercelOptimizedImageProps = (
     const responsiveWidths = imageWidths.filter(
       (candidateWidth) => candidateWidth <= maxResponsiveWidth,
     );
-    const widths =
-      responsiveWidths.length > 0 ? responsiveWidths : [largestImageWidth];
+    const widths = pickResponsiveWidths(responsiveWidths);
     const largestRequestedWidth = widths.at(-1) ?? largestImageWidth;
 
     return {

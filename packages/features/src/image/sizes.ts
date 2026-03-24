@@ -1,8 +1,6 @@
-export const imageDeviceSizes = [
-  640, 750, 828, 1080, 1200, 1600, 1920, 2560,
-] as const;
+export const imageDeviceSizes = [640, 960, 1280, 1920, 2560] as const;
 
-export const imageSizes = [32, 48, 64, 96, 128, 256, 384] as const;
+export const imageSizes = [48, 96, 160, 256, 384, 480] as const;
 
 export const imageWidths = [...imageSizes, ...imageDeviceSizes] as const;
 
