@@ -10,9 +10,13 @@ export const MIN_ADMIN_LEVEL = 1 satisfies AdminLevel;
 export const CMS_SCOPES = [
   "can-edit-blog-posts",
   "can-create-blog-posts",
+  "can-upload-files",
 ] as const;
 export const cmsScopeValidator = literals(...CMS_SCOPES);
 export type CmsScope = Infer<typeof cmsScopeValidator>;
-
 export const cmsScopesValidator = v.array(cmsScopeValidator);
 export type CmsScopes = Infer<typeof cmsScopesValidator>;
+
+export const STORAGE_PROVIDERS = ["convex", "r2"] as const;
+export const storageProviderValidator = literals(...STORAGE_PROVIDERS);
+export type StorageProvider = Infer<typeof storageProviderValidator>;

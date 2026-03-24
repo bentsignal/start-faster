@@ -1,10 +1,26 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-import { adminLevelValidator, cmsScopesValidator } from "./validators";
+import {
+  adminLevelValidator,
+  cmsScopesValidator,
+  storageProviderValidator,
+} from "./validators";
 
 export default defineSchema(
   {
+    files: defineTable({
+      storageId: v.string(),
+      storageProvider: storageProviderValidator,
+      fileName: v.string(),
+      contentType: v.union(v.string(), v.null()),
+      size: v.number(),
+      sha256: v.string(),
+      uploadedByUserId: v.id("users"),
+      createdAt: v.number(),
+    })
+      .index("by_storageId", ["storageId"])
+      .index("by_uploadedByUserId", ["uploadedByUserId"]),
     users: defineTable({
       name: v.string(),
       email: v.string(),

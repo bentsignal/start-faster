@@ -13,6 +13,7 @@ import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './app/_authenticated/index'
 import { Route as AuthenticatedAuthorizedRouteImport } from './app/_authenticated/_authorized'
+import { Route as AuthenticatedAuthorizedFilesRouteImport } from './app/_authenticated/_authorized/files'
 import { Route as AuthenticatedAuthorizedDashboardRouteImport } from './app/_authenticated/_authorized/dashboard'
 
 const CallbackRoute = CallbackRouteImport.update({
@@ -33,6 +34,12 @@ const AuthenticatedAuthorizedRoute = AuthenticatedAuthorizedRouteImport.update({
   id: '/_authorized',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAuthorizedFilesRoute =
+  AuthenticatedAuthorizedFilesRouteImport.update({
+    id: '/files',
+    path: '/files',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
+  } as any)
 const AuthenticatedAuthorizedDashboardRoute =
   AuthenticatedAuthorizedDashboardRouteImport.update({
     id: '/dashboard',
@@ -44,11 +51,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/callback': typeof CallbackRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
+  '/files': typeof AuthenticatedAuthorizedFilesRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
   '/': typeof AuthenticatedIndexRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
+  '/files': typeof AuthenticatedAuthorizedFilesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -57,12 +66,13 @@ export interface FileRoutesById {
   '/_authenticated/_authorized': typeof AuthenticatedAuthorizedRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_authorized/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
+  '/_authenticated/_authorized/files': typeof AuthenticatedAuthorizedFilesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/callback' | '/dashboard'
+  fullPaths: '/' | '/callback' | '/dashboard' | '/files'
   fileRoutesByTo: FileRoutesByTo
-  to: '/callback' | '/' | '/dashboard'
+  to: '/callback' | '/' | '/dashboard' | '/files'
   id:
     | '__root__'
     | '/_authenticated'
@@ -70,6 +80,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_authorized'
     | '/_authenticated/'
     | '/_authenticated/_authorized/dashboard'
+    | '/_authenticated/_authorized/files'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -107,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorizedRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/_authorized/files': {
+      id: '/_authenticated/_authorized/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof AuthenticatedAuthorizedFilesRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
+    }
     '/_authenticated/_authorized/dashboard': {
       id: '/_authenticated/_authorized/dashboard'
       path: '/dashboard'
@@ -119,12 +137,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAuthorizedRouteChildren {
   AuthenticatedAuthorizedDashboardRoute: typeof AuthenticatedAuthorizedDashboardRoute
+  AuthenticatedAuthorizedFilesRoute: typeof AuthenticatedAuthorizedFilesRoute
 }
 
 const AuthenticatedAuthorizedRouteChildren: AuthenticatedAuthorizedRouteChildren =
   {
     AuthenticatedAuthorizedDashboardRoute:
       AuthenticatedAuthorizedDashboardRoute,
+    AuthenticatedAuthorizedFilesRoute: AuthenticatedAuthorizedFilesRoute,
   }
 
 const AuthenticatedAuthorizedRouteWithChildren =

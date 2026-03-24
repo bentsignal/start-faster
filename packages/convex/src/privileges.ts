@@ -3,6 +3,15 @@ import { ConvexError } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { AuthNctx } from "./custom";
 import type { AdminLevel, CmsScope } from "./validators";
+import { MIN_ADMIN_LEVEL } from "./validators";
+
+export function hasCmsAccess(user: Doc<"users">) {
+  return user.adminLevel >= MIN_ADMIN_LEVEL || user.cmsScopes.length > 0;
+}
+
+export function hasCmsScopeOrAdmin(user: Doc<"users">, scope: CmsScope) {
+  return user.adminLevel >= MIN_ADMIN_LEVEL || user.cmsScopes.includes(scope);
+}
 
 export function ensureMinimumAdminLevel(
   callingUser: Doc<"users">,
@@ -21,6 +30,15 @@ export function ensureCmsScopes(
     if (!callingUser.cmsScopes.includes(scope)) {
       throw new ConvexError(`Missing required scope: ${scope}`);
     }
+  }
+}
+
+export function ensureCmsScopeOrAdmin(
+  callingUser: Doc<"users">,
+  requiredScope: CmsScope,
+) {
+  if (!hasCmsScopeOrAdmin(callingUser, requiredScope)) {
+    throw new ConvexError(`Missing required scope: ${requiredScope}`);
   }
 }
 

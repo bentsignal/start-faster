@@ -5,25 +5,26 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
+import { hasCmsAccess } from "@acme/convex/privileges";
+
+import { filesQueries } from "~/features/files/lib/queries";
 
 export const Route = createFileRoute("/_authenticated/_authorized")({
   component: RouteComponent,
   beforeLoad: ({ context }) => {
-    if (context.user.cmsScopes.length === 0) {
+    if (!hasCmsAccess(context.user)) {
       throw redirect({ to: "/" });
     }
   },
 });
 
 function RouteComponent() {
-  const { data: cmsScopes } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
-    select: (data) => data.cmsScopes,
+  const { data: hasAccess } = useSuspenseQuery({
+    ...filesQueries.currentUser(),
+    select: (data) => hasCmsAccess(data),
   });
-  if (cmsScopes.length === 0) {
+  if (!hasAccess) {
     return <Navigate to="/" />;
   }
   return <Outlet />;
