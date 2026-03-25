@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/_authorized/users/$id")({
 function UserDetailRoute() {
   const router = useRouter();
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background min-h-full">
       <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-6 py-10 sm:px-8">
         <Button
           onMouseDown={() => router.history.back()}

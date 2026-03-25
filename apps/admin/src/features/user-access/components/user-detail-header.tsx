@@ -1,13 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/toaster";
 
 import { useRevokeAllPermissions } from "~/features/user-access/hooks/use-update-user-access";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
+import { adminQueries } from "~/lib/queries";
 
 export function UserDetailHeader() {
   const id = useParams({
@@ -26,7 +25,7 @@ export function UserDetailHeader() {
   });
 
   const { data: myAdminLevel } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...adminQueries.currentUser(),
     select: (data) => data.adminLevel,
   });
 

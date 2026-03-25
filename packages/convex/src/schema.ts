@@ -33,6 +33,35 @@ export default defineSchema(
       .searchIndex("search_text", {
         searchField: "searchText",
       }),
+    pages: defineTable({
+      createdByUserId: v.id("users"),
+      createdAt: v.number(),
+    }),
+    pageVersions: defineTable(
+      v.union(
+        v.object({
+          pageId: v.id("pages"),
+          state: v.literal("draft"),
+          title: v.optional(v.string()),
+          path: v.optional(v.string()),
+          content: v.optional(v.string()),
+          createdByUserId: v.id("users"),
+          updatedAt: v.number(),
+        }),
+        v.object({
+          pageId: v.id("pages"),
+          state: v.literal("published"),
+          title: v.string(),
+          path: v.string(),
+          content: v.string(),
+          createdByUserId: v.id("users"),
+          updatedAt: v.number(),
+        }),
+      ),
+    )
+      .index("by_pageId", ["pageId"])
+      .index("by_createdByUserId", ["createdByUserId"])
+      .index("by_path_and_state", ["path", "state", "updatedAt"]),
   },
   { schemaValidation: true },
 );

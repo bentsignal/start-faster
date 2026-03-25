@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { SignOutButton } from "~/components/sign-out-button";
 import { UserAccessList } from "~/features/user-access/components/user-access-list";
 import { UserSearchInput } from "~/features/user-access/components/user-search-input";
 import { sanitizeSearch } from "~/features/user-access/lib/sanitize-search";
@@ -23,13 +22,12 @@ export const Route = createFileRoute("/_authenticated/_authorized/dashboard")({
 
 function DashboardRoute() {
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background min-h-full">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-7 px-6 py-10 sm:px-8">
-        <header className="mb-4 flex items-center justify-between gap-4">
+        <header className="mb-4">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Admin Portal
+            User Management
           </h1>
-          <SignOutButton />
         </header>
 
         <UserSearchInput />

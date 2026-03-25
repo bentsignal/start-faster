@@ -3,9 +3,12 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./account": "./src/account/account-details.tsx",
     "./image": "./src/image/image.tsx",
     "./image/config": "./src/image/create-image-config.ts",
     "./image/sizes": "./src/image/sizes.ts",
+    "./layout/account-item": "./src/layout/account-item.tsx",
+    "./layout/sign-out-item": "./src/layout/sign-out-item.tsx",
     "./quick-link": "./src/quick-link/quick-link.tsx",
     "./screen": "./src/screen/index.tsx",
     "./theme": "./src/theme/index.tsx"

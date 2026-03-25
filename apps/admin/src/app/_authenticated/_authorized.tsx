@@ -5,10 +5,16 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { MIN_ADMIN_LEVEL } from "@acme/convex/types";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@acme/ui/sidebar";
+
+import { AppSidebar } from "~/features/layout/components/app-sidebar";
+import { adminQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/_authenticated/_authorized")({
   component: RouteComponent,
@@ -21,11 +27,23 @@ export const Route = createFileRoute("/_authenticated/_authorized")({
 
 function RouteComponent() {
   const { data: adminLevel } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...adminQueries.currentUser(),
     select: (data) => data.adminLevel,
   });
   if (adminLevel < MIN_ADMIN_LEVEL) {
     return <Navigate to="/" />;
   }
-  return <Outlet />;
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-12 shrink-0 items-center px-4">
+          <SidebarTrigger />
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }

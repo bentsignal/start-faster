@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './app/_authenticated/index'
 import { Route as AuthenticatedAuthorizedRouteImport } from './app/_authenticated/_authorized'
 import { Route as AuthenticatedAuthorizedDashboardRouteImport } from './app/_authenticated/_authorized/dashboard'
+import { Route as AuthenticatedAuthorizedAccountRouteImport } from './app/_authenticated/_authorized/account'
 import { Route as AuthenticatedAuthorizedUsersIdRouteImport } from './app/_authenticated/_authorized/users.$id'
 
 const CallbackRoute = CallbackRouteImport.update({
@@ -40,6 +41,12 @@ const AuthenticatedAuthorizedDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAuthorizedRoute,
   } as any)
+const AuthenticatedAuthorizedAccountRoute =
+  AuthenticatedAuthorizedAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
+  } as any)
 const AuthenticatedAuthorizedUsersIdRoute =
   AuthenticatedAuthorizedUsersIdRouteImport.update({
     id: '/users/$id',
@@ -50,12 +57,14 @@ const AuthenticatedAuthorizedUsersIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/callback': typeof CallbackRoute
+  '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/users/$id': typeof AuthenticatedAuthorizedUsersIdRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
   '/': typeof AuthenticatedIndexRoute
+  '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/users/$id': typeof AuthenticatedAuthorizedUsersIdRoute
 }
@@ -65,20 +74,22 @@ export interface FileRoutesById {
   '/callback': typeof CallbackRoute
   '/_authenticated/_authorized': typeof AuthenticatedAuthorizedRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/_authorized/account': typeof AuthenticatedAuthorizedAccountRoute
   '/_authenticated/_authorized/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/_authenticated/_authorized/users/$id': typeof AuthenticatedAuthorizedUsersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/callback' | '/dashboard' | '/users/$id'
+  fullPaths: '/' | '/callback' | '/account' | '/dashboard' | '/users/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/callback' | '/' | '/dashboard' | '/users/$id'
+  to: '/callback' | '/' | '/account' | '/dashboard' | '/users/$id'
   id:
     | '__root__'
     | '/_authenticated'
     | '/callback'
     | '/_authenticated/_authorized'
     | '/_authenticated/'
+    | '/_authenticated/_authorized/account'
     | '/_authenticated/_authorized/dashboard'
     | '/_authenticated/_authorized/users/$id'
   fileRoutesById: FileRoutesById
@@ -125,6 +136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorizedDashboardRouteImport
       parentRoute: typeof AuthenticatedAuthorizedRoute
     }
+    '/_authenticated/_authorized/account': {
+      id: '/_authenticated/_authorized/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAuthorizedAccountRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
+    }
     '/_authenticated/_authorized/users/$id': {
       id: '/_authenticated/_authorized/users/$id'
       path: '/users/$id'
@@ -136,12 +154,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAuthorizedRouteChildren {
+  AuthenticatedAuthorizedAccountRoute: typeof AuthenticatedAuthorizedAccountRoute
   AuthenticatedAuthorizedDashboardRoute: typeof AuthenticatedAuthorizedDashboardRoute
   AuthenticatedAuthorizedUsersIdRoute: typeof AuthenticatedAuthorizedUsersIdRoute
 }
 
 const AuthenticatedAuthorizedRouteChildren: AuthenticatedAuthorizedRouteChildren =
   {
+    AuthenticatedAuthorizedAccountRoute: AuthenticatedAuthorizedAccountRoute,
     AuthenticatedAuthorizedDashboardRoute:
       AuthenticatedAuthorizedDashboardRoute,
     AuthenticatedAuthorizedUsersIdRoute: AuthenticatedAuthorizedUsersIdRoute,

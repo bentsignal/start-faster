@@ -11,7 +11,8 @@
       "types": "./src/_generated/dataModel.d.ts"
     },
     "./types": "./src/validators.ts",
-    "./privileges": "./src/privileges.ts"
+    "./privileges": "./src/privileges.ts",
+    "./pages": "./src/pages.ts"
   },
   "scripts": {
     "dev": "convex dev",

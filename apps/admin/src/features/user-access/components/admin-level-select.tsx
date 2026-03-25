@@ -1,8 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { ADMIN_LEVELS } from "@acme/convex/types";
 import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { toast } from "@acme/ui/toaster";
@@ -13,6 +11,7 @@ import {
   isAdminLevel,
 } from "~/features/user-access/lib/access-utils";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
+import { adminQueries } from "~/lib/queries";
 
 export function AdminLevelSelect() {
   const id = useParams({
@@ -30,7 +29,7 @@ export function AdminLevelSelect() {
   });
 
   const { data: currentUserAdminLevel } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...adminQueries.currentUser(),
     select: (data) => data.adminLevel,
   });
 

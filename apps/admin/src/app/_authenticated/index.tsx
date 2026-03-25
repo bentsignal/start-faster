@@ -1,12 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Navigate, redirect } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 import { Loader } from "lucide-react";
 
-import { api } from "@acme/convex/api";
 import { MIN_ADMIN_LEVEL } from "@acme/convex/types";
 
 import { SignOutButton } from "~/components/sign-out-button";
+import { adminQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/_authenticated/")({
   beforeLoad: ({ context }) => {
@@ -19,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/")({
 
 function RouteComponent() {
   const { data: adminLevel } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...adminQueries.currentUser(),
     select: (data) => data.adminLevel,
   });
   if (adminLevel >= MIN_ADMIN_LEVEL) {

@@ -1,13 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { CMS_SCOPES } from "@acme/convex/types";
 import { toast } from "@acme/ui/toaster";
 
 import { useUpdateCmsScopes } from "~/features/user-access/hooks/use-update-user-access";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
+import { adminQueries } from "~/lib/queries";
 
 export function CmsScopesEditor() {
   const id = useParams({
@@ -25,7 +24,7 @@ export function CmsScopesEditor() {
   });
 
   const { data: currentUserAdminLevel } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...adminQueries.currentUser(),
     select: (data) => data.adminLevel,
   });
 

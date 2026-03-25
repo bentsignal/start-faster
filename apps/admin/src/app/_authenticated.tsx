@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 import { getSignInUrl } from "@workos/authkit-tanstack-react-start";
 
 import { api } from "@acme/convex/api";
+
+import { adminQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
 
     const currentUser = await context.queryClient.ensureQueryData(
-      convexQuery(api.users.getCurrentUser, {}),
+      adminQueries.currentUser(),
     );
     return {
       auth,
