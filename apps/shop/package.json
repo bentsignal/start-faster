@@ -14,9 +14,11 @@
     "with-env": "dotenv -e ./.env.local -e ./.env -e ../../.env --"
   },
   "dependencies": {
+    "@acme/convex": "workspace:*",
     "@acme/features": "workspace:*",
     "@acme/shopify": "workspace:*",
     "@acme/ui": "workspace:*",
+    "@convex-dev/react-query": "catalog:",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
     "@shopify/hydrogen": "catalog:",
@@ -30,6 +32,7 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "convex": "catalog:",
     "great-time": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
