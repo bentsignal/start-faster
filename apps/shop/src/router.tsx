@@ -1,14 +1,18 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { ConvexQueryClient } from "@convex-dev/react-query";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 import { Error } from "~/components/error";
 import { NotFound } from "~/components/not-found";
 import { Pending } from "~/components/pending";
+import { env } from "~/env";
 import { cartMutationKeys } from "~/features/cart/lib/cart-queries";
 import { routeTree } from "./routeTree.gen";
 
 export interface RouterContext {
+  convex: ConvexReactClient;
   queryClient: QueryClient;
 }
 
@@ -17,13 +21,19 @@ function mutationRetryDelay(attemptIndex: number) {
 }
 
 export function getRouter() {
+  const convex = new ConvexReactClient(env.VITE_CONVEX_URL);
+  const convexQueryClient = new ConvexQueryClient(convex);
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
+        queryKeyHashFn: convexQueryClient.hashFn(),
+        queryFn: convexQueryClient.queryFn(),
       },
     },
   });
+  convexQueryClient.connect(queryClient);
 
   queryClient.setMutationDefaults(cartMutationKeys.lineAll, {
     retry: 3,
@@ -35,8 +45,12 @@ export function getRouter() {
     defaultPreload: "intent",
     scrollRestoration: true,
     context: {
+      convex,
       queryClient,
     },
+    Wrap: ({ children }) => (
+      <ConvexProvider client={convex}>{children}</ConvexProvider>
+    ),
     defaultNotFoundComponent: NotFound,
     defaultErrorComponent: Error,
     defaultPendingComponent: Pending,
