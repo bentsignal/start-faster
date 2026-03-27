@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
-import { ArrowRight, Files } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 
 import { api } from "@acme/convex/api";
 import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
@@ -13,36 +13,36 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-export function FilesDashboardCard() {
-  const { data: canUploadFiles } = useSuspenseQuery({
+export function PagesDashboardCard() {
+  const { data: canManagePages } = useSuspenseQuery({
     ...convexQuery(api.users.getCurrentUser, {}),
-    select: (data) => hasCmsScopeOrAdmin(data, "can-upload-files"),
+    select: (data) => hasCmsScopeOrAdmin(data, "can-create-pages"),
   });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Files className="size-4" />
-          Files
+          <FileText className="size-4" />
+          Pages
         </CardTitle>
         <CardDescription>
-          Upload and browse shared CMS assets stored in Convex.
+          Create and manage pages published on the shop.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-muted-foreground text-sm">
-          {canUploadFiles
-            ? "Your account can open the shared asset library and upload new files."
-            : "Your account can enter the CMS, but it does not have permission to upload files yet."}
+          {canManagePages
+            ? "Your account can create and manage pages on the shop."
+            : "Your account can enter the CMS, but it does not have permission to manage pages yet."}
         </p>
 
-        {canUploadFiles ? (
+        {canManagePages ? (
           <QuickLink
-            to="/files"
+            to="/pages"
             className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
           >
-            Open files
+            Open pages
             <ArrowRight className="size-4" />
           </QuickLink>
         ) : null}

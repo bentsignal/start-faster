@@ -1,12 +1,13 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 
+import { api } from "@acme/convex/api";
 import { Card, CardContent } from "@acme/ui/card";
 
 import { formatDate, formatFileSize } from "~/features/files/lib/format";
-import { filesQueries } from "~/features/files/lib/queries";
 
 export function FilesList() {
-  const { data: files } = useSuspenseQuery(filesQueries.list());
+  const { data: files } = useSuspenseQuery(convexQuery(api.files.list, {}));
 
   if (files.length === 0) {
     return (

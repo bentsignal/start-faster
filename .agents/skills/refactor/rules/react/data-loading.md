@@ -38,9 +38,14 @@ beforeLoad: async ({ context }) => {
 
 ## Query Option Builders
 
-All TanStack Query options must be organized into `*Queries` builder objects (e.g. `productQueries`, `cartQueries`, `searchQueries`). Each method returns a query options object with a stable, hierarchical query key and colocated fetch logic. Never scatter raw `queryKey` / `queryFn` pairs across components.
+> **IMPORTANT — Convex queries are exempt from this section.** The `*Queries` builder pattern described below applies to non-Convex data sources (Shopify, REST APIs, custom fetch calls, etc.) where you must manually wire up `queryKey` and `queryFn`. **Do NOT create `*Queries` builder objects for Convex queries.** Convex queries should be called inline at the call site using `convexQuery(api.<module>.<function>, { ...args })` — this keeps the Convex function reference directly visible so you can command-click through to the backend definition. The `convexQuery` helper from `@convex-dev/react-query` already generates stable query keys and a query function automatically, so wrapping it in another layer adds indirection with zero benefit.
+>
+> To be completely clear: if the data comes from Convex, do **not** create a query file, do **not** create a `*Queries` object, do **not** wrap `convexQuery` in a factory function. Just call `convexQuery(api.foo.bar, { args })` directly wherever you need it — in route loaders, in `useSuspenseQuery`, etc. This is the correct pattern for Convex.
+
+For **non-Convex** data sources (Shopify Storefront API, REST endpoints, custom fetchers), all TanStack Query options must be organized into `*Queries` builder objects (e.g. `productQueries`, `cartQueries`, `searchQueries`). Each method returns a query options object with a stable, hierarchical query key and colocated fetch logic. Never scatter raw `queryKey` / `queryFn` pairs across components for these data sources.
 
 ```tsx
+// ✅ Correct for non-Convex data (Shopify, REST, etc.)
 export const cartQueries = {
   all: () => ({
     queryKey: ["cart"] as const,
@@ -61,7 +66,17 @@ export const cartQueries = {
 };
 ```
 
-Key points:
+```tsx
+// ✅ Correct for Convex data — call convexQuery inline, no wrapper
+const { data } = useSuspenseQuery(convexQuery(api.pages.list, {}));
+
+// ❌ Wrong — do NOT wrap Convex queries in builder objects
+const pagesQueries = {
+  list: () => convexQuery(api.pages.list, {}), // unnecessary indirection
+};
+```
+
+Key points for non-Convex query builders:
 
 - Name the export `<domain>Queries` (e.g. `productQueries`, `searchQueries`).
 - Build query keys hierarchically so broader invalidations work (e.g. invalidating `cartQueries.all()` clears every cart query).

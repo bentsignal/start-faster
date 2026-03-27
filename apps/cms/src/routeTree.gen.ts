@@ -15,6 +15,9 @@ import { Route as AuthenticatedIndexRouteImport } from './app/_authenticated/ind
 import { Route as AuthenticatedAuthorizedRouteImport } from './app/_authenticated/_authorized'
 import { Route as AuthenticatedAuthorizedFilesRouteImport } from './app/_authenticated/_authorized/files'
 import { Route as AuthenticatedAuthorizedDashboardRouteImport } from './app/_authenticated/_authorized/dashboard'
+import { Route as AuthenticatedAuthorizedAccountRouteImport } from './app/_authenticated/_authorized/account'
+import { Route as AuthenticatedAuthorizedPagesIndexRouteImport } from './app/_authenticated/_authorized/pages.index'
+import { Route as AuthenticatedAuthorizedPagesPageIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -46,18 +49,42 @@ const AuthenticatedAuthorizedDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAuthorizedRoute,
   } as any)
+const AuthenticatedAuthorizedAccountRoute =
+  AuthenticatedAuthorizedAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesIndexRoute =
+  AuthenticatedAuthorizedPagesIndexRouteImport.update({
+    id: '/pages/',
+    path: '/pages/',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesPageIdRoute =
+  AuthenticatedAuthorizedPagesPageIdRouteImport.update({
+    id: '/pages/$pageId',
+    path: '/pages/$pageId',
+    getParentRoute: () => AuthenticatedAuthorizedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/callback': typeof CallbackRoute
+  '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/files': typeof AuthenticatedAuthorizedFilesRoute
+  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
+  '/pages/': typeof AuthenticatedAuthorizedPagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
   '/': typeof AuthenticatedIndexRoute
+  '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/files': typeof AuthenticatedAuthorizedFilesRoute
+  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
+  '/pages': typeof AuthenticatedAuthorizedPagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -65,22 +92,42 @@ export interface FileRoutesById {
   '/callback': typeof CallbackRoute
   '/_authenticated/_authorized': typeof AuthenticatedAuthorizedRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/_authorized/account': typeof AuthenticatedAuthorizedAccountRoute
   '/_authenticated/_authorized/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/_authenticated/_authorized/files': typeof AuthenticatedAuthorizedFilesRoute
+  '/_authenticated/_authorized/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
+  '/_authenticated/_authorized/pages/': typeof AuthenticatedAuthorizedPagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/callback' | '/dashboard' | '/files'
+  fullPaths:
+    | '/'
+    | '/callback'
+    | '/account'
+    | '/dashboard'
+    | '/files'
+    | '/pages/$pageId'
+    | '/pages/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/callback' | '/' | '/dashboard' | '/files'
+  to:
+    | '/callback'
+    | '/'
+    | '/account'
+    | '/dashboard'
+    | '/files'
+    | '/pages/$pageId'
+    | '/pages'
   id:
     | '__root__'
     | '/_authenticated'
     | '/callback'
     | '/_authenticated/_authorized'
     | '/_authenticated/'
+    | '/_authenticated/_authorized/account'
     | '/_authenticated/_authorized/dashboard'
     | '/_authenticated/_authorized/files'
+    | '/_authenticated/_authorized/pages/$pageId'
+    | '/_authenticated/_authorized/pages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,19 +179,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorizedDashboardRouteImport
       parentRoute: typeof AuthenticatedAuthorizedRoute
     }
+    '/_authenticated/_authorized/account': {
+      id: '/_authenticated/_authorized/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAuthorizedAccountRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
+    }
+    '/_authenticated/_authorized/pages/': {
+      id: '/_authenticated/_authorized/pages/'
+      path: '/pages'
+      fullPath: '/pages/'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesIndexRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
+    }
+    '/_authenticated/_authorized/pages/$pageId': {
+      id: '/_authenticated/_authorized/pages/$pageId'
+      path: '/pages/$pageId'
+      fullPath: '/pages/$pageId'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedRoute
+    }
   }
 }
 
 interface AuthenticatedAuthorizedRouteChildren {
+  AuthenticatedAuthorizedAccountRoute: typeof AuthenticatedAuthorizedAccountRoute
   AuthenticatedAuthorizedDashboardRoute: typeof AuthenticatedAuthorizedDashboardRoute
   AuthenticatedAuthorizedFilesRoute: typeof AuthenticatedAuthorizedFilesRoute
+  AuthenticatedAuthorizedPagesPageIdRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+  AuthenticatedAuthorizedPagesIndexRoute: typeof AuthenticatedAuthorizedPagesIndexRoute
 }
 
 const AuthenticatedAuthorizedRouteChildren: AuthenticatedAuthorizedRouteChildren =
   {
+    AuthenticatedAuthorizedAccountRoute: AuthenticatedAuthorizedAccountRoute,
     AuthenticatedAuthorizedDashboardRoute:
       AuthenticatedAuthorizedDashboardRoute,
     AuthenticatedAuthorizedFilesRoute: AuthenticatedAuthorizedFilesRoute,
+    AuthenticatedAuthorizedPagesPageIdRoute:
+      AuthenticatedAuthorizedPagesPageIdRoute,
+    AuthenticatedAuthorizedPagesIndexRoute:
+      AuthenticatedAuthorizedPagesIndexRoute,
   }
 
 const AuthenticatedAuthorizedRouteWithChildren =

@@ -5,10 +5,17 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
+import { convexQuery } from "@convex-dev/react-query";
 
+import { api } from "@acme/convex/api";
 import { hasCmsAccess } from "@acme/convex/privileges";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@acme/ui/sidebar";
 
-import { filesQueries } from "~/features/files/lib/queries";
+import { AppSidebar } from "~/features/sidebars/components/app-sidebar";
 
 export const Route = createFileRoute("/_authenticated/_authorized")({
   component: RouteComponent,
@@ -17,15 +24,32 @@ export const Route = createFileRoute("/_authenticated/_authorized")({
       throw redirect({ to: "/" });
     }
   },
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(
+      convexQuery(api.users.getCurrentUser, {}),
+    );
+  },
 });
 
 function RouteComponent() {
   const { data: hasAccess } = useSuspenseQuery({
-    ...filesQueries.currentUser(),
+    ...convexQuery(api.users.getCurrentUser, {}),
     select: (data) => hasCmsAccess(data),
   });
   if (!hasAccess) {
     return <Navigate to="/" />;
   }
-  return <Outlet />;
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-12 shrink-0 items-center px-4">
+          <SidebarTrigger />
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }

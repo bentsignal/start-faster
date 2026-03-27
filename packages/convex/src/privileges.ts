@@ -35,10 +35,18 @@ export function ensureCmsScopes(
 
 export function ensureCmsScopeOrAdmin(
   callingUser: Doc<"users">,
-  requiredScope: CmsScope,
+  requiredScopes: CmsScope | CmsScope[],
 ) {
-  if (!hasCmsScopeOrAdmin(callingUser, requiredScope)) {
-    throw new ConvexError(`Missing required scope: ${requiredScope}`);
+  if (typeof requiredScopes === "string") {
+    if (!hasCmsScopeOrAdmin(callingUser, requiredScopes)) {
+      throw new ConvexError(`Missing required scope: ${requiredScopes}`);
+    }
+  } else {
+    for (const scope of requiredScopes) {
+      if (!hasCmsScopeOrAdmin(callingUser, scope)) {
+        throw new ConvexError(`Missing required scope: ${scope}`);
+      }
+    }
   }
 }
 

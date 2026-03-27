@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAccessToken } from "@workos/authkit-tanstack-react-start/client";
 
 import { api } from "@acme/convex/api";
@@ -8,7 +7,6 @@ import { toast } from "@acme/ui/toaster";
 
 import { env } from "~/env";
 import { toConvexSiteUrl } from "~/features/files/lib/format";
-import { filesQueries } from "~/features/files/lib/queries";
 
 const convexSiteUrl = toConvexSiteUrl(env.VITE_CONVEX_URL);
 
@@ -21,7 +19,6 @@ const uploadFileOptions = {
 };
 
 export function useFileUpload() {
-  const queryClient = useQueryClient();
   const { getAccessToken } = useAccessToken();
   const { uploadFile } = useUploadFile(api.files, uploadFileOptions);
 
@@ -51,10 +48,6 @@ export function useFileUpload() {
           baseUrl: convexSiteUrl,
           authToken,
         },
-      });
-
-      await queryClient.invalidateQueries({
-        queryKey: filesQueries.list().queryKey,
       });
 
       setSelectedFile(null);
