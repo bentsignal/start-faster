@@ -9,7 +9,7 @@ The single biggest failure mode for AI-generated React code is producing monolit
 ## Principles
 
 1. **Small over large.** A 40-line component that does one thing well is always better than a 200-line component that does five things.
-2. **Separate concerns by file.** Business logic lives in hooks or utility functions. UI lives in components. Data fetching configuration lives in query builders. Do not combine these into a single file.
+2. **Separate concerns by file.** Business logic lives in hooks or utility functions. UI lives in components. Data fetching configuration lives in query builders. Exception: a component and its dedicated hook may live in the same file when the hook serves only that component. Shared or reusable hooks still belong in separate files.
 3. **Compose, don't accumulate.** Build complex behavior by composing small hooks and small components rather than letting a single unit grow.
 4. **Every file should answer one question at a glance.** A route file answers "what does this page look like and what data does it need?" A component file answers "what does this piece of UI render?" A hook answers "what behavior does this encapsulate?"
 

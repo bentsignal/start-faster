@@ -10,7 +10,7 @@ These are the React standards for this project. Follow them when writing or modi
 ## Composition
 
 - Code should read like prose. Every file should have a clear, single purpose.
-- Separate concerns by file: business logic in hooks/utilities, UI in components, data fetching config in query builders. Do not combine these into a single file.
+- Separate concerns by file: business logic in hooks/utilities, UI in components, data fetching config in query builders. Exception: a component and its dedicated hook may live in the same file when the hook serves only that component.
 - Build complex behavior by composing small hooks and small components — do not let a single unit grow.
 - **Route files**: Under ~100 lines. All route-level configuration (search params, loader, beforeLoad, head, meta, error/pending components, static data, etc.) defined inline — never imported from a separate config file. The route component composes well-named child components so the page structure is visible at a glance. No helper functions, constants, hooks, or complex logic in route files.
 - **Components**: Under ~80 lines or one distinct UI concern. Split if larger. Colocate tightly related sub-components in the same file when not reused elsewhere.
@@ -20,22 +20,22 @@ These are the React standards for this project. Follow them when writing or modi
 
 ## State Management
 
-Four strategies, each with specific use cases:
+TanStack Query is the primary state management solution for server data. Components should pull data directly using hooks (`useSuspenseQuery`, `useSearch`, `useRouteContext`, `useStore`) at the leaf level where it's needed — **never prop drill data that a hook can provide directly**.
 
-1. **URL state** (TanStack Router `validateSearch` + `useSearch`): For state that should persist across refreshes, be shareable via link, or be bookmarkable. Always use `select` with `useSearch` to avoid unnecessary re-renders.
-2. **Query caches** (TanStack Query for Shopify, `convexQuery` for Convex): For server data. Query at the level you need it — no prop drilling required. Follow the data-loading rules closely.
-3. **Rostra stores**: For global concerns (auth, theme) or page-level state that needs to be shared across a subtree of components. See the `rostra` skill for implementation details.
-4. **Prop drilling**: Least preferred. One level down is normal. Passing the same data through multiple intermediary components is a smell — use one of the above instead.
+1. **Query caches** (TanStack Query for all data sources): The default for server data. Query at the component level — no prop drilling required. Centralize all query definitions (including Convex) into `*Queries` files using `queryOptions`.
+2. **URL state** (TanStack Router `validateSearch` + `useSearch`): For state that should persist across refreshes, be shareable via link, or be bookmarkable. Always use `select` with `useSearch` to avoid unnecessary re-renders.
+3. **Rostra stores**: Only for non-server state — form inputs before submission, global concerns (auth, theme), UI state shared across a subtree. See the `rostra` skill for implementation details.
+4. **Prop drilling**: Least preferred, and usually unnecessary. One level of props is normal for component-specific configuration. Passing data available via hooks through multiple intermediary components is always wrong. Before prop drilling though, you should always ask yourself if one of the solutions above could be used instead, typically the answer is yes.
 
 When uncertain about the right choice, ask the user.
 
 ## Data Loading
 
+- **Component + hook pattern**: Each component pairs with a co-located hook that owns all data access (queries, mutations, derived state). The component is a thin renderer.
 - **Route loaders**: Prefetch with `ensureQueryData` (or `ensureInfiniteQueryData`). Declare `loaderDeps` when the loader depends on search params.
-- **Convex reads**: Use `convexQuery(api.<module>.<function>, { ...args })` inline at call sites — in loaders, in `useSuspenseQuery`, everywhere. Do NOT create `*Queries` wrapper objects for Convex data. This keeps the Convex function reference directly visible for cmd-click navigation.
-- **Non-Convex data** (Shopify, REST): Organize into `*Queries` builder objects (e.g. `productQueries`) with hierarchical query keys and colocated `queryFn`. Never scatter raw `queryKey`/`queryFn` pairs across components.
-- **Components**: Consume prefetched data with `useSuspenseQuery`. Since the loader already populated the cache, this resolves synchronously.
-- **Mutations**: Always driven by user events (clicks, form submissions). Never trigger from `useEffect` or render logic. Use `*Mutations` builder objects for non-Convex mutations. Use `useMutation` from `convex/react` for Convex mutations.
+- **Centralized query definitions**: All queries — Convex and non-Convex — should be centralized into `*Queries` files using `queryOptions`. For Convex, wrap `convexQuery()` in `queryOptions()` — no explicit `queryKey` needed since `convexQuery` generates keys automatically.
+- **Centralized mutation definitions**: Use `mutationOptions` for all mutations. Convex mutations must be defined inside a hook (since `useConvexMutation` is a hook).
+- **Components**: Consume prefetched data with `useSuspenseQuery`. Since the loader already populated the cache, this resolves synchronously. Pull data at the leaf component — do not drill it from parents.
 - **Optimistic updates**: For TanStack Query — cancel in-flight queries in `onMutate`, snapshot previous data, apply optimistic change, roll back in `onError`. For Convex — use `.withOptimisticUpdate`. Prioritize for actions where perceived latency matters (cart ops, toggles, inline edits).
 - **Loading/error states**: Do NOT manually write loading spinners or error checks. TanStack Start handles this at the route level via `defaultPendingComponent`, `defaultErrorComponent`, and `defaultNotFoundComponent`. Only check mutation status (`isPending`, `isError`) for mutation-driven UI feedback.
 
