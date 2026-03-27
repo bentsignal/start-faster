@@ -1,6 +1,6 @@
 ---
 name: rostra
-description: Guides correct usage of the Rostra state management library (createStore, Store, useStore), including store scoping, selectors, optional access, prop-driven initialization, and typing. Use when dealing with state management in React/React Native, or when the user mentions rostra, createStore, useStore, Store providers, or performant state.
+description: Guides correct usage of the Rostra state management library (createStore, Store, useStore), including store scoping, selectors, optional access, prop-driven initialization, and typing. Use only when the user asks you to work with an existing rostra store or to implement a new one.
 ---
 
 ## Overview

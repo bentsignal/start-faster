@@ -1,5 +1,5 @@
 ---
-name: Refactor
+name: refactor
 description: Code refactor to improve implementation details, only use when explicitly requested by user.
 ---
 
@@ -9,11 +9,18 @@ This skill turns "working enough" code into code that is robust, maintainable, a
 
 The target is the active change set, not the entire repository.
 
-Each rule file under `rules/` represents an independent concern (composition, data loading, performance, state management, TypeScript patterns, etc.). Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents -- one per rule file. Each subagent becomes a deep expert on its single rule and evaluates the current changes entirely through that lens.
+Each reference file under the `typescript` and `react` skills represents an independent concern (composition, data loading, performance, state management, TypeScript patterns, etc.). Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents -- one per reference file. Each subagent becomes a deep expert on its single rule and evaluates the current changes entirely through that lens.
 
-## 1. Spawn one subagent per rule file
+## 1. Spawn one subagent per reference file
 
-Enumerate every file under `rules/` and its subfolders. For each rule file, spawn a subagent with the following instructions:
+Enumerate every file under these directories:
+
+- `typescript/references/`
+- `react/references/`
+
+These paths are relative to this skill's parent directory (i.e. the `skills/` directory).
+
+For each reference file, spawn a subagent with the following instructions:
 
 1. **Role:** You are a senior engineer mentoring a junior teammate. You have been given one rule file that describes a coding standard the team has agreed on. Your job is to deeply internalize this rule, study the current changes, and produce a thorough assessment of how the code should be overhauled to fully align with the standard.
 2. **Read-only constraint:** Do NOT edit, create, or delete any files. Your only job is to read code, analyze it, and return findings.

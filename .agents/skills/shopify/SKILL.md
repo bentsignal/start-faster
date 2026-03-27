@@ -1,6 +1,6 @@
 ---
 name: Shopify
-description: How to handle working with Shopify inside this project.
+description: Use whenever the scope of your task touches the shopify package or its uses anywhere in the project.
 ---
 
 This project uses Shopify headless. The shopify package `@acme/shopify` is configured to generate TypeScript types for the GraphQL queries written in the package.
