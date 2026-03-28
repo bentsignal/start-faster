@@ -18,6 +18,9 @@ import { Route as AuthenticatedAuthorizedDashboardRouteImport } from './app/_aut
 import { Route as AuthenticatedAuthorizedAccountRouteImport } from './app/_authenticated/_authorized/account'
 import { Route as AuthenticatedAuthorizedPagesIndexRouteImport } from './app/_authenticated/_authorized/pages.index'
 import { Route as AuthenticatedAuthorizedPagesPageIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId'
+import { Route as AuthenticatedAuthorizedPagesPageIdIndexRouteImport } from './app/_authenticated/_authorized/pages.$pageId.index'
+import { Route as AuthenticatedAuthorizedPagesPageIdSettingsRouteImport } from './app/_authenticated/_authorized/pages.$pageId.settings'
+import { Route as AuthenticatedAuthorizedPagesPageIdDraftDraftIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId.draft.$draftId'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -67,6 +70,24 @@ const AuthenticatedAuthorizedPagesPageIdRoute =
     path: '/pages/$pageId',
     getParentRoute: () => AuthenticatedAuthorizedRoute,
   } as any)
+const AuthenticatedAuthorizedPagesPageIdIndexRoute =
+  AuthenticatedAuthorizedPagesPageIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesPageIdSettingsRoute =
+  AuthenticatedAuthorizedPagesPageIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute =
+  AuthenticatedAuthorizedPagesPageIdDraftDraftIdRouteImport.update({
+    id: '/draft/$draftId',
+    path: '/draft/$draftId',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -74,8 +95,11 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/files': typeof AuthenticatedAuthorizedFilesRoute
-  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
+  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRouteWithChildren
   '/pages/': typeof AuthenticatedAuthorizedPagesIndexRoute
+  '/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
+  '/pages/$pageId/': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
+  '/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
@@ -83,8 +107,10 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAuthorizedAccountRoute
   '/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/files': typeof AuthenticatedAuthorizedFilesRoute
-  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
   '/pages': typeof AuthenticatedAuthorizedPagesIndexRoute
+  '/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
+  '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
+  '/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,8 +121,11 @@ export interface FileRoutesById {
   '/_authenticated/_authorized/account': typeof AuthenticatedAuthorizedAccountRoute
   '/_authenticated/_authorized/dashboard': typeof AuthenticatedAuthorizedDashboardRoute
   '/_authenticated/_authorized/files': typeof AuthenticatedAuthorizedFilesRoute
-  '/_authenticated/_authorized/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRoute
+  '/_authenticated/_authorized/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdRouteWithChildren
   '/_authenticated/_authorized/pages/': typeof AuthenticatedAuthorizedPagesIndexRoute
+  '/_authenticated/_authorized/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
+  '/_authenticated/_authorized/pages/$pageId/': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
+  '/_authenticated/_authorized/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +137,9 @@ export interface FileRouteTypes {
     | '/files'
     | '/pages/$pageId'
     | '/pages/'
+    | '/pages/$pageId/settings'
+    | '/pages/$pageId/'
+    | '/pages/$pageId/draft/$draftId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/callback'
@@ -115,8 +147,10 @@ export interface FileRouteTypes {
     | '/account'
     | '/dashboard'
     | '/files'
-    | '/pages/$pageId'
     | '/pages'
+    | '/pages/$pageId/settings'
+    | '/pages/$pageId'
+    | '/pages/$pageId/draft/$draftId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -128,6 +162,9 @@ export interface FileRouteTypes {
     | '/_authenticated/_authorized/files'
     | '/_authenticated/_authorized/pages/$pageId'
     | '/_authenticated/_authorized/pages/'
+    | '/_authenticated/_authorized/pages/$pageId/settings'
+    | '/_authenticated/_authorized/pages/$pageId/'
+    | '/_authenticated/_authorized/pages/$pageId/draft/$draftId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -200,14 +237,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdRouteImport
       parentRoute: typeof AuthenticatedAuthorizedRoute
     }
+    '/_authenticated/_authorized/pages/$pageId/': {
+      id: '/_authenticated/_authorized/pages/$pageId/'
+      path: '/'
+      fullPath: '/pages/$pageId/'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
+    '/_authenticated/_authorized/pages/$pageId/settings': {
+      id: '/_authenticated/_authorized/pages/$pageId/settings'
+      path: '/settings'
+      fullPath: '/pages/$pageId/settings'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdSettingsRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
+    '/_authenticated/_authorized/pages/$pageId/draft/$draftId': {
+      id: '/_authenticated/_authorized/pages/$pageId/draft/$draftId'
+      path: '/draft/$draftId'
+      fullPath: '/pages/$pageId/draft/$draftId'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
   }
 }
+
+interface AuthenticatedAuthorizedPagesPageIdRouteChildren {
+  AuthenticatedAuthorizedPagesPageIdSettingsRoute: typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
+  AuthenticatedAuthorizedPagesPageIdIndexRoute: typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
+  AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute: typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
+}
+
+const AuthenticatedAuthorizedPagesPageIdRouteChildren: AuthenticatedAuthorizedPagesPageIdRouteChildren =
+  {
+    AuthenticatedAuthorizedPagesPageIdSettingsRoute:
+      AuthenticatedAuthorizedPagesPageIdSettingsRoute,
+    AuthenticatedAuthorizedPagesPageIdIndexRoute:
+      AuthenticatedAuthorizedPagesPageIdIndexRoute,
+    AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute:
+      AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute,
+  }
+
+const AuthenticatedAuthorizedPagesPageIdRouteWithChildren =
+  AuthenticatedAuthorizedPagesPageIdRoute._addFileChildren(
+    AuthenticatedAuthorizedPagesPageIdRouteChildren,
+  )
 
 interface AuthenticatedAuthorizedRouteChildren {
   AuthenticatedAuthorizedAccountRoute: typeof AuthenticatedAuthorizedAccountRoute
   AuthenticatedAuthorizedDashboardRoute: typeof AuthenticatedAuthorizedDashboardRoute
   AuthenticatedAuthorizedFilesRoute: typeof AuthenticatedAuthorizedFilesRoute
-  AuthenticatedAuthorizedPagesPageIdRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+  AuthenticatedAuthorizedPagesPageIdRoute: typeof AuthenticatedAuthorizedPagesPageIdRouteWithChildren
   AuthenticatedAuthorizedPagesIndexRoute: typeof AuthenticatedAuthorizedPagesIndexRoute
 }
 
@@ -218,7 +297,7 @@ const AuthenticatedAuthorizedRouteChildren: AuthenticatedAuthorizedRouteChildren
       AuthenticatedAuthorizedDashboardRoute,
     AuthenticatedAuthorizedFilesRoute: AuthenticatedAuthorizedFilesRoute,
     AuthenticatedAuthorizedPagesPageIdRoute:
-      AuthenticatedAuthorizedPagesPageIdRoute,
+      AuthenticatedAuthorizedPagesPageIdRouteWithChildren,
     AuthenticatedAuthorizedPagesIndexRoute:
       AuthenticatedAuthorizedPagesIndexRoute,
   }

@@ -1,8 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { convexQuery } from "@convex-dev/react-query";
 import { ArrowRight, FileText } from "lucide-react";
 
-import { api } from "@acme/convex/api";
 import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
 import { QuickLink } from "@acme/features/quick-link";
 import {
@@ -13,10 +11,12 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
+import { userQueries } from "~/lib/user-queries";
+
 export function PagesDashboardCard() {
   const { data: canManagePages } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
-    select: (data) => hasCmsScopeOrAdmin(data, "can-create-pages"),
+    ...userQueries.currentUser(),
+    select: (data) => hasCmsScopeOrAdmin(data, "can-view-pages"),
   });
 
   return (

@@ -1,12 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Navigate, redirect } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 import { Loader } from "lucide-react";
 
-import { api } from "@acme/convex/api";
 import { hasCmsAccess } from "@acme/convex/privileges";
 
 import { SignOutButton } from "~/components/sign-out-button";
+import { userQueries } from "~/lib/user-queries";
 
 export const Route = createFileRoute("/_authenticated/")({
   beforeLoad: ({ context }) => {
@@ -14,17 +13,12 @@ export const Route = createFileRoute("/_authenticated/")({
       throw redirect({ href: "/dashboard" });
     }
   },
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      convexQuery(api.users.getCurrentUser, {}),
-    );
-  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { data: hasAccess } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...userQueries.currentUser(),
     select: (data) => hasCmsAccess(data),
   });
   if (hasAccess) {

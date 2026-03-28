@@ -11,6 +11,7 @@
 import type * as custom from "../custom.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as page_utils from "../page_utils.js";
 import type * as pages from "../pages.js";
 import type * as privileges from "../privileges.js";
 import type * as users from "../users.js";
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   custom: typeof custom;
   files: typeof files;
   http: typeof http;
+  page_utils: typeof page_utils;
   pages: typeof pages;
   privileges: typeof privileges;
   users: typeof users;

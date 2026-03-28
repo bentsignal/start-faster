@@ -1,12 +1,23 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 
+import type { CmsScope } from "@acme/convex/types";
 import { CMS_SCOPES } from "@acme/convex/types";
 import { toast } from "@acme/ui/toaster";
 
 import { useUpdateCmsScopes } from "~/features/user-access/hooks/use-update-user-access";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
 import { adminQueries } from "~/lib/queries";
+
+const SCOPE_LABELS = {
+  "can-view-pages": "User can view pages",
+  "can-create-new-pages": "User can create new pages",
+  "can-manage-page-content":
+    "User can create and upload new drafts to existing pages",
+  "can-manage-page-metadata":
+    "User can change page metadata like title and URL",
+  "can-upload-files": "User can upload files to the shared asset library",
+} as const satisfies Record<CmsScope, string>;
 
 export function CmsScopesEditor() {
   const id = useParams({
@@ -54,7 +65,7 @@ export function CmsScopesEditor() {
                 });
               }}
             />
-            {scope}
+            {SCOPE_LABELS[scope]}
           </label>
         ))}
       </div>

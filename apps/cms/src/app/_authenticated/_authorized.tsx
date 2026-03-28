@@ -5,9 +5,7 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { hasCmsAccess } from "@acme/convex/privileges";
 import {
   SidebarInset,
@@ -16,6 +14,7 @@ import {
 } from "@acme/ui/sidebar";
 
 import { AppSidebar } from "~/features/sidebars/components/app-sidebar";
+import { userQueries } from "~/lib/user-queries";
 
 export const Route = createFileRoute("/_authenticated/_authorized")({
   component: RouteComponent,
@@ -24,16 +23,11 @@ export const Route = createFileRoute("/_authenticated/_authorized")({
       throw redirect({ to: "/" });
     }
   },
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      convexQuery(api.users.getCurrentUser, {}),
-    );
-  },
 });
 
 function RouteComponent() {
   const { data: hasAccess } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...userQueries.currentUser(),
     select: (data) => hasCmsAccess(data),
   });
   if (!hasAccess) {
@@ -43,9 +37,9 @@ function RouteComponent() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center px-4">
-          <SidebarTrigger />
-        </header>
+        <div className="relative">
+          <SidebarTrigger className="absolute top-3 left-4 z-10" />
+        </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <Outlet />
         </div>

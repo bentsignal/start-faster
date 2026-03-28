@@ -9,6 +9,7 @@
     "./card": "./src/components/card.tsx",
     "./carousel": "./src/components/carousel.tsx",
     "./dialog": "./src/components/dialog.tsx",
+    "./context-menu": "./src/components/context-menu.tsx",
     "./drawer": "./src/components/drawer.tsx",
     "./hover-card": "./src/components/hover-card.tsx",
     "./image": "./src/components/image/image.tsx",

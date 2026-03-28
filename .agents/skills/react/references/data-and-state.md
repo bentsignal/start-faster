@@ -95,9 +95,9 @@ import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@acme/convex/api";
 
 export const pageQueries = {
-  list: () => queryOptions(convexQuery(api.pages.list, {})),
+  list: () => queryOptions({ ...convexQuery(api.pages.list, {}) }),
   getById: (pageId: Id<"pages">) =>
-    queryOptions(convexQuery(api.pages.getById, { pageId })),
+    queryOptions({ ...convexQuery(api.pages.getById, { pageId }) }),
 };
 ```
 
@@ -246,6 +246,7 @@ const searchTerm = useSearch({
 **Always use `select`** with `useSearch` so the component only re-renders when the specific param it uses changes.
 
 URL state is the right choice when you want state that:
+
 - Persists across full page refreshes
 - Is shareable via link
 - Survives if a user bookmarks the page
@@ -274,7 +275,9 @@ For Convex mutations:
 const pageMutations = usePageMutations();
 const { mutate } = useMutation({
   ...pageMutations.saveDraft,
-  onSuccess: () => { /* ... */ },
+  onSuccess: () => {
+    /* ... */
+  },
 });
 ```
 

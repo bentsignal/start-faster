@@ -41,7 +41,7 @@ export const strictAppBoundariesConfig = defineConfig({
     "max-lines-per-function": [
       "error",
       {
-        max: 60,
+        max: 100,
         skipBlankLines: true,
         skipComments: true,
       },

@@ -19,7 +19,9 @@ import {
 } from "@acme/ui/sidebar";
 
 import { env } from "~/env";
-import { PageDetailSidebar } from "./page-detail-sidebar";
+import { DraftSidebar } from "./draft-sidebar";
+import { PageHubSidebar } from "./page-hub-sidebar";
+import { SettingsSidebar } from "./settings-sidebar";
 
 const NAV_ITEMS = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -30,12 +32,23 @@ const NAV_ITEMS = [
 const ACTIVE_PROPS = { "data-active": "" } as const;
 
 export function AppSidebar() {
-  const match = useMatch({
-    from: "/_authenticated/_authorized/pages/$pageId",
+  const pageDraftMatch = useMatch({
+    from: "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
+    shouldThrow: false,
+  });
+  const pageSettingsMatch = useMatch({
+    from: "/_authenticated/_authorized/pages/$pageId/settings",
+    shouldThrow: false,
+  });
+  const pageHubMatch = useMatch({
+    from: "/_authenticated/_authorized/pages/$pageId/",
     shouldThrow: false,
   });
 
-  return match ? <PageDetailSidebar /> : <DefaultSidebar />;
+  if (pageDraftMatch) return <DraftSidebar />;
+  if (pageSettingsMatch) return <SettingsSidebar />;
+  if (pageHubMatch) return <PageHubSidebar />;
+  return <DefaultSidebar />;
 }
 
 function DefaultSidebar() {

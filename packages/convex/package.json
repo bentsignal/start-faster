@@ -12,7 +12,8 @@
     },
     "./types": "./src/validators.ts",
     "./privileges": "./src/privileges.ts",
-    "./pages": "./src/pages.ts"
+    "./pages": "./src/pages.ts",
+    "./page-utils": "./src/page_utils.ts"
   },
   "scripts": {
     "dev": "convex dev",

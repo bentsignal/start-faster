@@ -1,152 +1,71 @@
+import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
 import { query } from "./_generated/server";
 import { authNmutation, authNquery } from "./custom";
+import { validatePath } from "./page_utils";
 import { ensureCmsScopeOrAdmin } from "./privileges";
 
-const RESERVED_PATHS = [
-  "/",
-  "/shop",
-  "/collections",
-  "/search",
-  "/privacy-policy",
-  "/terms-of-service",
-  "/_auth",
-  "/_authenticated",
-] as const;
-
-export function validatePublishInput(input: {
-  title: string | undefined;
-  path: string | undefined;
-  content: string | undefined;
-}) {
-  const title = input.title?.trim();
-  const path = input.path?.trim();
-  const content = input.content?.trim();
-
-  if (!title || !path || !content) {
-    return {
-      status: "invalid" as const,
-      error: "All fields are required to publish.",
-    };
-  }
-
-  if (!path.startsWith("/")) {
-    return { status: "invalid" as const, error: "Path must start with /" };
-  }
-
-  if (path !== "/" && path.endsWith("/")) {
-    return { status: "invalid" as const, error: "Path must not end with /" };
-  }
-
-  for (const reserved of RESERVED_PATHS) {
-    if (path === reserved || path.startsWith(reserved + "/")) {
-      return {
-        status: "invalid" as const,
-        error: `Path ${reserved} is reserved`,
-      };
-    }
-  }
-
-  return { status: "valid" as const, title, path, content };
-}
-
 export const create = authNmutation({
-  args: {},
-  handler: async (ctx) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-create-pages");
+  args: {
+    title: v.string(),
+    path: v.string(),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-create-new-pages");
+
+    const title = args.title.trim();
+    if (!title) {
+      throw new ConvexError("Title is required");
+    }
+
+    const pathResult = validatePath(args.path);
+    if (pathResult.status === "invalid") {
+      throw new ConvexError(pathResult.error);
+    }
+
+    // Check path uniqueness
+    const existing = await ctx.db
+      .query("pages")
+      .withIndex("by_path", (q) => q.eq("path", pathResult.path))
+      .first();
+    if (existing) {
+      throw new ConvexError("A page with this path already exists");
+    }
 
     const pageId = await ctx.db.insert("pages", {
+      title,
+      path: pathResult.path,
       createdByUserId: ctx.user._id,
-      createdAt: Date.now(),
     });
 
-    const versionId = await ctx.db.insert("pageVersions", {
+    const draftId = await ctx.db.insert("pageDrafts", {
       pageId,
-      state: "draft",
+      name: "Untitled Draft",
+      content: "",
       createdByUserId: ctx.user._id,
       updatedAt: Date.now(),
     });
 
-    return { pageId, versionId };
+    return { pageId, draftId };
   },
 });
 
 export const saveDraft = authNmutation({
   args: {
-    versionId: v.id("pageVersions"),
-    title: v.optional(v.string()),
-    path: v.optional(v.string()),
-    content: v.optional(v.string()),
+    draftId: v.id("pageDrafts"),
+    content: v.string(),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-edit-pages");
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
 
-    const version = await ctx.db.get(args.versionId);
-    if (!version) {
-      throw new ConvexError("Version not found");
-    }
-    if (version.state !== "draft") {
-      throw new ConvexError("Can only edit draft versions");
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      throw new ConvexError("Draft not found");
     }
 
-    await ctx.db.patch(args.versionId, {
-      ...(args.title !== undefined && { title: args.title }),
-      ...(args.path !== undefined && { path: args.path }),
-      ...(args.content !== undefined && { content: args.content }),
-      updatedAt: Date.now(),
-    });
-  },
-});
-
-export const publish = authNmutation({
-  args: {
-    versionId: v.id("pageVersions"),
-  },
-  handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-edit-pages");
-
-    const version = await ctx.db.get(args.versionId);
-    if (!version) {
-      throw new ConvexError("Version not found");
-    }
-    if (version.state !== "draft") {
-      throw new ConvexError("This version is already published");
-    }
-
-    const result = validatePublishInput({
-      title: version.title,
-      path: version.path,
-      content: version.content,
-    });
-    if (result.status === "invalid") {
-      throw new ConvexError(result.error);
-    }
-
-    const { title, path, content } = result;
-
-    // Check path uniqueness: no other page should have a published version with this path
-    const existingPublished = await ctx.db
-      .query("pageVersions")
-      .withIndex("by_path_and_state", (q) =>
-        q.eq("path", path).eq("state", "published"),
-      )
-      .collect();
-
-    const conflict = existingPublished.find((v) => v.pageId !== version.pageId);
-    if (conflict) {
-      throw new ConvexError(
-        "Another page already has a published version with this path",
-      );
-    }
-
-    await ctx.db.replace(args.versionId, {
-      pageId: version.pageId,
-      state: "published",
-      title,
-      path,
-      content,
-      createdByUserId: version.createdByUserId,
+    await ctx.db.patch(args.draftId, {
+      content: args.content,
       updatedAt: Date.now(),
     });
   },
@@ -155,71 +74,201 @@ export const publish = authNmutation({
 export const createNewDraft = authNmutation({
   args: {
     pageId: v.id("pages"),
-    fromVersionId: v.optional(v.id("pageVersions")),
+    source: v.optional(
+      v.union(
+        v.object({
+          kind: v.literal("release"),
+          releaseId: v.id("pageReleases"),
+        }),
+        v.object({ kind: v.literal("draft"), draftId: v.id("pageDrafts") }),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-edit-pages");
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
 
     const page = await ctx.db.get(args.pageId);
     if (!page) {
       throw new ConvexError("Page not found");
     }
 
-    // Pre-fill from the specified version, or fall back to latest published
-    const sourceVersion = args.fromVersionId
-      ? await ctx.db.get(args.fromVersionId)
-      : await ctx.db
-          .query("pageVersions")
-          .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
-          .order("desc")
-          .filter((q) => q.eq(q.field("state"), "published"))
-          .first();
+    let name = "Untitled Draft";
+    let content = "";
 
-    const versionId = await ctx.db.insert("pageVersions", {
+    if (args.source) {
+      switch (args.source.kind) {
+        case "release": {
+          const release = await ctx.db.get(args.source.releaseId);
+          if (release) {
+            name = `Copy of ${release.name}`;
+            content = release.content;
+          }
+          break;
+        }
+        case "draft": {
+          const draft = await ctx.db.get(args.source.draftId);
+          if (draft) {
+            name = `Copy of ${draft.name}`;
+            content = draft.content;
+          }
+          break;
+        }
+      }
+    }
+
+    const draftId = await ctx.db.insert("pageDrafts", {
       pageId: args.pageId,
-      state: "draft",
-      title: sourceVersion?.title,
-      path: sourceVersion?.path,
-      content: sourceVersion?.content,
+      name,
+      content,
       createdByUserId: ctx.user._id,
       updatedAt: Date.now(),
     });
 
-    return versionId;
+    return draftId;
+  },
+});
+
+export const publish = authNmutation({
+  args: {
+    draftId: v.id("pageDrafts"),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
+
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      throw new ConvexError("Draft not found");
+    }
+
+    if (!draft.content.trim()) {
+      throw new ConvexError("Cannot publish a draft with empty content");
+    }
+
+    await ctx.db.insert("pageReleases", {
+      pageId: draft.pageId,
+      name: draft.name,
+      content: draft.content,
+      publishedByUserId: ctx.user._id,
+    });
+
+    // Delete the draft after publishing
+    await ctx.db.delete(args.draftId);
+  },
+});
+
+export const updatePageMetadata = authNmutation({
+  args: {
+    pageId: v.id("pages"),
+    title: v.optional(v.string()),
+    path: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-metadata");
+
+    const page = await ctx.db.get(args.pageId);
+    if (!page) {
+      throw new ConvexError("Page not found");
+    }
+
+    const updates: { title?: string; path?: string } = {};
+
+    if (args.title !== undefined) {
+      const title = args.title.trim();
+      if (!title) {
+        throw new ConvexError("Title is required");
+      }
+      updates.title = title;
+    }
+
+    if (args.path !== undefined) {
+      const pathResult = validatePath(args.path);
+      if (pathResult.status === "invalid") {
+        throw new ConvexError(pathResult.error);
+      }
+
+      // Check path uniqueness (exclude current page)
+      const existing = await ctx.db
+        .query("pages")
+        .withIndex("by_path", (q) => q.eq("path", pathResult.path))
+        .first();
+      if (existing && existing._id !== args.pageId) {
+        throw new ConvexError("A page with this path already exists");
+      }
+
+      updates.path = pathResult.path;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await ctx.db.patch(args.pageId, updates);
+    }
+  },
+});
+
+export const renameDraft = authNmutation({
+  args: {
+    draftId: v.id("pageDrafts"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
+
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      throw new ConvexError("Draft not found");
+    }
+
+    const name = args.name.trim();
+    if (!name) {
+      throw new ConvexError("Name is required");
+    }
+
+    await ctx.db.patch(args.draftId, { name });
+  },
+});
+
+export const deleteDraft = authNmutation({
+  args: {
+    draftId: v.id("pageDrafts"),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
+
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      throw new ConvexError("Draft not found");
+    }
+
+    await ctx.db.delete(args.draftId);
   },
 });
 
 export const list = authNquery({
   args: {},
   handler: async (ctx) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-create-pages");
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
 
     const pages = await ctx.db.query("pages").order("desc").collect();
 
     return await Promise.all(
       pages.map(async (page) => {
-        const versions = await ctx.db
-          .query("pageVersions")
+        const drafts = await ctx.db
+          .query("pageDrafts")
           .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
-          .order("desc")
           .collect();
 
-        // Find the latest published version, or fall back to the latest version
-        const latestPublished = versions.find((v) => v.state === "published");
-        const displayVersion =
-          latestPublished ?? (versions.length > 0 ? versions[0] : undefined);
+        const latestRelease = await ctx.db
+          .query("pageReleases")
+          .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
+          .order("desc")
+          .first();
 
         const createdByUser = await ctx.db.get(page.createdByUserId);
 
         return {
           ...page,
-          title: displayVersion?.title ?? "Untitled",
-          path: displayVersion?.path,
-          state: latestPublished ? ("published" as const) : ("draft" as const),
-          hasPublished: latestPublished !== undefined,
-          hasDraft: versions.some((v) => v.state === "draft"),
-          versionCount: versions.length,
-          updatedAt: displayVersion?.updatedAt ?? page.createdAt,
+          hasRelease: latestRelease !== null,
+          hasDraft: drafts.length > 0,
+          draftCount: drafts.length,
           createdBy: createdByUser
             ? { _id: createdByUser._id, name: createdByUser.name }
             : null,
@@ -234,24 +283,24 @@ export const getById = authNquery({
     pageId: v.id("pages"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-create-pages");
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
 
     const page = await ctx.db.get(args.pageId);
     if (!page) {
       throw new ConvexError("Page not found");
     }
 
-    const versions = await ctx.db
-      .query("pageVersions")
+    const latestRelease = await ctx.db
+      .query("pageReleases")
       .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
       .order("desc")
-      .collect();
+      .first();
 
     const createdByUser = await ctx.db.get(page.createdByUserId);
 
     return {
       ...page,
-      versions,
+      hasRelease: latestRelease !== null,
       createdBy: createdByUser
         ? { _id: createdByUser._id, name: createdByUser.name }
         : null,
@@ -259,43 +308,49 @@ export const getById = authNquery({
   },
 });
 
-export const listVersions = authNquery({
+export const getDraft = authNquery({
+  args: {
+    draftId: v.id("pageDrafts"),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      throw new ConvexError("Draft not found");
+    }
+    return draft;
+  },
+});
+
+export const listDrafts = authNquery({
+  args: {
+    pageId: v.id("pages"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+
+    return await ctx.db
+      .query("pageDrafts")
+      .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+  },
+});
+
+export const listRecentReleases = authNquery({
   args: {
     pageId: v.id("pages"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-create-pages");
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
 
-    const versions = await ctx.db
-      .query("pageVersions")
+    return await ctx.db
+      .query("pageReleases")
       .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
       .order("desc")
-      .collect();
-
-    return await Promise.all(
-      versions.map(async (version) => {
-        const user = await ctx.db.get(version.createdByUserId);
-        return {
-          ...version,
-          createdBy: user ? { _id: user._id, name: user.name } : null,
-        };
-      }),
-    );
-  },
-});
-
-export const getVersion = authNquery({
-  args: {
-    versionId: v.id("pageVersions"),
-  },
-  handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-create-pages");
-
-    const version = await ctx.db.get(args.versionId);
-    if (!version) {
-      throw new ConvexError("Version not found");
-    }
-    return version;
+      .take(3);
   },
 });
 
@@ -304,13 +359,29 @@ export const getByPath = query({
     path: v.string(),
   },
   handler: async (ctx, args) => {
-    // Index includes updatedAt, so desc order gives us the most recently published
-    return await ctx.db
-      .query("pageVersions")
-      .withIndex("by_path_and_state", (q) =>
-        q.eq("path", args.path).eq("state", "published"),
-      )
+    const page = await ctx.db
+      .query("pages")
+      .withIndex("by_path", (q) => q.eq("path", args.path))
+      .first();
+
+    if (!page) {
+      return null;
+    }
+
+    const latestRelease = await ctx.db
+      .query("pageReleases")
+      .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
       .order("desc")
       .first();
+
+    if (!latestRelease) {
+      return null;
+    }
+
+    return {
+      title: page.title,
+      path: page.path,
+      content: latestRelease.content,
+    };
   },
 });

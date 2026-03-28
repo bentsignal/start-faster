@@ -1,8 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { convexQuery } from "@convex-dev/react-query";
 import { ArrowRight, Files } from "lucide-react";
 
-import { api } from "@acme/convex/api";
 import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
 import { QuickLink } from "@acme/features/quick-link";
 import {
@@ -13,9 +11,11 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
+import { userQueries } from "~/lib/user-queries";
+
 export function FilesDashboardCard() {
   const { data: canUploadFiles } = useSuspenseQuery({
-    ...convexQuery(api.users.getCurrentUser, {}),
+    ...userQueries.currentUser(),
     select: (data) => hasCmsScopeOrAdmin(data, "can-upload-files"),
   });
 

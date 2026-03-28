@@ -21,9 +21,16 @@ A route file is the entry point for a page. When someone opens it, they should i
 - What the general layout looks like
 - Where to go to dig deeper into any specific piece
 
-Route files should be concise. Search params, loaders, and the route component all live in the same file. The route component itself uses well-named child components so you can see the page structure without drowning in implementation details.
+Route files should be concise. Search params, loaders, and the route component all live in the same file.
 
-**Do not** put helper functions, constants, hooks, or complex logic in route files. The route file is a map — it shows you the shape of the page and points you toward the implementations that live elsewhere.
+A route file contains at most **one hook** and **one route component**. Nothing else.
+
+- The **hook** shows what data the page needs — queries, context, derived state. Not every route needs one; omit it when the route component has no data to fetch.
+- The **route component** contains the actual page markup and layout. It calls the hook (if one exists) and renders the page using imported child components. If the page is simple enough, the route component just contains the markup directly — do not create sub-components for the sake of it.
+
+Do not extract the entire route component body into a single feature component and render only that. If the route component would just be `<SomePageComponent />`, that component's content belongs inline in the route component itself.
+
+Sub-components, constants, types, hooks beyond the single route hook, and utilities do **not** belong in route files. Sub-components live in `components/` feature folders. Constants and types live in `lib/` feature folders. The route file imports them. The route file is a map — it shows you what data the page uses, how it uses it, and what the page looks like at a glance.
 
 ### Example: A well-composed route file
 
