@@ -33,14 +33,15 @@ function useDraftEditor() {
     select: (data) => ({ _id: data._id, content: data.content }),
   });
 
-  return { draft };
-}
-
-function RouteComponent() {
-  const { draft } = useDraftEditor();
   const [content, setContent] = useState(draft.content);
 
   useAutosave({ draftId: draft._id, content });
+
+  return { content, setContent };
+}
+
+function RouteComponent() {
+  const { content, setContent } = useDraftEditor();
 
   return (
     <div className="flex flex-1 flex-col pt-8">

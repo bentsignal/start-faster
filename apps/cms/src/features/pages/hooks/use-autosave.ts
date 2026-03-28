@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useBlocker } from "@tanstack/react-router";
 
 import type { Id } from "@acme/convex/model";
 
@@ -15,7 +16,7 @@ export function useAutosave({
   content: string;
 }) {
   const pageMutations = usePageMutations();
-  const { mutate } = useMutation(pageMutations.saveDraft);
+  const { mutate, mutateAsync } = useMutation(pageMutations.saveDraft);
 
   const contentRef = useRef(content);
   const draftIdRef = useRef(draftId);
@@ -41,6 +42,21 @@ export function useAutosave({
       mutate({ draftId: draftIdRef.current, content: contentRef.current });
     }
   }, [mutate]);
+
+  /** Flush pending changes and wait for the save to complete. */
+  const flushAndAwait = useCallback(async () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (contentRef.current !== lastSavedContentRef.current) {
+      lastSavedContentRef.current = contentRef.current;
+      await mutateAsync({
+        draftId: draftIdRef.current,
+        content: contentRef.current,
+      });
+    }
+  }, [mutateAsync]);
 
   useEffect(() => {
     if (content === lastSavedContentRef.current) {
@@ -70,4 +86,13 @@ export function useAutosave({
       flush();
     };
   }, [flush]);
+
+  // Block navigation until any pending save completes
+  useBlocker({
+    shouldBlockFn: async () => {
+      await flushAndAwait();
+      return false;
+    },
+    enableBeforeUnload: true,
+  });
 }

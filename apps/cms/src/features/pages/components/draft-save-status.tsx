@@ -21,8 +21,7 @@ function useSaveStatus() {
     from: "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
     select: (ctx) => ctx.draftId,
   });
-  const pageMutations = usePageMutations();
-  const isSaving = useIsPending(pageMutations.saveDraft.mutationKey);
+  const isSaving = useIsPending(usePageMutations().saveDraft.mutationKey);
 
   const { data: draft } = useSuspenseQuery({
     ...pageQueries.getDraft(draftId),
