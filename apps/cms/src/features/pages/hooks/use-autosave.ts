@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 
@@ -16,11 +16,21 @@ export function useAutosave({
   content: string;
 }) {
   const pageMutations = usePageMutations();
-  const { mutate, mutateAsync } = useMutation(pageMutations.saveDraft);
+
+  // Reactive state for render-time comparison (updated on successful save)
+  const [lastSavedContent, setLastSavedContent] = useState(content);
+
+  const { mutate, mutateAsync, isPending } = useMutation({
+    ...pageMutations.saveDraft,
+    onSuccess: (_data, variables) => {
+      setLastSavedContent(variables.content);
+    },
+  });
 
   const contentRef = useRef(content);
   const draftIdRef = useRef(draftId);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref mirror for imperative dedup in callbacks (avoids double-saves)
   const lastSavedContentRef = useRef(content);
 
   // Sync refs in an effect to avoid writing during render
@@ -87,12 +97,17 @@ export function useAutosave({
     };
   }, [flush]);
 
+  // Only show the browser's "unsaved changes" dialog when there are actually
+  // unsaved changes: either content diverged from last save or a mutation is
+  // currently in flight.
+  const hasUnsavedChanges = content !== lastSavedContent || isPending;
+
   // Block navigation until any pending save completes
   useBlocker({
     shouldBlockFn: async () => {
       await flushAndAwait();
       return false;
     },
-    enableBeforeUnload: true,
+    enableBeforeUnload: hasUnsavedChanges,
   });
 }
