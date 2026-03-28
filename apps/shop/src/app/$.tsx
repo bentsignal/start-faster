@@ -38,7 +38,7 @@ export const Route = createFileRoute("/$")({
 
 function CmsPage() {
   const { page: loaderPage } = Route.useLoaderData();
-  const path = loaderPage.path ?? "";
+  const path = loaderPage.path;
   const { data: page } = useSuspenseQuery(shopQueries.getByPath(path));
 
   if (!page) {
