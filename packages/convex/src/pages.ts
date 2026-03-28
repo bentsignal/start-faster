@@ -354,6 +354,28 @@ export const listRecentReleases = authNquery({
   },
 });
 
+export const getDraftPreview = query({
+  args: {
+    draftId: v.id("pageDrafts"),
+  },
+  handler: async (ctx, args) => {
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) {
+      return null;
+    }
+
+    const page = await ctx.db.get(draft.pageId);
+    if (!page) {
+      return null;
+    }
+
+    return {
+      title: page.title,
+      content: draft.content,
+    };
+  },
+});
+
 export const getByPath = query({
   args: {
     path: v.string(),

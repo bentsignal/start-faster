@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Monitor, Smartphone, Tablet } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 import { z } from "zod";
 
 import {
@@ -10,45 +10,30 @@ import {
 } from "@acme/ui/tooltip";
 import { cn } from "@acme/ui/utils";
 
-export const viewportValidator = z.enum(["mobile", "tablet", "desktop"]);
-export type Viewport = z.infer<typeof viewportValidator>;
-export const defaultViewport = "desktop" satisfies Viewport;
+export const editorModeValidator = z.enum(["edit", "preview"]);
+export type EditorMode = z.infer<typeof editorModeValidator>;
+export const defaultEditorMode = "edit" satisfies EditorMode;
 
-export const VIEWPORT_OPTIONS = [
-  {
-    value: "mobile",
-    label: "Mobile",
-    icon: Smartphone,
-    width: 375,
-    height: 812,
-  },
-  { value: "tablet", label: "Tablet", icon: Tablet, width: 768, height: 1024 },
-  {
-    value: "desktop",
-    label: "Desktop",
-    icon: Monitor,
-    width: undefined,
-    height: undefined,
-  },
+const MODE_OPTIONS = [
+  { value: "edit", label: "Edit", icon: Pencil },
+  { value: "preview", label: "Preview", icon: Eye },
 ] as const satisfies readonly {
-  value: Viewport;
+  value: EditorMode;
   label: string;
   icon: LucideIcon;
-  width: number | undefined;
-  height: number | undefined;
 }[];
 
-export function ViewportToggle({
+export function EditPreviewToggle({
   value,
   onChange,
 }: {
-  value: Viewport;
-  onChange: (viewport: Viewport) => void;
+  value: EditorMode;
+  onChange: (mode: EditorMode) => void;
 }) {
   return (
     <TooltipProvider>
       <div className="bg-muted flex items-center gap-0.5 rounded-lg p-0.5">
-        {VIEWPORT_OPTIONS.map((option) => {
+        {MODE_OPTIONS.map((option) => {
           const Icon = option.icon;
           return (
             <Tooltip key={option.value}>

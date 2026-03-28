@@ -1,12 +1,15 @@
-import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { z } from "zod";
 
 import type { Viewport } from "~/features/pages/components/viewport-controls";
 import { env } from "~/env";
+import { OpenInNewTab } from "~/features/pages/components/open-in-new-tab";
+import { PreviewIframe } from "~/features/pages/components/preview-iframe";
 import {
-  VIEWPORT_OPTIONS,
+  defaultViewport,
   ViewportToggle,
+  viewportValidator,
 } from "~/features/pages/components/viewport-controls";
 import { pageQueries } from "~/features/pages/lib/page-queries";
 
@@ -14,6 +17,9 @@ export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/",
 )({
   component: RouteComponent,
+  validateSearch: z.object({
+    viewport: viewportValidator.default(defaultViewport),
+  }),
   loader: async ({ context }) => {
     const { pageId } = context;
     await Promise.all([
@@ -25,11 +31,11 @@ export const Route = createFileRoute(
       ),
     ]);
   },
+  shouldReload: false,
 });
 
 function RouteComponent() {
-  const { title, path, hasRelease } = usePageHub();
-  const [viewport, setViewport] = useState<Viewport>("desktop");
+  const { title, hasRelease, url, viewport, setViewport } = usePageHub();
 
   if (!hasRelease) {
     return (
@@ -41,25 +47,17 @@ function RouteComponent() {
     );
   }
 
-  const activeOption = VIEWPORT_OPTIONS.find((o) => o.value === viewport);
-
   return (
     <div className="flex h-full flex-1 flex-col">
-      <div className="flex shrink-0 items-center justify-end px-4 py-2">
+      <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-2">
+        <OpenInNewTab url={url} />
         <ViewportToggle value={viewport} onChange={setViewport} />
       </div>
-      <div className="flex min-h-0 flex-1 items-start justify-center">
-        <iframe
-          src={`${env.VITE_SHOP_URL}${path}`}
-          title={`Preview of ${title}`}
-          className={viewport !== "desktop" ? "border" : undefined}
-          style={{
-            width: activeOption?.width ?? "100%",
-            height: activeOption?.height ?? "100%",
-            maxHeight: "100%",
-          }}
-        />
-      </div>
+      <PreviewIframe
+        url={url}
+        title={`Preview of ${title}`}
+        viewport={viewport}
+      />
     </div>
   );
 }
@@ -79,5 +77,16 @@ function usePageHub() {
     }),
   });
 
-  return data;
+  const viewport = Route.useSearch({
+    select: (search) => search.viewport,
+  });
+
+  const navigate = Route.useNavigate();
+  async function setViewport(newViewport: Viewport) {
+    await navigate({ search: { viewport: newViewport }, replace: true });
+  }
+
+  const url = `${env.VITE_SHOP_URL}${data.path}`;
+
+  return { ...data, url, viewport, setViewport };
 }
