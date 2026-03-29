@@ -11,6 +11,7 @@
     "./dialog": "./src/components/dialog.tsx",
     "./context-menu": "./src/components/context-menu.tsx",
     "./drawer": "./src/components/drawer.tsx",
+    "./dropdown-menu": "./src/components/dropdown-menu.tsx",
     "./hover-card": "./src/components/hover-card.tsx",
     "./image": "./src/components/image/image.tsx",
     "./image/sizes": "./src/components/image/sizes.ts",

@@ -6,10 +6,13 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarSeparator,
 } from "@acme/ui/sidebar";
 
+import { DeleteDraftButton } from "~/features/pages/components/delete-draft-button";
 import { SaveStatus } from "~/features/pages/components/draft-save-status";
 import { PublishButton } from "~/features/pages/components/publish-draft-button";
 import { RenameDraftButton } from "~/features/pages/components/rename-draft-button";
@@ -20,7 +23,12 @@ export function DraftSidebar() {
       <DraftSidebarHeader />
       <SidebarSeparator />
       <SidebarContent>
-        <RenameDraftButton />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <RenameDraftButton />
+            <DeleteDraftButton />
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarSeparator className="mx-0" />

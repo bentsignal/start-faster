@@ -11,7 +11,6 @@ import { ScrollArea } from "@acme/ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -38,15 +37,11 @@ export function PageHubSidebar() {
     <Sidebar variant="inset">
       <PageHubHeader />
       <SidebarSeparator />
-      <SidebarContent className="min-h-0 flex-1">
+      <SidebarContent className="min-h-0 flex-1 gap-0">
         <NavItems />
         <DraftsList />
         <ReleasesList />
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarSeparator className="mx-0" />
-        <NewDraftButton />
-      </SidebarFooter>
     </Sidebar>
   );
 }
@@ -139,21 +134,21 @@ function DraftsList() {
 
   const { drafts, status, sentinelRef } = useDraftsList(pageId);
 
-  if (drafts.length === 0 && status !== "LoadingFirstPage") {
-    return null;
-  }
-
   return (
     <SidebarGroup className="flex min-h-0 flex-1 flex-col">
-      <SidebarGroupLabel className="text-sidebar-foreground/40 shrink-0 text-[11px] tracking-wider uppercase">
-        Drafts
-      </SidebarGroupLabel>
       <SidebarGroupContent className="min-h-0 flex-1">
-        <ScrollArea className="h-full">
+        <NewDraftButton />
+        <ScrollArea className="mt-2 h-full">
           <SidebarMenu>
-            {drafts.map((draft) => (
-              <DraftItem key={draft._id} pageId={pageId} draft={draft} />
-            ))}
+            {drafts.length > 0 ? (
+              drafts.map((draft) => (
+                <DraftItem key={draft._id} pageId={pageId} draft={draft} />
+              ))
+            ) : (
+              <span className="text-sidebar-foreground/40 px-2 text-center text-xs">
+                No drafts yet
+              </span>
+            )}
           </SidebarMenu>
           {status === "CanLoadMore" ? (
             <div ref={sentinelRef} className="h-1" />
@@ -213,21 +208,16 @@ function NewDraftButton() {
     from: "/_authenticated/_authorized/pages/$pageId",
     select: (ctx) => ctx.pageId,
   });
-  const { mutate, isPending } = useCreateDraftFromVersion(pageId);
+  const { mutate } = useCreateDraftFromVersion();
 
   return (
     <Button
       variant="outline"
       size="sm"
       className="w-full"
-      disabled={isPending}
       onClick={() => mutate({ pageId })}
     >
-      {isPending ? (
-        <Loader className="size-3.5 animate-spin" />
-      ) : (
-        <Plus className="size-3.5" />
-      )}
+      <Plus className="size-3.5" />
       New Draft
     </Button>
   );

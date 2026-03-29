@@ -15,7 +15,6 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 import { Input } from "@acme/ui/input";
-import { SidebarGroup, SidebarGroupContent } from "@acme/ui/sidebar";
 import { toast } from "@acme/ui/toaster";
 
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
@@ -27,59 +26,51 @@ export function RenameDraftButton() {
     useRenameDraftButton();
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent>
-        <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-sidebar-foreground/70 hover:text-sidebar-foreground w-full justify-start gap-2"
-              >
-                <Pencil className="size-3.5 shrink-0" />
-                <span className="min-w-0 truncate">{draftName}</span>
-              </Button>
-            }
-          />
-          {open ? (
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Rename Draft</DialogTitle>
-                <DialogDescription>
-                  Give this draft a name to help identify it.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-2 py-2">
-                <label htmlFor="draft-name" className="text-sm font-medium">
-                  Name
-                </label>
-                <Input
-                  autoFocus
-                  id="draft-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submit();
-                  }}
-                />
-              </div>
-              <DialogFooter>
-                <DialogClose
-                  render={<Button variant="outline">Cancel</Button>}
-                />
-                <Button disabled={isRenaming || !name.trim()} onClick={submit}>
-                  {isRenaming ? (
-                    <Loader className="size-3.5 animate-spin" />
-                  ) : null}
-                  Save
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          ) : null}
-        </Dialog>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-sidebar-foreground/70 hover:text-sidebar-foreground w-full justify-start gap-2"
+          >
+            <Pencil className="size-3.5 shrink-0" />
+            <span className="min-w-0 truncate">{draftName}</span>
+          </Button>
+        }
+      />
+      {open ? (
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Draft</DialogTitle>
+            <DialogDescription>
+              Give this draft a name to help identify it.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2 py-2">
+            <label htmlFor="draft-name" className="text-sm font-medium">
+              Name
+            </label>
+            <Input
+              autoFocus
+              id="draft-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submit();
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button disabled={isRenaming || !name.trim()} onClick={submit}>
+              {isRenaming ? <Loader className="size-3.5 animate-spin" /> : null}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      ) : null}
+    </Dialog>
   );
 }
 
