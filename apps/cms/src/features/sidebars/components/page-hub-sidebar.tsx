@@ -96,7 +96,7 @@ function useDraftsList(pageId: Id<"pages">) {
     ...pageQueries.listDraftsFirstPage(pageId),
   });
   const liveQuery = useConvexPaginatedQuery(
-    api.pages.listDrafts,
+    api.pages.drafts.list,
     { pageId },
     { initialNumItems: DRAFTS_PAGE_SIZE },
   );

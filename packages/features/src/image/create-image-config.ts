@@ -9,7 +9,7 @@ export function createImageConfig({
   shopifyImageUrlStoreId: string;
   sizes: number[];
 }) {
-  const formats: ("image/webp" | "image/avif")[] = ["image/webp"];
+  const formats = ["image/webp"] satisfies ("image/webp" | "image/avif")[];
   return {
     sizes,
     qualities: [75] as const,

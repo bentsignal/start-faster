@@ -35,6 +35,67 @@ const imageElementIsReady = (image: HTMLImageElement) => {
   return image.complete && image.naturalWidth > 0;
 };
 
+function useImageLoadState(imageSignature: string, shouldReveal: boolean) {
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
+  const [loadState, setLoadState] = useState<{
+    signature: string;
+    state: ImageLoadState;
+  }>(() => ({
+    signature: imageSignature,
+    state:
+      !shouldReveal || loadedImageSignatures.has(imageSignature)
+        ? "ready"
+        : "loading",
+  }));
+
+  const currentState =
+    loadState.signature === imageSignature
+      ? loadState.state
+      : !shouldReveal || loadedImageSignatures.has(imageSignature)
+        ? "ready"
+        : "loading";
+
+  const markReady = () => {
+    loadedImageSignatures.add(imageSignature);
+    setLoadState({ signature: imageSignature, state: "ready" });
+  };
+
+  const setImageRef = (imageElement: HTMLImageElement | null) => {
+    imageRef.current = imageElement;
+
+    if (!imageElement || !shouldReveal || currentState !== "loading") return;
+    if (!imageElementIsReady(imageElement)) return;
+
+    if (loadedImageSignatures.has(imageSignature)) {
+      setLoadState({ signature: imageSignature, state: "ready" });
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => markReady());
+    });
+  };
+
+  const handleLoad =
+    (onLoad?: (e: SyntheticEvent<HTMLImageElement>) => void) =>
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (shouldReveal) markReady();
+      onLoad?.(event);
+    };
+
+  const handleError =
+    (onError?: (e: SyntheticEvent<HTMLImageElement>) => void) =>
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (shouldReveal) {
+        setLoadState({ signature: imageSignature, state: "error" });
+      }
+      onError?.(event);
+    };
+
+  return { currentState, setImageRef, handleLoad, handleError };
+}
+
 export function Image({
   src,
   width,
@@ -51,101 +112,25 @@ export function Image({
   ...props
 }: ImageProps) {
   const shouldReveal = !disableReveal;
-  const imageRef = useRef<HTMLImageElement | null>(null);
-  const imgProps = useVercelOptimizedImageProps(
+  const imgProps = useVercelOptimizedImageProps({
     src,
     width,
     height,
     sizes,
     optimizerBaseUrl,
-  );
+  });
   const imageSignature = getImageSignature({
     src: imgProps.src,
     srcSet: imgProps.srcSet,
     sizes: imgProps.sizes,
   });
 
-  const [loadState, setLoadState] = useState<{
-    signature: string;
-    state: ImageLoadState;
-  }>(() => {
-    if (!shouldReveal || loadedImageSignatures.has(imageSignature)) {
-      return {
-        signature: imageSignature,
-        state: "ready",
-      };
-    }
-    return {
-      signature: imageSignature,
-      state: "loading",
-    };
-  });
+  const { currentState, setImageRef, handleLoad, handleError } =
+    useImageLoadState(imageSignature, shouldReveal);
 
-  const loadStateForCurrentImage =
-    loadState.signature === imageSignature
-      ? loadState.state
-      : !shouldReveal || loadedImageSignatures.has(imageSignature)
-        ? "ready"
-        : "loading";
+  const hideImage = shouldReveal && currentState !== "ready";
 
-  const setImageRef = (imageElement: HTMLImageElement | null) => {
-    imageRef.current = imageElement;
-
-    if (
-      imageElement !== null &&
-      shouldReveal &&
-      loadStateForCurrentImage === "loading" &&
-      imageElementIsReady(imageElement)
-    ) {
-      if (loadedImageSignatures.has(imageSignature)) {
-        setLoadState({
-          signature: imageSignature,
-          state: "ready",
-        });
-        return;
-      }
-
-      // If an image is already complete during hydration/full reload, we still
-      // want a first-view fade. Wait for a paint before revealing it.
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          loadedImageSignatures.add(imageSignature);
-          setLoadState({
-            signature: imageSignature,
-            state: "ready",
-          });
-        });
-      });
-    }
-  };
-
-  const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
-    if (shouldReveal) {
-      loadedImageSignatures.add(imageSignature);
-      setLoadState({
-        signature: imageSignature,
-        state: "ready",
-      });
-    }
-    onLoad?.(event);
-  };
-
-  const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
-    if (shouldReveal) {
-      setLoadState({
-        signature: imageSignature,
-        state: "error",
-      });
-    }
-    onError?.(event);
-  };
-
-  const hideImage =
-    shouldReveal &&
-    (loadStateForCurrentImage === "loading" ||
-      loadStateForCurrentImage === "error");
-
-  if (shouldReveal && loadStateForCurrentImage === "error") {
+  if (shouldReveal && currentState === "error") {
     return (
       <div
         className={cn(
@@ -164,8 +149,8 @@ export function Image({
       loading={loading}
       {...imgProps}
       {...props}
-      onLoad={handleLoad}
-      onError={handleError}
+      onLoad={handleLoad(onLoad)}
+      onError={handleError(onError)}
       className={cn(
         "motion-reduce:transition-none",
         shouldReveal && "transition-opacity duration-300 ease-out",

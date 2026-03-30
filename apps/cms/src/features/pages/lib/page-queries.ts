@@ -7,20 +7,20 @@ import { api } from "@acme/convex/api";
 export const DRAFTS_PAGE_SIZE = 20;
 
 export const pageQueries = {
-  list: () => queryOptions({ ...convexQuery(api.pages.list, {}) }),
+  list: () => queryOptions({ ...convexQuery(api.pages.manage.list, {}) }),
   getById: (pageId: Id<"pages">) =>
-    queryOptions({ ...convexQuery(api.pages.getById, { pageId }) }),
+    queryOptions({ ...convexQuery(api.pages.manage.getById, { pageId }) }),
   getDraft: (draftId: Id<"pageDrafts">) =>
-    queryOptions({ ...convexQuery(api.pages.getDraft, { draftId }) }),
+    queryOptions({ ...convexQuery(api.pages.drafts.get, { draftId }) }),
   listDraftsFirstPage: (pageId: Id<"pages">) =>
     queryOptions({
-      ...convexQuery(api.pages.listDrafts, {
+      ...convexQuery(api.pages.drafts.list, {
         pageId,
         paginationOpts: { numItems: DRAFTS_PAGE_SIZE, cursor: null },
       }),
     }),
   listRecentReleases: (pageId: Id<"pages">) =>
     queryOptions({
-      ...convexQuery(api.pages.listRecentReleases, { pageId }),
+      ...convexQuery(api.pages.manage.listRecentReleases, { pageId }),
     }),
 };

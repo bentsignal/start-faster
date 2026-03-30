@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useSyncExternalStore } from "react";
 
 function getPointerSnapshot() {
   const canHover = window.matchMedia("(hover: hover)").matches;
@@ -29,7 +29,7 @@ function getServerSnapshot() {
 }
 
 export function useHasTouch() {
-  const capability = React.useSyncExternalStore(
+  const capability = useSyncExternalStore(
     subscribeToPointerCapability,
     getPointerSnapshot,
     getServerSnapshot,

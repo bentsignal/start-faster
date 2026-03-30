@@ -7,31 +7,31 @@ export function usePageMutations() {
   return {
     createPage: mutationOptions({
       mutationKey: ["create-page"],
-      mutationFn: useConvexMutation(api.pages.create),
+      mutationFn: useConvexMutation(api.pages.manage.create),
     }),
     createNewDraft: mutationOptions({
       mutationKey: ["new-draft"],
-      mutationFn: useConvexMutation(api.pages.createNewDraft),
+      mutationFn: useConvexMutation(api.pages.drafts.createNew),
     }),
     saveDraft: mutationOptions({
       mutationKey: ["save-draft"],
-      mutationFn: useConvexMutation(api.pages.saveDraft),
+      mutationFn: useConvexMutation(api.pages.drafts.save),
     }),
     renameDraft: mutationOptions({
       mutationKey: ["rename-draft"],
-      mutationFn: useConvexMutation(api.pages.renameDraft),
+      mutationFn: useConvexMutation(api.pages.drafts.rename),
     }),
     publish: mutationOptions({
       mutationKey: ["publish-page"],
-      mutationFn: useConvexMutation(api.pages.publish),
+      mutationFn: useConvexMutation(api.pages.manage.publish),
     }),
     updatePageMetadata: mutationOptions({
       mutationKey: ["update-page-metadata"],
-      mutationFn: useConvexMutation(api.pages.updatePageMetadata),
+      mutationFn: useConvexMutation(api.pages.manage.updateMetadata),
     }),
     deleteDraft: mutationOptions({
       mutationKey: ["delete-draft"],
-      mutationFn: useConvexMutation(api.pages.deleteDraft),
+      mutationFn: useConvexMutation(api.pages.drafts.deleteDraft),
     }),
   };
 }

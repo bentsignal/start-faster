@@ -1,7 +1,6 @@
-import type { ScreenSizeValue } from "./sizes";
 import { SCREEN_BREAKPOINTS } from "./sizes";
 
-export function getScreenSizeFromWidth(width: number): ScreenSizeValue {
+export function getScreenSizeFromWidth(width: number) {
   if (width >= SCREEN_BREAKPOINTS.XXL) return "2xl";
   if (width >= SCREEN_BREAKPOINTS.XL) return "xl";
   if (width >= SCREEN_BREAKPOINTS.LG) return "lg";

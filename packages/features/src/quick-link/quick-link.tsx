@@ -1,9 +1,5 @@
 import type { LinkComponent } from "@tanstack/react-router";
-import type {
-  ComponentPropsWithoutRef,
-  MouseEvent,
-  MouseEventHandler,
-} from "react";
+import type { ComponentPropsWithoutRef, MouseEvent } from "react";
 import { forwardRef, useRef } from "react";
 import { createLink } from "@tanstack/react-router";
 
@@ -45,7 +41,7 @@ const QuickAnchor = forwardRef<
 >(({ href, onClick, onMouseDown, target, ...props }, ref) => {
   const skipNextClickRef = useRef(false);
 
-  const handleMouseDown: MouseEventHandler<HTMLAnchorElement> = (event) => {
+  const handleMouseDown = (event: MouseEvent<HTMLAnchorElement>) => {
     onMouseDown?.(event);
 
     if (event.defaultPrevented) {
@@ -60,7 +56,7 @@ const QuickAnchor = forwardRef<
     onClick?.(event);
   };
 
-  const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (skipNextClickRef.current) {
       skipNextClickRef.current = false;
       event.preventDefault();
@@ -86,10 +82,10 @@ QuickAnchor.displayName = "QuickAnchor";
 
 const CreatedLink = createLink(QuickAnchor);
 
-export const QuickLink: LinkComponent<typeof QuickAnchor> = (props) => {
+export const QuickLink = ((props) => {
   const { isTouchPrimary, isKnown } = useHasTouch();
   const preload =
     props.preload ?? (isKnown && isTouchPrimary ? "viewport" : "intent");
 
   return <CreatedLink preload={preload} {...props} />;
-};
+}) satisfies LinkComponent<typeof QuickAnchor>;

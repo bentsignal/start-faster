@@ -13,6 +13,7 @@ function useInternalStore({ initialTheme }: { initialTheme: Theme }) {
   const { setTheme: setNextTheme } = useNextTheme();
   const [theme, setTheme] = useState<Theme>(initialTheme);
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs theme cookie with external browser storage
   useEffect(() => {
     document.cookie = `theme=${theme}; path=/; max-age=${60 * 60 * 24 * 30}`;
   }, [theme]);

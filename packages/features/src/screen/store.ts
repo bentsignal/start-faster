@@ -8,6 +8,7 @@ import { getScreenSizeFromWidth } from "./utils";
 function useInternalStore() {
   const [size, setSize] = useState<ScreenSizeValue | undefined>(undefined);
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs screen size with window resize, an external browser API
   useEffect(() => {
     const syncScreenSize = () => {
       setSize(getScreenSizeFromWidth(window.innerWidth));

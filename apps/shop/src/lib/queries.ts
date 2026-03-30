@@ -6,9 +6,9 @@ import { api } from "@acme/convex/api";
 
 export const shopQueries = {
   getByPath: (path: string) =>
-    queryOptions({ ...convexQuery(api.pages.getByPath, { path }) }),
+    queryOptions({ ...convexQuery(api.pages.manage.getByPath, { path }) }),
   getDraftPreview: (draftId: Id<"pageDrafts">) =>
     queryOptions({
-      ...convexQuery(api.pages.getDraftPreview, { draftId }),
+      ...convexQuery(api.pages.drafts.getPreview, { draftId }),
     }),
 };

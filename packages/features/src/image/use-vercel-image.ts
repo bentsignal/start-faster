@@ -44,15 +44,15 @@ const normalizeImageSourceUrl = (src: string) => {
   }
 };
 
-const pickResponsiveWidths = (
-  candidateWidths: readonly ImgWidth[],
-): [ImgWidth, ...ImgWidth[]] => {
+const pickResponsiveWidths = (candidateWidths: readonly ImgWidth[]) => {
   if (candidateWidths.length === 0) {
     return [largestImageWidth];
   }
 
   if (candidateWidths.length <= maxResponsiveSrcSetCandidates) {
-    return [...candidateWidths] as [ImgWidth, ...ImgWidth[]];
+    const first = candidateWidths[0];
+    if (first === undefined) return [largestImageWidth];
+    return [first, ...candidateWidths.slice(1)];
   }
 
   const lastIndex = candidateWidths.length - 1;
@@ -68,16 +68,25 @@ const pickResponsiveWidths = (
     }
   }
 
-  return [...selectedWidths] as [ImgWidth, ...ImgWidth[]];
+  const result = [...selectedWidths];
+  const first = result[0];
+  if (first === undefined) return [largestImageWidth];
+  return [first, ...result.slice(1)];
 };
 
-export const useVercelOptimizedImageProps = (
-  src: string,
-  width: number,
-  height: number,
-  sizes?: string,
-  optimizerBaseUrl?: string,
-) => {
+export const useVercelOptimizedImageProps = ({
+  src,
+  width,
+  height,
+  sizes,
+  optimizerBaseUrl,
+}: {
+  src: string;
+  width: number;
+  height: number;
+  sizes?: string;
+  optimizerBaseUrl?: string;
+}) => {
   const normalizedSrc = normalizeImageSourceUrl(src);
 
   if (process.env.NODE_ENV === "development") {
@@ -109,13 +118,15 @@ export const useVercelOptimizedImageProps = (
     };
   }
 
-  const widths = [
+  const uniqueWidths = [
     ...new Set(
       [width, width * 2, width * 3].map(
         (w) => imageWidths.find((p) => p >= w) ?? largestImageWidth,
       ),
     ),
-  ] as [ImgWidth, ...ImgWidth[]];
+  ];
+  const firstWidth = uniqueWidths[0] ?? largestImageWidth;
+  const widths = [firstWidth, ...uniqueWidths.slice(1)] as const;
   return {
     srcSet: widths
       .map(
