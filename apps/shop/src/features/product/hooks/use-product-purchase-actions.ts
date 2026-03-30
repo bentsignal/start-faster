@@ -65,6 +65,7 @@ export function useProductPurchaseActions({
     },
   });
 
+  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
   useEffect(() => {
     return () => {
       if (addToCartFeedbackTimeoutId.current !== null) {

@@ -1,13 +1,11 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
 
-import type {
-  ProductFilter,
-  SearchSortKeys,
-} from "@acme/shopify/storefront/types";
+import type { ProductFilter } from "@acme/shopify/storefront/types";
 import {
   getPredictiveSearch,
   searchProducts,
 } from "@acme/shopify/storefront/search";
+import { SearchSortKeys } from "@acme/shopify/storefront/types";
 
 import { shopify } from "~/lib/shopify";
 
@@ -17,12 +15,12 @@ export const SEARCH_PAGE_SIZE = 30;
 export type SearchSortBy = "relevance" | "price";
 export type SearchSortDirection = "asc" | "desc";
 
-function getSearchSortKey(sortBy: SearchSortBy): SearchSortKeys {
+function getSearchSortKey(sortBy: SearchSortBy) {
   if (sortBy === "price") {
-    return "PRICE" as SearchSortKeys;
+    return SearchSortKeys.Price;
   }
 
-  return "RELEVANCE" as SearchSortKeys;
+  return SearchSortKeys.Relevance;
 }
 
 export const searchQueries = {
@@ -62,6 +60,7 @@ export const searchQueries = {
         filters,
         first,
       ] as const,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- TanStack Query requires initialPageParam to carry the full page-param union type
       initialPageParam: undefined as string | undefined,
       queryFn: async ({ pageParam }) => {
         const response = await shopify.request(searchProducts, {

@@ -12,7 +12,7 @@ export function getOrderProductIds(orders: CustomerOrder[]) {
 }
 
 export function getProductIdChunks(productIds: string[], maxChunkSize = 250) {
-  const chunks: string[][] = [];
+  const chunks = [];
 
   for (let start = 0; start < productIds.length; start += maxChunkSize) {
     chunks.push(productIds.slice(start, start + maxChunkSize));

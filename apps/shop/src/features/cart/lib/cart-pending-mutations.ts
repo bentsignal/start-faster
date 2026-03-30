@@ -5,26 +5,28 @@ import {
   applyOptimisticRemove,
 } from "~/features/cart/lib/optimistic-cart";
 
-interface PendingCartMutation {
-  submittedAt: number;
-  action: "add" | "update" | "remove";
-  variables:
-    | {
-        cartId?: string;
-        merchandiseId: string;
-        quantity?: number;
-        optimisticLine?: OptimisticCartLineDraft;
-      }
-    | {
-        cartId: string;
-        lineId: string;
-        quantity: number;
-      }
-    | {
-        cartId: string;
-        lineId: string;
-      };
+interface AddVariables {
+  cartId?: string;
+  merchandiseId: string;
+  quantity?: number;
+  optimisticLine?: OptimisticCartLineDraft;
 }
+
+interface UpdateVariables {
+  cartId: string;
+  lineId: string;
+  quantity: number;
+}
+
+interface RemoveVariables {
+  cartId: string;
+  lineId: string;
+}
+
+type PendingCartMutation =
+  | { submittedAt: number; action: "add"; variables: AddVariables }
+  | { submittedAt: number; action: "update"; variables: UpdateVariables }
+  | { submittedAt: number; action: "remove"; variables: RemoveVariables };
 
 export function applyPendingMutationsToCart(
   sourceCart: Cart | null,
@@ -37,69 +39,75 @@ export function applyPendingMutationsToCart(
 
   for (const mutation of sortedMutations) {
     if (mutation.action === "add") {
-      const variables = mutation.variables as Extract<
-        PendingCartMutation["variables"],
-        { merchandiseId: string }
-      >;
-      nextCart = applyOptimisticAdd(nextCart, variables.optimisticLine ?? null);
-      continue;
-    }
-
-    if (mutation.action === "update") {
-      const variables = mutation.variables as Extract<
-        PendingCartMutation["variables"],
-        { lineId: string; quantity: number }
-      >;
-      nextCart = applyOptimisticQuantityUpdate(
+      nextCart = applyOptimisticAdd(
         nextCart,
-        variables.lineId,
-        variables.quantity,
+        mutation.variables.optimisticLine ?? null,
       );
       continue;
     }
 
-    const variables = mutation.variables as Extract<
-      PendingCartMutation["variables"],
-      { lineId: string }
-    >;
-    nextCart = applyOptimisticRemove(nextCart, variables.lineId);
+    if (mutation.action === "update") {
+      nextCart = applyOptimisticQuantityUpdate(
+        nextCart,
+        mutation.variables.lineId,
+        mutation.variables.quantity,
+      );
+      continue;
+    }
+
+    nextCart = applyOptimisticRemove(nextCart, mutation.variables.lineId);
   }
 
   return nextCart;
 }
 
-export function parsePendingCartMutation(
-  mutation: unknown,
-): PendingCartMutation | null {
-  const typedMutation = mutation as {
-    options: {
-      mutationKey?: unknown;
-    };
-    state: {
-      variables: unknown;
-      submittedAt: number;
-    };
-  };
+function hasMutationShape(value: unknown): value is {
+  options: { mutationKey?: unknown };
+  state: { variables: unknown; submittedAt: number };
+} {
+  if (typeof value !== "object" || value === null) return false;
+  if (
+    !("options" in value) ||
+    typeof value.options !== "object" ||
+    value.options === null
+  )
+    return false;
+  if (
+    !("state" in value) ||
+    typeof value.state !== "object" ||
+    value.state === null
+  )
+    return false;
+  return (
+    "submittedAt" in value.state && typeof value.state.submittedAt === "number"
+  );
+}
 
-  const mutationKey = typedMutation.options.mutationKey;
+export function parsePendingCartMutation(mutation: unknown) {
+  if (!hasMutationShape(mutation)) {
+    return null;
+  }
+
+  const mutationKey = mutation.options.mutationKey;
   if (Array.isArray(mutationKey) === false) {
     return null;
   }
 
+  // eslint-disable-next-line no-restricted-syntax -- widening from any to unknown for safe narrowing below
   const rawAction: unknown = mutationKey[mutationKey.length - 1];
   if (rawAction !== "add" && rawAction !== "update" && rawAction !== "remove") {
     return null;
   }
-  const action: PendingCartMutation["action"] = rawAction;
 
-  const variables = typedMutation.state.variables;
+  const variables = mutation.state.variables;
   if (typeof variables !== "object" || variables === null) {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- variables come from TanStack Query's untyped mutation cache; runtime checks above validate the shape
   return {
-    submittedAt: typedMutation.state.submittedAt,
-    action,
-    variables: variables as PendingCartMutation["variables"],
-  };
+    submittedAt: mutation.state.submittedAt,
+    action: rawAction,
+    variables,
+  } as PendingCartMutation;
 }

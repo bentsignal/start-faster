@@ -160,8 +160,8 @@ function ColorOptionGroup({
   selectedOptions: Record<string, string>;
   onSelect: (value: string) => void;
 }) {
-  const knownColors: string[] = [];
-  const unknownColors: string[] = [];
+  const knownColors = [];
+  const unknownColors = [];
 
   for (const value of values) {
     if (getKnownColorHex(value)) {

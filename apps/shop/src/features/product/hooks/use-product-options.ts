@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import type { Product } from "~/features/product/types";
 import {
   isColorOptionName,
@@ -87,8 +85,5 @@ export function useProductOptions(
   product: Product,
   canonicalColorOrder: string[],
 ) {
-  return useMemo(
-    () => getOrderedProductOptions(product, canonicalColorOrder),
-    [canonicalColorOrder, product],
-  );
+  return getOrderedProductOptions(product, canonicalColorOrder);
 }

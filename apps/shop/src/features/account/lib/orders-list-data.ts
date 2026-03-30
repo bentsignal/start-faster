@@ -12,7 +12,7 @@ export type OrderListItem = CustomerOrder & {
   financialStatusLabel: string;
 };
 
-export function getOrdersListData(orders: CustomerOrder[]): OrderListItem[] {
+export function getOrdersListData(orders: CustomerOrder[]) {
   return orders.map((order) => {
     const primaryStatus = getCustomerOrderStatus(order);
 

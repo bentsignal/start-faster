@@ -16,7 +16,7 @@ function buildLineTotal(unitAmount: number | string, quantity: number) {
   return roundCurrency(normalizeAmount(unitAmount) * quantity);
 }
 
-function recalculateCart(cart: Cart): Cart {
+function recalculateCart(cart: Cart) {
   const totalQuantity = cart.lines.nodes.reduce(
     (accumulator, line) => accumulator + line.quantity,
     0,
@@ -42,7 +42,7 @@ function recalculateCart(cart: Cart): Cart {
   };
 }
 
-function createOptimisticLine(draft: OptimisticCartLineDraft): CartLine {
+function createOptimisticLine(draft: OptimisticCartLineDraft) {
   const lineTotal = buildLineTotal(draft.unitAmount, draft.quantity);
   return {
     id: `optimistic-${draft.merchandiseId}`,
@@ -75,7 +75,7 @@ function createOptimisticLine(draft: OptimisticCartLineDraft): CartLine {
   };
 }
 
-function createOptimisticCartFromLine(line: CartLine): Cart {
+function createOptimisticCartFromLine(line: CartLine) {
   return recalculateCart({
     id: "optimistic-cart",
     checkoutUrl: "",

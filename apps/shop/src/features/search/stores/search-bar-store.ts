@@ -26,6 +26,7 @@ function useInternalStore({
   });
   const [isPredictiveOpen, setIsPredictiveOpen] = useState(false);
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs debounced search term with router preloading (external system)
   useEffect(() => {
     const trimmedQuery = debouncedSearchTerm.trim();
 

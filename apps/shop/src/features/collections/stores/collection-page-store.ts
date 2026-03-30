@@ -18,6 +18,124 @@ import {
   collectionQueries,
 } from "~/features/collections/lib/collection-queries";
 
+async function runWithLoading({
+  setLoading,
+  action,
+}: {
+  setLoading: (isLoading: boolean) => void;
+  action: () => Promise<void>;
+}) {
+  setLoading(true);
+  await action().finally(() => {
+    setLoading(false);
+  });
+}
+
+type CollectionNavigateFn = (opts: {
+  to: "/collections/$handle";
+  params: { handle: string };
+  search: {
+    sortBy: CollectionSortBy;
+    sortDirection: CollectionSortDirection;
+    filters: ProductFilter[];
+  };
+}) => Promise<void>;
+
+function createCollectionNavigator({
+  navigate,
+  params,
+  searchState,
+  setIsFilterNavigationLoading,
+  setIsPriceApplyLoading,
+}: {
+  navigate: CollectionNavigateFn;
+  params: { handle: string };
+  searchState: {
+    sortBy: CollectionSortBy;
+    sortDirection: CollectionSortDirection;
+    urlFilters: ProductFilter[];
+  };
+  setIsFilterNavigationLoading: (isLoading: boolean) => void;
+  setIsPriceApplyLoading: (isLoading: boolean) => void;
+}) {
+  const onSortByChange = (nextSortBy: CollectionSortBy) => {
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigate({
+          to: "/collections/$handle",
+          params: { handle: params.handle },
+          search: {
+            sortBy: nextSortBy,
+            sortDirection: searchState.sortDirection,
+            filters: searchState.urlFilters,
+          },
+        }),
+    });
+  };
+
+  const onSortDirectionChange = (
+    nextSortDirection: CollectionSortDirection,
+  ) => {
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigate({
+          to: "/collections/$handle",
+          params: { handle: params.handle },
+          search: {
+            sortBy: searchState.sortBy,
+            sortDirection: nextSortDirection,
+            filters: searchState.urlFilters,
+          },
+        }),
+    });
+  };
+
+  const onToggleFilter = (input: ProductFilter) => {
+    void runWithLoading({
+      setLoading: setIsFilterNavigationLoading,
+      action: () =>
+        navigate({
+          to: "/collections/$handle",
+          params: { handle: params.handle },
+          search: {
+            sortBy: searchState.sortBy,
+            sortDirection: searchState.sortDirection,
+            filters: toggleFilter(searchState.urlFilters, input),
+          },
+        }),
+    });
+  };
+
+  const onApplyPriceRange = (min: string, max: string) => {
+    void runWithLoading({
+      setLoading: setIsPriceApplyLoading,
+      action: () =>
+        navigate({
+          to: "/collections/$handle",
+          params: { handle: params.handle },
+          search: {
+            sortBy: searchState.sortBy,
+            sortDirection: searchState.sortDirection,
+            filters: applyPriceRangeFilter({
+              filters: searchState.urlFilters,
+              min,
+              max,
+            }),
+          },
+        }),
+    });
+  };
+
+  return {
+    onSortByChange,
+    onSortDirectionChange,
+    onToggleFilter,
+    onApplyPriceRange,
+  };
+}
+
 function useInternalStore() {
   const navigate = useNavigate({ from: "/collections/$handle" });
   const params = useParams({ from: "/collections/$handle" });
@@ -53,88 +171,18 @@ function useInternalStore() {
   const isFetchingNextPage = query.isFetchingNextPage;
   const canLoadMore = hasNextPage && !isFetchingNextPage;
 
-  const runWithLoading = async ({
-    setLoading,
-    action,
-  }: {
-    setLoading: (isLoading: boolean) => void;
-    action: () => Promise<void>;
-  }) => {
-    setLoading(true);
-    await action().finally(() => {
-      setLoading(false);
-    });
-  };
-
-  const onSortByChange = (nextSortBy: CollectionSortBy) => {
-    void runWithLoading({
-      setLoading: setIsFilterNavigationLoading,
-      action: () =>
-        navigate({
-          to: "/collections/$handle",
-          params: { handle: params.handle },
-          search: {
-            sortBy: nextSortBy,
-            sortDirection,
-            filters: urlFilters,
-          },
-        }),
-    });
-  };
-
-  const onSortDirectionChange = (
-    nextSortDirection: CollectionSortDirection,
-  ) => {
-    void runWithLoading({
-      setLoading: setIsFilterNavigationLoading,
-      action: () =>
-        navigate({
-          to: "/collections/$handle",
-          params: { handle: params.handle },
-          search: {
-            sortBy: sortBy,
-            sortDirection: nextSortDirection,
-            filters: urlFilters,
-          },
-        }),
-    });
-  };
-
-  const onToggleFilter = (input: ProductFilter) => {
-    void runWithLoading({
-      setLoading: setIsFilterNavigationLoading,
-      action: () =>
-        navigate({
-          to: "/collections/$handle",
-          params: { handle: params.handle },
-          search: {
-            sortBy: sortBy,
-            sortDirection: sortDirection,
-            filters: toggleFilter(urlFilters, input),
-          },
-        }),
-    });
-  };
-
-  const onApplyPriceRange = (min: string, max: string) => {
-    void runWithLoading({
-      setLoading: setIsPriceApplyLoading,
-      action: () =>
-        navigate({
-          to: "/collections/$handle",
-          params: { handle: params.handle },
-          search: {
-            sortBy: sortBy,
-            sortDirection: sortDirection,
-            filters: applyPriceRangeFilter({
-              filters: urlFilters,
-              min,
-              max,
-            }),
-          },
-        }),
-    });
-  };
+  const {
+    onSortByChange,
+    onSortDirectionChange,
+    onToggleFilter,
+    onApplyPriceRange,
+  } = createCollectionNavigator({
+    navigate,
+    params,
+    searchState: { sortBy, sortDirection, urlFilters },
+    setIsFilterNavigationLoading,
+    setIsPriceApplyLoading,
+  });
 
   const fetchNextPage = async () => {
     if (!canLoadMore) {

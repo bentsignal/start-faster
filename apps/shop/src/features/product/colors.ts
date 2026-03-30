@@ -2,6 +2,7 @@
  * Known product color names mapped to their hex values.
  * Used to render visual color swatches on the PDP instead of plain text buttons.
  */
+// eslint-disable-next-line no-restricted-syntax -- Record<string, string> is needed to allow arbitrary string key lookups
 const KNOWN_COLORS: Record<string, string> = {
   White: "#F9F9F9",
   "Athletic Heather": "#CCCED5",
@@ -20,13 +21,13 @@ const KNOWN_COLORS: Record<string, string> = {
   Orchid: "#E3DDE3",
   "Heather Grey": "#CDD1D6",
   Sandshell: "#E8E2D0",
-} as const;
+};
 
 /**
  * Look up a hex color for a given color name.
  * Returns the hex string if found, or undefined for unknown colors.
  */
-export function getKnownColorHex(colorName: string): string | undefined {
+export function getKnownColorHex(colorName: string) {
   return KNOWN_COLORS[colorName];
 }
 
@@ -34,7 +35,7 @@ export function getKnownColorHex(colorName: string): string | undefined {
  * Returns true if a hex color is perceptually light (would blend into a white background).
  * Uses relative luminance with a threshold tuned for swatch visibility.
  */
-export function isLightColor(hex: string): boolean {
+export function isLightColor(hex: string) {
   const luminance = getRelativeLuminance(hex);
   return luminance > 0.7;
 }
@@ -43,12 +44,12 @@ export function isLightColor(hex: string): boolean {
  * Returns true if a hex color is perceptually dark (would blend into a dark background).
  * Uses relative luminance with a threshold tuned for swatch visibility.
  */
-export function isDarkColor(hex: string): boolean {
+export function isDarkColor(hex: string) {
   const luminance = getRelativeLuminance(hex);
   return luminance < 0.08;
 }
 
-function getRelativeLuminance(hex: string): number {
+function getRelativeLuminance(hex: string) {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
   const b = parseInt(hex.slice(5, 7), 16) / 255;

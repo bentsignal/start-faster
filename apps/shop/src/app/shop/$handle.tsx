@@ -99,9 +99,20 @@ function ProductPage() {
   const screen = useScreenStore((store) => store.screen);
   const { handle } = Route.useParams();
   const variant = Route.useSearch({ select: (search) => search.variant });
-  const { data: product } = useSuspenseQuery(
-    productQueries.productByHandle(handle),
-  );
+  const { data: product } = useSuspenseQuery({
+    ...productQueries.productByHandle(handle),
+    select: (p) => ({
+      id: p.id,
+      title: p.title,
+      handle: p.handle,
+      description: p.description,
+      featuredImage: p.featuredImage,
+      images: p.images,
+      options: p.options,
+      priceRange: p.priceRange,
+      variants: p.variants,
+    }),
+  });
   const shouldRenderSingleGallery = isHydrated && screen.size !== undefined;
   const showDesktopGallery = shouldRenderSingleGallery
     ? screen.isBiggerThan(ScreenSize.LG)

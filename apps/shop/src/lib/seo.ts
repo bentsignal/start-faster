@@ -1,14 +1,6 @@
 const SITE_NAME = "Start Faster";
 const DEFAULT_DESCRIPTION = "The fastest shopping experience you've ever seen.";
 const MAX_DESCRIPTION_LENGTH = 160;
-interface SeoLinkTag {
-  rel: string;
-  href: string;
-}
-type SeoMetaTag =
-  | { title: string }
-  | { name: string; content: string }
-  | { property: string; content: string };
 interface SeoScriptTag {
   type: string;
   children?: string;
@@ -39,12 +31,6 @@ interface SeoHeadInput {
   scripts?: SeoScriptTag[];
 }
 
-interface SeoHead {
-  links: SeoLinkTag[];
-  meta: SeoMetaTag[];
-  scripts: SeoScriptTag[];
-}
-
 export function buildSeoHead({
   title,
   description,
@@ -53,7 +39,7 @@ export function buildSeoHead({
   imageAlt,
   type = "website",
   scripts = [],
-}: SeoHeadInput): SeoHead {
+}: SeoHeadInput) {
   const fullTitle =
     title === SITE_NAME || title.endsWith(`| ${SITE_NAME}`)
       ? title
@@ -88,9 +74,7 @@ export function buildSeoHead({
 
 export const defaultSeoDescription = DEFAULT_DESCRIPTION;
 
-export function jsonLdScript(
-  data: Record<string, unknown> | null | undefined,
-): SeoScriptTag[] {
+export function jsonLdScript(data: Record<string, unknown> | null | undefined) {
   if (data === undefined || data === null) {
     return [];
   }

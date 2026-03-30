@@ -12,7 +12,7 @@ export function getOptionValueAvailability({
   optionName: string;
   optionValue: string;
   selectedOptions: Record<string, string>;
-}): OptionValueAvailability {
+}) {
   const nextSelections = {
     ...selectedOptions,
     [optionName]: optionValue,

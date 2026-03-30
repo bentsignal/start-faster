@@ -15,6 +15,7 @@ export const Route = createFileRoute("/$")({
   loaderDeps: ({ search }) => ({ draftId: search.draftId }),
   loader: async ({ context, params, deps }) => {
     if (deps.draftId) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Id is a branded type; the runtime value is a plain string from the URL search params
       const draftId = deps.draftId as Id<"pageDrafts">;
       await context.queryClient.ensureQueryData(
         shopQueries.getDraftPreview(draftId),
@@ -52,7 +53,12 @@ export const Route = createFileRoute("/$")({
 });
 
 function CmsPage() {
-  const loaderData = Route.useLoaderData();
+  const loaderData = Route.useLoaderData({
+    select: (d) =>
+      d.mode === "draft"
+        ? { mode: d.mode, draftId: d.draftId }
+        : { mode: d.mode, page: d.page },
+  });
 
   if (loaderData.mode === "draft") {
     return <LiveDraftPreview draftId={loaderData.draftId} />;
@@ -77,9 +83,10 @@ function StaticPage({
 }
 
 function LiveDraftPreview({ draftId }: { draftId: Id<"pageDrafts"> }) {
-  const { data: draft } = useSuspenseQuery(
-    shopQueries.getDraftPreview(draftId),
-  );
+  const { data: draft } = useSuspenseQuery({
+    ...shopQueries.getDraftPreview(draftId),
+    select: (d) => (d ? { title: d.title, content: d.content } : null),
+  });
 
   if (!draft) {
     return (

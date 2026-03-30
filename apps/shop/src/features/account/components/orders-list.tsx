@@ -11,28 +11,13 @@ import { toast } from "@acme/ui/toaster";
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type { LiveOrderProducts } from "~/features/account/types";
 import { OrderProductsSection } from "~/features/account/components/order-products-section";
+import {
+  formatDate,
+  formatMoney,
+  getReorderLines,
+  getTrackingEntries,
+} from "~/features/account/lib/order-list-helpers";
 import { shopify } from "~/lib/shopify";
-
-function formatMoney(amount: number | string, currencyCode: string) {
-  const parsedAmount =
-    typeof amount === "number" ? amount : Number.parseFloat(amount);
-  if (Number.isNaN(parsedAmount)) {
-    return `${amount} ${currencyCode}`;
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currencyCode,
-  }).format(parsedAmount);
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
-}
 
 function StatusPill({
   label,
@@ -56,79 +41,6 @@ function StatusPill({
       {label}
     </span>
   );
-}
-
-function getReorderLines({
-  order,
-  liveProducts,
-}: {
-  order: OrderListItem;
-  liveProducts: LiveOrderProducts;
-}) {
-  const liveProductsById = new Map<
-    string,
-    Extract<LiveOrderProducts[number], { __typename: "Product" }>
-  >();
-
-  for (const product of liveProducts) {
-    if (product?.__typename !== "Product") {
-      continue;
-    }
-
-    liveProductsById.set(product.id, product);
-  }
-
-  return order.lineItems.nodes.flatMap((lineItem): CartLineInput[] => {
-    if (lineItem.productId == null || lineItem.variantId == null) {
-      return [];
-    }
-
-    const liveProduct = liveProductsById.get(lineItem.productId);
-    if (liveProduct === undefined) {
-      return [];
-    }
-
-    const hasLiveVariant = liveProduct.variants.nodes.some(
-      (variant) => variant.id === lineItem.variantId,
-    );
-    if (hasLiveVariant === false) {
-      return [];
-    }
-
-    return [
-      {
-        merchandiseId: lineItem.variantId,
-        quantity: lineItem.quantity,
-      },
-    ];
-  });
-}
-
-function getTrackingEntries(order: OrderListItem) {
-  const entries = order.fulfillments.nodes.flatMap((fulfillment) =>
-    fulfillment.trackingInformation.flatMap((trackingInformation) => {
-      const label = trackingInformation.number?.trim();
-      if (!label) {
-        return [];
-      }
-
-      return [
-        {
-          number: label,
-          url: trackingInformation.url ?? null,
-        },
-      ];
-    }),
-  );
-
-  return entries.filter((entry, index, allEntries) => {
-    return (
-      allEntries.findIndex(
-        (candidate) =>
-          candidate.number === entry.number && candidate.url === entry.url,
-      ) === index
-    );
-  });
 }
 
 function TrackingNumbers({ order }: { order: OrderListItem }) {
@@ -167,6 +79,101 @@ function TrackingNumbers({ order }: { order: OrderListItem }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function EmptyOrdersList() {
+  return (
+    <div className="flex flex-col items-center gap-6 py-16 text-center">
+      <div className="bg-muted flex size-16 items-center justify-center rounded-full">
+        <Package className="text-muted-foreground size-7" />
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-lg font-semibold">No orders yet</p>
+        <p className="text-muted-foreground text-sm">
+          When you place an order, it will show up here.
+        </p>
+      </div>
+      <QuickLink to="/" className={buttonVariants()}>
+        Start shopping
+      </QuickLink>
+    </div>
+  );
+}
+
+function OrderCard({
+  order,
+  liveProducts,
+  isReordering,
+  onReorder,
+}: {
+  order: OrderListItem;
+  liveProducts: LiveOrderProducts;
+  isReordering: boolean;
+  onReorder: (orderId: string, lines: CartLineInput[]) => void;
+}) {
+  return (
+    <Card className="gap-0">
+      <CardHeader className="gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-3">
+            <StatusPill
+              label={order.primaryStatusLabel}
+              tone={order.primaryStatusTone}
+            />
+            <TrackingNumbers order={order} />
+            <div className="space-y-1">
+              <p className="font-semibold">{order.name}</p>
+              <p className="text-muted-foreground text-sm">
+                Placed on {formatDate(order.processedAt)}
+              </p>
+            </div>
+          </div>
+          <p className="text-base font-semibold">
+            {formatMoney(
+              order.totalPrice.amount,
+              order.totalPrice.currencyCode,
+            )}
+          </p>
+        </div>
+      </CardHeader>
+      {order.lineItems.nodes.length > 0 ? (
+        <CardContent className="py-6">
+          <OrderProductsSection order={order} liveProducts={liveProducts} />
+        </CardContent>
+      ) : null}
+      <CardContent className="flex flex-wrap items-center justify-between gap-3 border-t pt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusPill label={order.fulfillmentStatusLabel} />
+          <StatusPill label={order.financialStatusLabel} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-22"
+            onClick={() => {
+              const lines = getReorderLines({ order, liveProducts });
+              if (lines.length === 0) {
+                toast.error(
+                  "No currently available items from this order can be reordered.",
+                );
+                return;
+              }
+
+              onReorder(order.id, lines);
+            }}
+            disabled={isReordering}
+          >
+            {isReordering ? (
+              <Loader className="size-4 animate-spin" />
+            ) : (
+              "Reorder"
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -214,99 +221,22 @@ export function OrdersList({
     : null;
 
   if (orders.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-6 py-16 text-center">
-        <div className="bg-muted flex size-16 items-center justify-center rounded-full">
-          <Package className="text-muted-foreground size-7" />
-        </div>
-        <div className="space-y-1.5">
-          <p className="text-lg font-semibold">No orders yet</p>
-          <p className="text-muted-foreground text-sm">
-            When you place an order, it will show up here.
-          </p>
-        </div>
-        <QuickLink to="/" className={buttonVariants()}>
-          Start shopping
-        </QuickLink>
-      </div>
-    );
+    return <EmptyOrdersList />;
   }
 
   return (
     <div className="grid gap-4">
-      {orders.map((order) => {
-        const isReorderingThisOrder = activeReorderOrderId === order.id;
-
-        return (
-          <Card key={order.id} className="gap-0">
-            <CardHeader className="gap-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex min-w-0 flex-col gap-3">
-                  <StatusPill
-                    label={order.primaryStatusLabel}
-                    tone={order.primaryStatusTone}
-                  />
-                  <TrackingNumbers order={order} />
-                  <div className="space-y-1">
-                    <p className="font-semibold">{order.name}</p>
-                    <p className="text-muted-foreground text-sm">
-                      Placed on {formatDate(order.processedAt)}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-base font-semibold">
-                  {formatMoney(
-                    order.totalPrice.amount,
-                    order.totalPrice.currencyCode,
-                  )}
-                </p>
-              </div>
-            </CardHeader>
-            {order.lineItems.nodes.length > 0 ? (
-              <CardContent className="py-6">
-                <OrderProductsSection
-                  order={order}
-                  liveProducts={liveProducts}
-                />
-              </CardContent>
-            ) : null}
-            <CardContent className="flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill label={order.fulfillmentStatusLabel} />
-                <StatusPill label={order.financialStatusLabel} />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-22"
-                  onClick={() => {
-                    const lines = getReorderLines({ order, liveProducts });
-                    if (lines.length === 0) {
-                      toast.error(
-                        "No currently available items from this order can be reordered.",
-                      );
-                      return;
-                    }
-
-                    reorderMutation.mutate({
-                      orderId: order.id,
-                      lines,
-                    });
-                  }}
-                  disabled={isReorderingThisOrder}
-                >
-                  {isReorderingThisOrder ? (
-                    <Loader className="size-4 animate-spin" />
-                  ) : (
-                    "Reorder"
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {orders.map((order) => (
+        <OrderCard
+          key={order.id}
+          order={order}
+          liveProducts={liveProducts}
+          isReordering={activeReorderOrderId === order.id}
+          onReorder={(orderId, lines) => {
+            reorderMutation.mutate({ orderId, lines });
+          }}
+        />
+      ))}
     </div>
   );
 }

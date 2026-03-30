@@ -36,6 +36,7 @@ function DesktopGalleryContent({
     (store) => store.setDesktopScrollToImage,
   );
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs scroll callback with external zustand store
   useEffect(() => {
     setDesktopScrollToImage(scrollToImage);
 

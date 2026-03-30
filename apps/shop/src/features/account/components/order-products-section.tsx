@@ -30,7 +30,7 @@ function formatMoney(amount: number | string, currencyCode: string) {
 function getLiveProduct(
   lineItem: CustomerOrderLineItem,
   liveProducts: LiveOrderProducts | undefined,
-): LiveOrderProduct | undefined {
+) {
   return liveProducts?.find(
     (product): product is LiveOrderProduct =>
       product?.__typename === "Product" && product.id === lineItem.productId,
@@ -52,6 +52,33 @@ function getDisplayedMoney(
   );
 }
 
+function resolveProductImage(
+  lineItem: CustomerOrderLineItem,
+  liveProduct: LiveOrderProduct | undefined,
+) {
+  const liveVariantImage = liveProduct?.variants.nodes.find(
+    (variant) => variant.id === lineItem.variantId,
+  )?.image;
+
+  return (
+    liveVariantImage ?? lineItem.image ?? liveProduct?.featuredImage ?? null
+  );
+}
+
+function resolveProductDisplayProps(
+  lineItem: CustomerOrderLineItem,
+  liveProducts: LiveOrderProducts | undefined,
+) {
+  const liveProduct = getLiveProduct(lineItem, liveProducts);
+  const image = resolveProductImage(lineItem, liveProduct);
+  const title = liveProduct?.title ?? lineItem.title;
+  const price = getDisplayedMoney(lineItem, liveProducts);
+  const shouldShowVariant =
+    lineItem.variantTitle !== null && lineItem.variantTitle !== "Default Title";
+
+  return { liveProduct, image, title, price, shouldShowVariant };
+}
+
 function OrderProductTile({
   lineItem,
   liveProducts,
@@ -59,19 +86,10 @@ function OrderProductTile({
   lineItem: CustomerOrderLineItem;
   liveProducts: LiveOrderProducts | undefined;
 }) {
-  const liveProduct = getLiveProduct(lineItem, liveProducts);
-  const liveVariantImage = liveProduct?.variants.nodes.find(
-    (variant) => variant.id === lineItem.variantId,
-  )?.image;
-  const image: ProductImage =
-    liveVariantImage ?? lineItem.image ?? liveProduct?.featuredImage ?? null;
-  const title = liveProduct?.title ?? lineItem.title;
-  const price = getDisplayedMoney(lineItem, liveProducts);
-  const shouldShowVariant =
-    lineItem.variantTitle !== null && lineItem.variantTitle !== "Default Title";
-  const isLiveProduct = liveProduct !== undefined;
+  const { liveProduct, image, title, price, shouldShowVariant } =
+    resolveProductDisplayProps(lineItem, liveProducts);
 
-  if (isLiveProduct) {
+  if (liveProduct !== undefined) {
     return (
       <QuickLink
         to="/shop/$handle"

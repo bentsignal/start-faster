@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useMutationState, useQuery } from "@tanstack/react-query";
 
 import { clearCartStorage } from "~/features/cart/hooks/use-cart-mutations";
@@ -14,6 +14,15 @@ import {
   getStoredCartId,
   getStoredCartQuantity,
 } from "~/features/cart/lib/cart-storage";
+
+function getFallbackQuantity(
+  cartId: string | null,
+  cookieData: { quantity?: number } | undefined,
+) {
+  if (cartId === null) return 0;
+  const stored = getStoredCartQuantity();
+  return stored > 0 ? stored : (cookieData?.quantity ?? 0);
+}
 
 // this hook should only be used in the cart store, not directly in components. use the cart store instead.
 export function useCart() {
@@ -36,19 +45,14 @@ export function useCart() {
     select: parsePendingCartMutation,
   }).filter((mutation) => mutation !== null);
 
-  const cart = useMemo(
-    () => applyPendingMutationsToCart(cartQuery.data ?? null, pendingMutations),
-    [cartQuery.data, pendingMutations],
+  const cart = applyPendingMutationsToCart(
+    cartQuery.data ?? null,
+    pendingMutations,
   );
-  const storedQuantity = getStoredCartQuantity();
-  const fallbackQuantity =
-    cartId === null
-      ? 0
-      : storedQuantity > 0
-        ? storedQuantity
-        : (cookieCartQuery.data?.quantity ?? 0);
-  const cartQuantity = cart?.totalQuantity ?? fallbackQuantity;
+  const cartQuantity =
+    cart?.totalQuantity ?? getFallbackQuantity(cartId, cookieCartQuery.data);
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs query result with external localStorage state
   useEffect(() => {
     if (cartId === null) {
       return;

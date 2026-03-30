@@ -22,6 +22,7 @@ export const accountQueries = {
             first: ORDERS_PAGE_SIZE,
           },
         }),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- TanStack Query requires initialPageParam to carry the full page-param union type
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => {
         if (lastPage.pageInfo.hasNextPage === false) {

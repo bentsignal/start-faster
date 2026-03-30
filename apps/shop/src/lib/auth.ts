@@ -26,9 +26,7 @@ function shouldUseSecureCookies(request: Request) {
   return isSecureRequest(request);
 }
 
-async function createHydrogenSessionAdapter(
-  request: Request,
-): Promise<HydrogenSession> {
+async function createHydrogenSessionAdapter(request: Request) {
   const config = {
     name: "__Host-shopify_customer_session",
     password: env.SHOPIFY_CUSTOMER_ACCOUNT_SESSION_SECRET,

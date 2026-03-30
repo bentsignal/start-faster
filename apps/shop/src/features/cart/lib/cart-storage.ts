@@ -6,7 +6,7 @@ export const CART_ID_COOKIE_KEY = "shopify-cart-id";
 const SHOPIFY_CART_ID_KEY = "shopify-cart-id";
 const CART_STORAGE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
-function parseStoredQuantity(value: string | null | undefined): number {
+function parseStoredQuantity(value: string | null | undefined) {
   if (value === null || value === undefined || value.length === 0) {
     return 0;
   }

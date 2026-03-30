@@ -47,17 +47,14 @@ function getLatestShipmentStatuses(order: CustomerOrder) {
   });
 }
 
-export function getCustomerOrderStatus(order: CustomerOrder): {
-  label: string;
-  tone: "primary" | "accent" | "success";
-} {
+export function getCustomerOrderStatus(order: CustomerOrder) {
   const latestShipmentStatuses = getLatestShipmentStatuses(order);
 
   if (latestShipmentStatuses.includes(FulfillmentEventStatus.Delivered)) {
     return {
       label: "Delivered",
       tone: "success",
-    };
+    } as const;
   }
 
   if (
@@ -68,11 +65,11 @@ export function getCustomerOrderStatus(order: CustomerOrder): {
     return {
       label: "Shipped",
       tone: "accent",
-    };
+    } as const;
   }
 
   return {
     label: "In progress",
     tone: "primary",
-  };
+  } as const;
 }

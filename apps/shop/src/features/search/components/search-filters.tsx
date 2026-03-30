@@ -215,6 +215,10 @@ function FilterSectionContent({
             return null;
           }
 
+          // Shopify returns FilterValue.input as `unknown` (JSON scalar).
+          // After the object guard above we know it's a non-null object, but
+          // there is no runtime schema to validate the full ProductFilter shape.
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Shopify JSON scalar has no narrower static type
           const input = value.input as ProductFilter;
           const active = hasSelectedFilterValue(selectedFilters, input);
 

@@ -8,6 +8,7 @@ export default function useDebouncedInput(options?: {
   const [value, setValue] = useState(initialValue);
   const [debouncedValue, setDebouncedValue] = useState(initialValue);
 
+  // eslint-disable-next-line no-restricted-syntax -- debounce timer is an external browser timer
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedValue(value);

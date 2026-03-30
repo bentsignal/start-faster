@@ -2,6 +2,7 @@ import type { ProductFilter } from "@acme/shopify/storefront/types";
 
 import { supportedCollectionFilterSchema } from "~/features/collections/schema";
 
+// eslint-disable-next-line no-restricted-syntax -- recursive function requires explicit return type to avoid implicit any
 function stableSerialize(value: unknown): string {
   if (Array.isArray(value)) {
     return `[${value.map((item) => stableSerialize(item)).join(",")}]`;

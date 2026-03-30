@@ -1,6 +1,6 @@
 import { defineConfig } from "eslint/config";
 
-import { baseConfig } from "@acme/eslint-config/base";
+import { baseConfig, strictConfig } from "@acme/eslint-config/base";
 import { reactConfig } from "@acme/eslint-config/react";
 import { createStrictSyntax } from "@acme/eslint-config/syntax";
 
@@ -10,7 +10,8 @@ export default defineConfig(
   },
   baseConfig,
   reactConfig,
-  createStrictSyntax({ env: true }),
+  strictConfig,
+  createStrictSyntax({ ts: true, react: true, env: true }),
   {
     rules: {
       "@typescript-eslint/only-throw-error": "off",

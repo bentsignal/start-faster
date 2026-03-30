@@ -11,9 +11,7 @@ export const COLLECTION_PAGE_SIZE = 30;
 export type CollectionSortBy = "relevance" | "price";
 export type CollectionSortDirection = "asc" | "desc";
 
-function getCollectionSortKey(
-  sortBy: CollectionSortBy,
-): ProductCollectionSortKeys {
+function getCollectionSortKey(sortBy: CollectionSortBy) {
   if (sortBy === "price") {
     return ProductCollectionSortKeys.Price;
   }
@@ -45,6 +43,7 @@ export const collectionQueries = {
         filters,
         first,
       ] as const,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- TanStack Query requires initialPageParam to carry the full page-param union type
       initialPageParam: undefined as string | undefined,
       queryFn: async ({ pageParam }) => {
         const response = await shopify.request(getProductsByCollection, {

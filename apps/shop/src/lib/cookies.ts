@@ -1,4 +1,4 @@
-export function getClientCookie(name: string): string | undefined {
+export function getClientCookie(name: string) {
   if (typeof document === "undefined") {
     return undefined;
   }

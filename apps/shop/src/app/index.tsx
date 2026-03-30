@@ -32,10 +32,10 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
-  const { data: collection } = useSuspenseQuery(
-    productQueries.getProductsByCollection(args),
-  );
-  const products = collection?.products.nodes ?? [];
+  const { data: products } = useSuspenseQuery({
+    ...productQueries.getProductsByCollection(args),
+    select: (collection) => collection?.products.nodes ?? [],
+  });
 
   return (
     <main className="flex w-full flex-col">

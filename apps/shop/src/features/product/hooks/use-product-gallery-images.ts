@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import type { Product } from "~/features/product/types";
 import { getProductGalleryOrdering } from "~/features/product/lib/gallery-images";
 
@@ -14,11 +12,9 @@ export function useProductGalleryImages({
   variants,
   initialVariantId,
 }: UseProductGalleryImagesArgs) {
-  return useMemo(() => {
-    return getProductGalleryOrdering({
-      product,
-      variants,
-      initialVariantId,
-    });
-  }, [initialVariantId, product, variants]);
+  return getProductGalleryOrdering({
+    product,
+    variants,
+    initialVariantId,
+  });
 }

@@ -13,7 +13,6 @@ import {
   cartLinesUpdateForCart,
 } from "@acme/shopify/storefront/cart";
 
-import type { Cart } from "~/features/cart/types";
 import { shopify } from "~/lib/shopify";
 
 type CartSource =
@@ -27,7 +26,7 @@ interface ShopifyUserError {
   message: string;
 }
 
-function normalizeCart(cart: CartSource | null | undefined): Cart | null {
+function normalizeCart(cart: CartSource | null | undefined) {
   if (cart === null || cart === undefined) {
     return null;
   }
@@ -96,6 +95,56 @@ export async function getCartFn({ data }: { data: { cartId: string } }) {
   return normalizeCart(response.data?.cart);
 }
 
+async function tryAddToExistingCart(
+  cartId: string,
+  lines: { merchandiseId: string; quantity: number }[],
+) {
+  const addLineResponse = await shopify.request(cartLinesAddForCart, {
+    variables: {
+      cartId,
+      lines,
+    },
+  });
+
+  const existingPayload = addLineResponse.data?.cartLinesAdd;
+  if (existingPayload === null || existingPayload === undefined) {
+    return null;
+  }
+
+  if (hasRecoverableMissingCartError(existingPayload.userErrors) === false) {
+    assertNoUserErrors(
+      existingPayload.userErrors,
+      "Unable to add item to your cart.",
+    );
+  }
+
+  return normalizeCart(existingPayload.cart);
+}
+
+async function createNewCartWithLines(
+  lines: { merchandiseId: string; quantity: number }[],
+) {
+  const createCartResponse = await shopify.request(cartCreateForCart, {
+    variables: {
+      lines,
+    },
+  });
+
+  const newPayload = createCartResponse.data?.cartCreate;
+  if (newPayload === null || newPayload === undefined) {
+    throw new Error("Unable to create Shopify cart.");
+  }
+
+  assertNoUserErrors(newPayload.userErrors, "Unable to create Shopify cart.");
+
+  const newCart = normalizeCart(newPayload.cart);
+  if (newCart === null) {
+    throw new Error("Unable to create Shopify cart.");
+  }
+
+  return newCart;
+}
+
 export async function addCartLineFn({
   data,
 }: {
@@ -118,50 +167,13 @@ export async function addCartLineFn({
   if (data.cartId !== undefined) {
     assertNonEmptyValue(data.cartId, "cartId");
 
-    const addLineResponse = await shopify.request(cartLinesAddForCart, {
-      variables: {
-        cartId: data.cartId,
-        lines,
-      },
-    });
-
-    const existingPayload = addLineResponse.data?.cartLinesAdd;
-    if (existingPayload !== null && existingPayload !== undefined) {
-      if (
-        hasRecoverableMissingCartError(existingPayload.userErrors) === false
-      ) {
-        assertNoUserErrors(
-          existingPayload.userErrors,
-          "Unable to add item to your cart.",
-        );
-      }
-
-      const existingCart = normalizeCart(existingPayload.cart);
-      if (existingCart !== null) {
-        return existingCart;
-      }
+    const existingCart = await tryAddToExistingCart(data.cartId, lines);
+    if (existingCart !== null) {
+      return existingCart;
     }
   }
 
-  const createCartResponse = await shopify.request(cartCreateForCart, {
-    variables: {
-      lines,
-    },
-  });
-
-  const newPayload = createCartResponse.data?.cartCreate;
-  if (newPayload === null || newPayload === undefined) {
-    throw new Error("Unable to create Shopify cart.");
-  }
-
-  assertNoUserErrors(newPayload.userErrors, "Unable to create Shopify cart.");
-
-  const newCart = normalizeCart(newPayload.cart);
-  if (newCart === null) {
-    throw new Error("Unable to create Shopify cart.");
-  }
-
-  return newCart;
+  return createNewCartWithLines(lines);
 }
 
 export async function updateCartLineFn({

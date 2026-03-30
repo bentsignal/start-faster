@@ -24,10 +24,8 @@ export const Route = createFileRoute("/_auth/login")({
         }
 
         const formData = await request.formData();
-        const returnTo =
-          typeof formData.get("returnTo") === "string"
-            ? (formData.get("returnTo") as string)
-            : "/";
+        const rawReturnTo = formData.get("returnTo");
+        const returnTo = typeof rawReturnTo === "string" ? rawReturnTo : "/";
         const { customerAccount, session } =
           await createHydrogenCustomerAuthContext({
             request,

@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { toast } from "@acme/ui/toaster";
@@ -57,30 +56,33 @@ export function useUpdateCartLine({
   const updateLineMutation = useInternalUpdateCartLineMutation();
   const removeLineMutation = useInternalRemoveCartLineMutation();
 
-  const changeLineQuantity = useCallback(
-    ({ lineId, delta }: { lineId: string; delta: number }) => {
-      const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
-      if (cartLine === undefined || cartId === null) {
-        return;
-      }
+  const changeLineQuantity = ({
+    lineId,
+    delta,
+  }: {
+    lineId: string;
+    delta: number;
+  }) => {
+    const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
+    if (cartLine === undefined || cartId === null) {
+      return;
+    }
 
-      const nextQuantity = cartLine.quantity + delta;
-      if (nextQuantity <= 0) {
-        removeLineMutation.mutate({
-          cartId,
-          lineId,
-        });
-        return;
-      }
-
-      updateLineMutation.mutate({
+    const nextQuantity = cartLine.quantity + delta;
+    if (nextQuantity <= 0) {
+      removeLineMutation.mutate({
         cartId,
         lineId,
-        quantity: nextQuantity,
       });
-    },
-    [cart, cartId, removeLineMutation, updateLineMutation],
-  );
+      return;
+    }
+
+    updateLineMutation.mutate({
+      cartId,
+      lineId,
+      quantity: nextQuantity,
+    });
+  };
 
   return {
     changeLineQuantity,
