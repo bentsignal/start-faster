@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useMutationState, useSuspenseQuery } from "@tanstack/react-query";
 
 import { clearCartStorage } from "~/features/cart/hooks/cart-mutation-shared";
+import { useCartStorage } from "~/features/cart/hooks/use-cart-storage";
 import {
   applyPendingMutationsToCart,
   parsePendingCartMutation,
@@ -10,15 +11,25 @@ import {
   cartMutationKeys,
   cartQueries,
 } from "~/features/cart/lib/cart-queries";
-import {
-  getStoredCartId,
-  getStoredCartQuantity,
-} from "~/features/cart/lib/cart-storage";
+import { useIsHydrated } from "~/hooks/use-is-hydrated";
 
-function getFallbackQuantity(cartId: string | null, cookieQuantity: number) {
+function getFallbackQuantity({
+  cartId,
+  cookieQuantity,
+  isHydrated,
+  storedQuantity,
+}: {
+  cartId: string | null;
+  cookieQuantity: number;
+  isHydrated: boolean;
+  storedQuantity: number;
+}) {
   if (cartId === null) return 0;
-  const stored = getStoredCartQuantity();
-  return stored > 0 ? stored : cookieQuantity;
+  if (storedQuantity > 0) {
+    return storedQuantity;
+  }
+
+  return isHydrated ? 0 : cookieQuantity;
 }
 
 export function useCart() {
@@ -27,7 +38,9 @@ export function useCart() {
     select: (data) => ({ id: data.id, quantity: data.quantity }),
   });
 
-  const cartId = getStoredCartId() ?? cookieData.id ?? null;
+  const isHydrated = useIsHydrated();
+  const storedCart = useCartStorage();
+  const cartId = storedCart.id ?? (isHydrated ? null : cookieData.id) ?? null;
 
   const { data: cartData, status: cartStatus } = useSuspenseQuery({
     ...cartQueries.detail(cartId),
@@ -45,7 +58,13 @@ export function useCart() {
 
   const cart = applyPendingMutationsToCart(cartData, pendingMutations);
   const cartQuantity =
-    cart?.totalQuantity ?? getFallbackQuantity(cartId, cookieData.quantity);
+    cart?.totalQuantity ??
+    getFallbackQuantity({
+      cartId,
+      cookieQuantity: cookieData.quantity,
+      isHydrated,
+      storedQuantity: storedCart.quantity,
+    });
 
   // eslint-disable-next-line no-restricted-syntax -- syncs query result with external localStorage state
   useEffect(() => {
