@@ -5,7 +5,8 @@
   "exports": {
     "./base": "./base.ts",
     "./nextjs": "./nextjs.ts",
-    "./react": "./react.ts"
+    "./react": "./react.ts",
+    "./syntax": "./syntax.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo node_modules",

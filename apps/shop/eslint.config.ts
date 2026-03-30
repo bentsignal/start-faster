@@ -1,7 +1,8 @@
 import { defineConfig } from "eslint/config";
 
-import { baseConfig, restrictEnvAccess } from "@acme/eslint-config/base";
+import { baseConfig } from "@acme/eslint-config/base";
 import { reactConfig } from "@acme/eslint-config/react";
+import { createStrictSyntax } from "@acme/eslint-config/syntax";
 
 export default defineConfig(
   {
@@ -9,7 +10,7 @@ export default defineConfig(
   },
   baseConfig,
   reactConfig,
-  restrictEnvAccess,
+  createStrictSyntax({ env: true }),
   {
     rules: {
       "@typescript-eslint/only-throw-error": "off",
