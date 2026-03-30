@@ -38,6 +38,10 @@ For each subagent, provide these instructions:
 
 6. **If no issues are found:** Explicitly state that the current changes already satisfy the standards and no changes are needed.
 
+## Prohibited patterns
+
+- **No re-export shims.** When moving a function to a new module, update every import site to point to the new location. Never import a function into the old file and re-export it (under the same or a different name) just to avoid updating consumers. This creates indirection that makes the codebase harder to reason about and defeats the purpose of the refactor.
+
 ## 3. Synthesize findings
 
 Once all subagents have returned their findings, consolidate everything they reported. Identify overlaps, dependencies, and conflicts between findings from different skills. Do not leave out any details provided by subagents.
