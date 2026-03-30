@@ -7,15 +7,6 @@ import { useUserSearchResults } from "~/features/user-access/hooks/use-user-sear
 export function UserAccessList() {
   const { users, status, sentinelRef } = useUserSearchResults();
 
-  if (status === "LoadingFirstPage") {
-    return (
-      <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
-        <Loader className="size-4 animate-spin" />
-        Loading users...
-      </div>
-    );
-  }
-
   if (users.length === 0) {
     return (
       <p className="text-muted-foreground py-8 text-center text-sm">

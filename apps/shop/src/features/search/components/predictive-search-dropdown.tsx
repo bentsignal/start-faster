@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- conditional fetch: only runs when search term >= 2 chars
 import { useQuery } from "@tanstack/react-query";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";

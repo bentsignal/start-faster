@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useSearch } from "@tanstack/react-router";
 import { useConvexPaginatedQuery } from "@convex-dev/react-query";
 
@@ -16,9 +16,9 @@ export function useUserSearchResults() {
   });
   const searchTerm = sanitizeSearch(searchTermFromUrl);
 
-  const firstPageQuery = useQuery({
+  const firstPageQuery = useSuspenseQuery({
     ...userAccessQueries.searchFirstPage(searchTerm),
-    placeholderData: (previousData) => previousData,
+    select: (data) => ({ page: data.page, isDone: data.isDone }),
   });
   const liveQuery = useConvexPaginatedQuery(
     api.users.searchUsersPaginated,
@@ -33,14 +33,12 @@ export function useUserSearchResults() {
   const shouldUseLiveResults = liveQuery.status !== "LoadingFirstPage";
   const users = shouldUseLiveResults
     ? liveQuery.results
-    : (firstPageQuery.data?.page ?? []);
+    : firstPageQuery.data.page;
   const status = shouldUseLiveResults
     ? liveQuery.status
-    : firstPageQuery.isPending || firstPageQuery.data === undefined
-      ? "LoadingFirstPage"
-      : firstPageQuery.data.isDone
-        ? "Exhausted"
-        : "CanLoadMore";
+    : firstPageQuery.data.isDone
+      ? "Exhausted"
+      : "CanLoadMore";
 
   const { sentinelRef } = useLoadMoreOnIntersection({
     canLoadMore: status === "CanLoadMore",

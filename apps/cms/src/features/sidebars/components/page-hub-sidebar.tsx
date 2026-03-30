@@ -1,7 +1,7 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { useConvexPaginatedQuery } from "@convex-dev/react-query";
-import { ChevronLeft, Loader, Plus, Settings } from "lucide-react";
+import { ChevronLeft, Plus, Settings } from "lucide-react";
 
 import type { Id } from "@acme/convex/model";
 import { api } from "@acme/convex/api";
@@ -92,8 +92,9 @@ function NavItems() {
 }
 
 function useDraftsList(pageId: Id<"pages">) {
-  const firstPageQuery = useQuery({
+  const firstPageQuery = useSuspenseQuery({
     ...pageQueries.listDraftsFirstPage(pageId),
+    select: (data) => ({ page: data.page, isDone: data.isDone }),
   });
   const liveQuery = useConvexPaginatedQuery(
     api.pages.drafts.list,
@@ -104,14 +105,12 @@ function useDraftsList(pageId: Id<"pages">) {
   const shouldUseLiveResults = liveQuery.status !== "LoadingFirstPage";
   const drafts = shouldUseLiveResults
     ? liveQuery.results
-    : (firstPageQuery.data?.page ?? []);
+    : firstPageQuery.data.page;
   const status = shouldUseLiveResults
     ? liveQuery.status
-    : firstPageQuery.isPending || firstPageQuery.data === undefined
-      ? "LoadingFirstPage"
-      : firstPageQuery.data.isDone
-        ? "Exhausted"
-        : "CanLoadMore";
+    : firstPageQuery.data.isDone
+      ? "Exhausted"
+      : "CanLoadMore";
 
   const { sentinelRef } = useLoadMoreOnIntersection({
     canLoadMore: status === "CanLoadMore",
@@ -152,11 +151,6 @@ function DraftsList() {
           </SidebarMenu>
           {status === "CanLoadMore" ? (
             <div ref={sentinelRef} className="h-1" />
-          ) : null}
-          {status === "LoadingFirstPage" ? (
-            <div className="flex justify-center py-2">
-              <Loader className="text-sidebar-foreground/30 size-4 animate-spin" />
-            </div>
           ) : null}
         </ScrollArea>
       </SidebarGroupContent>

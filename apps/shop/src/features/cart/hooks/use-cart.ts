@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMutationState, useQuery } from "@tanstack/react-query";
+import { useMutationState, useSuspenseQuery } from "@tanstack/react-query";
 
 import { clearCartStorage } from "~/features/cart/hooks/cart-mutation-shared";
 import {
@@ -15,25 +15,24 @@ import {
   getStoredCartQuantity,
 } from "~/features/cart/lib/cart-storage";
 
-function getFallbackQuantity(
-  cartId: string | null,
-  cookieData: { quantity?: number } | undefined,
-) {
+function getFallbackQuantity(cartId: string | null, cookieQuantity: number) {
   if (cartId === null) return 0;
   const stored = getStoredCartQuantity();
-  return stored > 0 ? stored : (cookieData?.quantity ?? 0);
+  return stored > 0 ? stored : cookieQuantity;
 }
 
 export function useCart() {
-  const cookieCartQuery = useQuery({
+  const { data: cookieData } = useSuspenseQuery({
     ...cartQueries.cookie(),
+    select: (data) => ({ id: data.id, quantity: data.quantity }),
   });
 
-  const cartId = getStoredCartId() ?? cookieCartQuery.data?.id ?? null;
+  const cartId = getStoredCartId() ?? cookieData.id ?? null;
 
-  const cartQuery = useQuery({
+  const { data: cartData, status: cartStatus } = useSuspenseQuery({
     ...cartQueries.detail(cartId),
-    enabled: cartId !== null,
+    // eslint-disable-next-line no-restricted-syntax -- full Cart object needed by optimistic mutation pipeline (applyPendingMutationsToCart)
+    select: (cart) => cart,
   });
 
   const pendingMutations = useMutationState({
@@ -44,12 +43,9 @@ export function useCart() {
     select: parsePendingCartMutation,
   }).filter((mutation) => mutation !== null);
 
-  const cart = applyPendingMutationsToCart(
-    cartQuery.data ?? null,
-    pendingMutations,
-  );
+  const cart = applyPendingMutationsToCart(cartData, pendingMutations);
   const cartQuantity =
-    cart?.totalQuantity ?? getFallbackQuantity(cartId, cookieCartQuery.data);
+    cart?.totalQuantity ?? getFallbackQuantity(cartId, cookieData.quantity);
 
   // eslint-disable-next-line no-restricted-syntax -- syncs query result with external localStorage state
   useEffect(() => {
@@ -57,21 +53,20 @@ export function useCart() {
       return;
     }
 
-    if (cartQuery.status !== "success") {
+    if (cartStatus !== "success") {
       return;
     }
 
-    if (cartQuery.data !== null) {
+    if (cartData !== null) {
       return;
     }
 
     clearCartStorage();
-  }, [cartId, cartQuery.data, cartQuery.status]);
+  }, [cartId, cartData, cartStatus]);
 
   return {
     cartId,
     cart,
     cartQuantity,
-    cartQuery,
   };
 }

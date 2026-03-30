@@ -64,6 +64,12 @@ const strictReactSyntaxSelectors = [
   },
   {
     selector:
+      "CallExpression:matches([callee.name='useQuery'], [callee.property.name='useQuery']):not(:has(Property[key.name='select']))",
+    message:
+      "useQuery must include a `select` option so the component only subscribes to the data it needs.",
+  },
+  {
+    selector:
       "CallExpression:matches([callee.name='useRouteContext'], [callee.property.name='useRouteContext']):not(:has(Property[key.name='select']))",
     message:
       "useRouteContext must include a `select` option so the component only re-renders when the selected slice changes.",
@@ -98,6 +104,12 @@ const reactImportRestrictions = [
     importNames: ["useMemo", "useCallback", "memo"],
     message:
       "React Compiler handles memoization automatically. Only use manual memoization as an escape hatch with a comment explaining why.",
+  },
+  {
+    name: "@tanstack/react-query",
+    importNames: ["useQuery"],
+    message:
+      "Prefer `useSuspenseQuery` with data preloaded via `ensureQueryData` in the route loader. If `useQuery` is genuinely needed (e.g. conditional fetching), add an eslint-disable comment explaining why.",
   },
 ] as const;
 

@@ -1,5 +1,3 @@
-import { Loader } from "lucide-react";
-
 import { ScrollArea } from "@acme/ui/scroll-area";
 import {
   Sheet,
@@ -41,18 +39,8 @@ export function CartSheet() {
 }
 
 function Body() {
-  const { cart, cartQuery } = useCart();
-  const isCartLoading = cartQuery.isLoading;
-  const cartExists = cart !== null;
+  const { cart } = useCart();
   const lines = cart?.lines.nodes ?? [];
-
-  if (isCartLoading && !cartExists) {
-    return (
-      <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-        <Loader className="size-4 animate-spin" />
-      </div>
-    );
-  }
 
   if (lines.length > 0) {
     return (
