@@ -65,6 +65,11 @@ export const strictAppBoundariesConfig = defineConfig({
           "Do not annotate return types. Let TypeScript infer them so the types stay in sync with the implementation.",
       },
       {
+        selector: "VariableDeclarator[init][id.type='Identifier'][id.typeAnnotation]",
+        message:
+          "Do not annotate variable types when the initializer already provides the type. Let TypeScript infer it so the types stay in sync with the implementation.",
+      },
+      {
         selector:
           "CallExpression:matches([callee.name='useSearch'], [callee.property.name='useSearch']):not(:has(Property[key.name='select']))",
         message:

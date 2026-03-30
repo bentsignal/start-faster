@@ -14,7 +14,15 @@ export const Route = createFileRoute("/_authenticated/_authorized/account")({
 });
 
 function RouteComponent() {
-  const { data: user } = useSuspenseQuery(adminQueries.currentUser());
+  const { data: user } = useSuspenseQuery({
+    ...adminQueries.currentUser(),
+    select: (data) => ({
+      name: data.name,
+      email: data.email,
+      adminLevel: data.adminLevel,
+      cmsScopes: data.cmsScopes,
+    }),
+  });
 
   return (
     <main className="bg-background min-h-full">

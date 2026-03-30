@@ -95,7 +95,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootComponent() {
-  const context = Route.useRouteContext();
+  const { queryClient, theme } = Route.useRouteContext({
+    select: (ctx) => ({ queryClient: ctx.queryClient, theme: ctx.theme }),
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -108,12 +110,12 @@ function RootComponent() {
           "bg-background text-foreground min-h-screen font-sans antialiased",
         )}
       >
-        <QueryClientProvider client={context.queryClient}>
+        <QueryClientProvider client={queryClient}>
           <ThemeStore
             attribute="class"
             defaultTheme={DEFAULT_THEME}
             disableTransitionOnChange
-            initialTheme={context.theme}
+            initialTheme={theme}
           >
             <Outlet />
             <TanStackDevtools

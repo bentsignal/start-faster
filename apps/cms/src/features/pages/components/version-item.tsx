@@ -230,9 +230,5 @@ function VersionBadge({ variant }: { variant: "draft" | "live" | "previous" }) {
           Draft
         </span>
       );
-    default: {
-      const _exhaustive: never = variant;
-      return _exhaustive;
-    }
   }
 }

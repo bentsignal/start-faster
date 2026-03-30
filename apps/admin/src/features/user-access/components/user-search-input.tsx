@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 
 import { Input } from "@acme/ui/input";
 
-import { useUserSearch } from "~/features/user-access/hooks/use-user-search";
+const SEARCH_DEBOUNCE_MS = 500;
 
 export function UserSearchInput() {
   const { searchTerm, setSearchTerm } = useUserSearch();
@@ -30,4 +32,41 @@ export function UserSearchInput() {
       )}
     </div>
   );
+}
+
+function useUserSearch() {
+  const initialSearchTerm = useSearch({
+    from: "/_authenticated/_authorized/dashboard",
+    select: (search) => search.q ?? "",
+  });
+  const navigate = useNavigate({ from: "/dashboard" });
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+
+  // eslint-disable-next-line no-restricted-syntax -- syncs debounced input to router search params (external URL state)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const nextQuery = searchTerm.trim();
+      const currentQuery = initialSearchTerm;
+      if (nextQuery === currentQuery) {
+        return;
+      }
+
+      void navigate({
+        to: "/dashboard",
+        replace: true,
+        search: {
+          q: nextQuery.length > 0 ? nextQuery : undefined,
+        },
+      });
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [initialSearchTerm, navigate, searchTerm]);
+
+  return {
+    searchTerm,
+    setSearchTerm,
+  };
 }

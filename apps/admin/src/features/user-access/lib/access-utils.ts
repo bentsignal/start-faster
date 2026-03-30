@@ -12,5 +12,5 @@ export function getAdminLevelLabel(level: AdminLevel) {
 }
 
 export function isAdminLevel(value: number): value is AdminLevel {
-  return (ADMIN_LEVELS as readonly number[]).includes(value);
+  return ADMIN_LEVELS.some((level) => level === value);
 }
