@@ -35,239 +35,261 @@ Sub-components, constants, types, hooks beyond the single route hook, and utilit
 ### Example: A well-composed route file
 
 ```tsx
-import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import type { Viewport } from "~/features/pages/components/viewport-controls";
+import { env } from "~/env";
+import { OpenInNewTab } from "~/features/pages/components/open-in-new-tab";
+import { PreviewIframe } from "~/features/pages/components/preview-iframe";
+import {
+  defaultViewport,
+  ViewportToggle,
+  viewportValidator,
+} from "~/features/pages/components/viewport-controls";
+import { pageQueries } from "~/features/pages/lib/page-queries";
 
-import { SignOutButton } from "~/components/sign-out-button";
-import { UserAccessList } from "~/features/user-access/components/user-access-list";
-import { UserSearchInput } from "~/features/user-access/components/user-search-input";
-import { sanitizeSearch } from "~/features/user-access/lib/sanitize-search";
-import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
-
-export const Route = createFileRoute("/_authenticated/_authorized/dashboard")({
-  component: DashboardRoute,
-  loaderDeps: ({ search }) => search,
-  loader: async ({ context, deps }) => {
-    await context.queryClient.ensureQueryData(
-      userAccessQueries.searchFirstPage(sanitizeSearch(deps.q)),
-    );
-  },
+export const Route = createFileRoute(
+  "/_authenticated/_authorized/pages/$pageId/",
+)({
+  component: RouteComponent,
   validateSearch: z.object({
-    q: z.string().optional(),
+    viewport: viewportValidator.default(defaultViewport),
   }),
+  loader: async ({ context }) => {
+    const { pageId } = context;
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        pageQueries.listDraftsFirstPage(pageId),
+      ),
+      context.queryClient.ensureQueryData(
+        pageQueries.listRecentReleases(pageId),
+      ),
+    ]);
+  },
+  shouldReload: false,
 });
 
-function DashboardRoute() {
-  return (
-    <main className="bg-background min-h-screen">
-      <div className="container py-10">
-        <header className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Admin Portal</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage access for users in your admin workspace.
-            </p>
-          </div>
-          <SignOutButton />
-        </header>
+function RouteComponent() {
+  const { title, hasRelease, url, viewport, setViewport } = usePageHub();
 
-        <Card>
-          <CardHeader className="space-y-4">
-            <CardTitle>User Access</CardTitle>
-            <UserSearchInput />
-          </CardHeader>
-          <CardContent>
-            <UserAccessList />
-          </CardContent>
-        </Card>
+  if (!hasRelease) {
+    return (
+      <div className="flex h-full flex-1 items-center justify-center">
+        <p className="text-muted-foreground text-lg">
+          No version has been published yet
+        </p>
       </div>
-    </main>
-  );
-}
-```
+    );
+  }
 
-Notice what this file gives you: the search params are declared right here, the data dependency is visible in the loader, and the route component reads like an outline of the page. You can see the layout, the heading, and the two main pieces (`UserSearchInput` and `UserAccessList`) without any implementation noise. If you need to understand how search works, you click into `UserSearchInput`. The route file itself stays clean.
-
-## Components
-
-Components should be small and focused on a single piece of UI. When a component grows beyond a handful of concerns, split it into smaller components that each own one piece. The parent component then becomes a composition of those pieces, readable at a glance.
-
-Colocate tightly related sub-components in the same file when they are not reused elsewhere. This keeps related UI together without scattering tiny files across the project. The exported component is the public API of the file; the internal components are implementation details.
-
-### Example: Composing a complex panel from focused components
-
-```tsx
-import { Button } from "@acme/ui/button";
-
-import { useProductPageStore } from "~/features/product/stores/product-page-store";
-
-export function ProductDetailsPanel() {
   return (
-    <aside className="px-6 pb-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0">
-      <div className="mx-auto max-w-xl lg:mx-0 lg:h-full lg:max-w-md xl:max-w-lg">
-        <ProductTitle />
-        <ProductOptionSelector />
-        <ProductPrice />
-        <ProductActions />
-        <div className="bg-border mb-8 h-px" />
-        <ProductDescription />
+    <div className="flex h-full flex-1 flex-col">
+      <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-2">
+        <OpenInNewTab url={url} />
+        <ViewportToggle value={viewport} onChange={setViewport} />
       </div>
-    </aside>
-  );
-}
-
-function ProductTitle() {
-  const title = useProductPageStore((store) => store.product.title);
-
-  return (
-    <h1 className="mb-8 text-4xl leading-tight font-semibold tracking-tight">
-      {title}
-    </h1>
-  );
-}
-
-function ProductPrice() {
-  const price = useProductPageStore((store) => store.price);
-
-  return <p className="mb-8 text-2xl font-medium">{price}</p>;
-}
-
-function ProductActions() {
-  const addToCart = useProductPageStore((store) => store.addToCart);
-  const wasAddedToCart = useProductPageStore((store) => store.wasAddedToCart);
-  const buyNow = useProductPageStore((store) => store.buyNow);
-  const isBuyingNow = useProductPageStore((store) => store.isBuyingNow);
-
-  return (
-    <div className="mb-8 flex flex-col gap-2">
-      <Button disabled={wasAddedToCart} onClick={addToCart}>
-        {wasAddedToCart ? "Added to Cart" : "Add to Cart"}
-      </Button>
-      <Button variant="secondary" disabled={isBuyingNow} onClick={buyNow}>
-        {isBuyingNow ? "..." : "Buy Now"}
-      </Button>
+      <PreviewIframe
+        url={url}
+        title={`Preview of ${title}`}
+        viewport={viewport}
+      />
     </div>
   );
 }
 
-function ProductDescription() {
-  const description = useProductPageStore((store) => store.product.description);
+function usePageHub() {
+  const pageId = useRouteContext({
+    from: "/_authenticated/_authorized/pages/$pageId",
+    select: (ctx) => ctx.pageId,
+  });
 
-  return (
-    <p className="text-muted-foreground text-sm leading-7">{description}</p>
-  );
+  const { data } = useSuspenseQuery({
+    ...pageQueries.getById(pageId),
+    select: (data) => ({
+      title: data.title,
+      path: data.path,
+      hasRelease: data.hasRelease,
+    }),
+  });
+
+  const viewport = Route.useSearch({
+    select: (search) => search.viewport,
+  });
+
+  const navigate = Route.useNavigate();
+  async function setViewport(newViewport: Viewport) {
+    await navigate({ search: { viewport: newViewport }, replace: true });
+  }
+
+  const url = `${env.VITE_SHOP_URL}${data.path}`;
+
+  return { ...data, url, viewport, setViewport };
 }
 ```
 
-Reading `ProductDetailsPanel` tells you exactly what the panel contains: a title, options, price, actions, a divider, and a description. Each sub-component is small enough that you can verify its correctness in seconds. If you need to change how the price is displayed, you go straight to `ProductPrice` — you never have to wade through action buttons or option selectors to find it.
+Notice what this file gives you: the route configuration is self-contained at the top — search params, loader, and prefetching are all visible. The route component reads like a description of UI: if there's no release, show an empty state; otherwise show the preview toolbar and iframe. The hook reads like a description of behavior: get the page ID, select the three fields we need, read the viewport search param, wire up a navigation callback, derive the preview URL. Neither concern leaks into the other. Every query uses `select` to pull only what this specific component needs, and the hook returns only named primitives and callbacks.
+
+## Components
+
+Every component that needs business logic should pair with a co-located hook in the same file. The hook owns all data access — queries, mutations, derived state, navigation. The component is a thin renderer that calls the hook and renders UI based on what it returns.
+
+Components should be small and focused on a single piece of UI. When a component grows beyond a handful of concerns, split it into smaller components that each own one piece. The parent component then becomes a composition of those pieces, readable at a glance.
+
+Colocate tightly related sub-components in the same file when they are not reused elsewhere. The exported component is the public API of the file; internal sub-components and hooks are implementation details.
+
+### Example: A component with its co-located hook
+
+```tsx
+export function PagePreview() {
+  const { title, hasRelease, url, viewport, setViewport } = usePagePreview();
+
+  if (!hasRelease) {
+    return (
+      <div className="flex h-full flex-1 items-center justify-center">
+        <p className="text-muted-foreground text-lg">
+          No version has been published yet
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-1 flex-col">
+      <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-2">
+        <OpenInNewTab url={url} />
+        <ViewportToggle value={viewport} onChange={setViewport} />
+      </div>
+      <PreviewIframe
+        url={url}
+        title={`Preview of ${title}`}
+        viewport={viewport}
+      />
+    </div>
+  );
+}
+
+function usePagePreview() {
+  const pageId = useRouteContext({
+    from: "/_authenticated/_authorized/pages/$pageId",
+    select: (ctx) => ctx.pageId,
+  });
+
+  const { data } = useSuspenseQuery({
+    ...pageQueries.getById(pageId),
+    select: (data) => ({
+      title: data.title,
+      path: data.path,
+      hasRelease: data.hasRelease,
+    }),
+  });
+
+  const viewport = Route.useSearch({
+    select: (search) => search.viewport,
+  });
+
+  const navigate = Route.useNavigate();
+  async function setViewport(newViewport: Viewport) {
+    await navigate({ search: { viewport: newViewport }, replace: true });
+  }
+
+  const url = `${env.VITE_SHOP_URL}${data.path}`;
+
+  return { ...data, url, viewport, setViewport };
+}
+```
+
+Reading this file, the component reads like a description of UI: if there's no release, show an empty state; otherwise show the preview toolbar and iframe. The hook reads like a description of behavior: get the page ID, select the three fields we need, read the viewport search param, derive the preview URL. Neither concern leaks into the other.
+
+Notice the hook's `select` — it pulls only `title`, `path`, and `hasRelease` from the page query, not the entire page object. The hook then returns only named primitives and callbacks that the component actually uses. This keeps the interface between hook and component tight and explicit.
 
 ## Hooks
 
-Hooks should be small, single-purpose, and composable. When a feature requires complex behavior — managing selections, handling actions, computing derived data — break it into multiple focused hooks rather than writing one enormous hook that does everything.
+Hooks should be small, single-purpose, and specific to their consumer. A hook's return value should be the minimum interface its consumer needs — named primitives and callbacks, not raw query objects or large data structures.
 
-A coordinating hook can call several smaller hooks to assemble the full picture. This gives you verification at multiple levels: you can reason about each sub-hook independently, and you can reason about the coordinator as a composition of well-understood pieces.
+The default pattern is a **co-located hook** — an unexported hook in the same file as the component it serves. This hook owns all business logic for that component: queries with fine-grained `select`, mutations, derived state, and navigation. The component calls the hook and renders what it returns.
 
-### Example: Composing a complex hook from focused sub-hooks
+When a hook grows beyond ~50 lines, extract focused sub-hooks. But the goal is not to build a hierarchy of shared hooks that centralize data access — it's to keep each hook small and specific to the concern it serves.
+
+### Example: A co-located hook with fine-grained selection
 
 ```tsx
-function useInternalStore({ product, variant }: ProductPageStoreProps) {
-  const variants = product.variants.nodes;
-  const [initialVariantId] = useState(variant);
-
-  const galleryOrdering = useProductGalleryImages({
-    product,
-    variants,
-    initialVariantId,
+function useDraftEditor() {
+  const draftId = useRouteContext({
+    from: "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
+    select: (ctx) => ctx.draftId,
   });
 
-  const defaultVariantId = getDefaultVariantIdFromGalleryOrdering({
-    variants,
-    variantImageIndexById: galleryOrdering.variantImageIndexById,
+  const { data: draft } = useSuspenseQuery({
+    ...pageQueries.getDraft(draftId),
+    select: (data) => ({ _id: data._id, content: data.content }),
   });
 
-  const options = useProductOptions(product, galleryOrdering.colorOrder);
+  const [content, setContent] = useState(draft.content);
 
-  const { selectedVariant, selectedOptions } = useSelectedProductVariant({
-    variants,
-    variantId: variant,
-    defaultVariantId,
+  useAutosave({ draftId: draft._id, content });
+
+  const { mode, viewport } = Route.useSearch({
+    select: (search) => ({ mode: search.mode, viewport: search.viewport }),
   });
 
-  const { selectOption, addToCart, wasAddedToCart, buyNow, isBuyingNow } =
-    useProductVariantActions({
-      variants,
-      productTitle: product.title,
-      productHandle: product.handle,
-      selectedVariant,
-      selectedOptions,
-    });
+  const navigate = Route.useNavigate();
+  async function setMode(newMode: EditorMode) {
+    await navigate({ search: { mode: newMode, viewport }, replace: true });
+  }
+  async function setViewport(newViewport: Viewport) {
+    await navigate({ search: { mode, viewport: newViewport }, replace: true });
+  }
 
-  const selectedPrice =
-    selectedVariant?.price ?? product.priceRange.minVariantPrice;
-  const price = formatPrice(selectedPrice.amount, selectedPrice.currencyCode);
+  const pageId = useRouteContext({
+    from: "/_authenticated/_authorized/pages/$pageId",
+    select: (ctx) => ctx.pageId,
+  });
+
+  const { data: page } = useSuspenseQuery({
+    ...pageQueries.getById(pageId),
+    select: (data) => ({ path: data.path }),
+  });
+
+  const previewUrl = `${env.VITE_SHOP_URL}${page.path}?draftId=${draftId}`;
 
   return {
-    product,
-    options,
-    galleryImages: galleryOrdering.images,
-    price,
-    selectedVariant,
-    selectedOptions,
-    selectOption,
-    addToCart,
-    wasAddedToCart,
-    buyNow,
-    isBuyingNow,
+    content,
+    setContent,
+    mode,
+    viewport,
+    setMode,
+    setViewport,
+    previewUrl,
   };
 }
 ```
 
-This coordinating hook reads as a clear narrative: get gallery images, determine the default variant, build the option list, resolve the selected variant, wire up the actions, compute the price. Each step is a single function call whose name tells you what it does. The implementation details of _how_ gallery ordering works or _how_ variant selection works live in their own focused hooks.
+This hook reads as a clear narrative: get the draft ID, select only the two fields we need from the draft, set up autosave, read search params, wire up navigation callbacks, compute the preview URL. Every query uses `select` to pull only what this specific component needs. The return value is a flat set of named primitives and callbacks — no raw query objects, no large data structures.
 
-### Example: A focused sub-hook
+### What to avoid: shared "kitchen sink" hooks
+
+Do not build shared hooks that return large objects for many consumers to pick from:
 
 ```tsx
-interface UseSelectedProductVariantArgs {
-  variants: Product["variants"]["nodes"];
-  variantId?: string;
-  defaultVariantId?: string;
-}
-
-export function useSelectedProductVariant({
-  variants,
-  variantId,
-  defaultVariantId,
-}: UseSelectedProductVariantArgs) {
-  const defaultVariant =
-    variants.find((variant) => variant.id === defaultVariantId) ??
-    variants.find((variant) => variant.availableForSale) ??
-    variants[0] ??
-    null;
-
-  const selectedVariant =
-    variants.find((variant) => variant.id === variantId) ?? defaultVariant;
-
-  const selectedOptions =
-    selectedVariant?.selectedOptions.reduce<Record<string, string>>(
-      (accumulator, option) => {
-        accumulator[option.name] = option.value;
-        return accumulator;
-      },
-      {},
-    ) ?? {};
-
-  return { selectedVariant, selectedOptions };
+// ❌ WRONG — centralizes too much, returns more than any one consumer needs
+function useCart() {
+  const cartQuery = useSuspenseQuery(cartQueries.detail(cartId));
+  return {
+    cart: cartQuery.data, // entire cart object
+    cartQuantity: cartQuery.data.totalQuantity,
+    cartQuery, // raw query object leaked
+  };
 }
 ```
 
-This hook does one thing: resolve which variant is selected and extract its options. It's small enough to review in under a minute and test in isolation.
+Instead, each component that needs cart data should have its own hook (or inline query) that selects only what it needs. The query cache deduplicates the underlying fetch, so multiple components hitting the same query key with different `select` functions cost nothing. See the `data-and-state` reference for details.
 
 ## Rules of Thumb
 
 - **Route files**: Under ~100 lines. All route-level configuration (search params, loader, beforeLoad, head, meta, error/pending components, static data, etc.) must be defined inline in the route file — never in a separate config file that gets imported. The route file should read like a self-contained table of contents: configuration at the top, then a layout component that composes feature components.
 - **Components**: If a component exceeds ~80 lines or handles more than one distinct UI concern, split it.
-- **Hooks**: If a hook exceeds ~50 lines, look for sub-hooks to extract. A coordinating hook should mostly be a sequence of calls to smaller hooks plus a return statement.
+- **Hooks**: If a hook exceeds ~70 lines, extract sub-hooks. Co-located hooks should be specific to their component and return only what that component uses — never raw query objects or large data structures.
 - **Files**: If a file exceeds ~300 lines, it almost certainly has multiple concerns that should be separated.
 - **Business logic in components**: Small inline handlers (a couple of lines) are fine. Anything more substantial should be extracted into a hook or utility function so the component stays focused on rendering.

@@ -55,6 +55,8 @@ function useCreatePage() {
 
 The component reads like a description of UI. The hook reads like a description of behavior. When an agent looks at this file, it sees both concerns clearly separated but co-located for discoverability.
 
+The co-located hook should return only what the component actually uses — named variables and callbacks, not raw query objects or large data structures. If the component needs a quantity and a delete action, the hook returns `{ quantity, deleteItem }`, not `{ cart, cartQuery }`. This keeps the interface between hook and component tight and explicit.
+
 When a hook is reused across multiple components, extract it to a shared hooks directory. See the `composition` reference for size limits — if the co-located hook exceeds ~50 lines, decompose it into sub-hooks.
 
 ## Centralized Query and Mutation Definitions
@@ -190,6 +192,51 @@ const { data: pages } = useSuspenseQuery({
 Use `select` whenever the component only needs a slice of the query result. This is covered in detail in the `performance` reference, but it bears repeating: never subscribe to an entire query result when the component only uses part of it.
 
 Pull data at the leaf component where it's needed — never drill it down from a parent.
+
+## Fine-Grained Data Hooks
+
+Prefer many small hooks that each select the minimum data one consumer needs over a single shared hook that returns a large object.
+
+The query cache already holds all the data. Any component can call `useSuspenseQuery` with the same query key and a different `select` — TanStack Query deduplicates the underlying fetch. This means there is no cost to having multiple hooks hit the same query; each one just projects a different slice.
+
+```tsx
+// ✅ CORRECT — each hook selects only what its consumer needs
+function useCartQuantity() {
+  const { data: quantity } = useSuspenseQuery({
+    ...cartQueries.detail(cartId),
+    select: (cart) => cart.totalQuantity,
+  });
+  return quantity;
+}
+
+function useCartCheckoutUrl() {
+  const { data: checkoutUrl } = useSuspenseQuery({
+    ...cartQueries.detail(cartId),
+    select: (cart) => cart.checkoutUrl,
+  });
+  return checkoutUrl;
+}
+```
+
+```tsx
+// ❌ WRONG — "kitchen sink" hook that returns a large object for many consumers
+function useCart() {
+  const cartQuery = useSuspenseQuery(cartQueries.detail(cartId));
+  return {
+    cart: cartQuery.data,        // entire cart object
+    cartQuantity: cartQuery.data.totalQuantity,
+    cartQuery,                   // raw query object leaked to consumers
+  };
+}
+```
+
+The kitchen-sink pattern creates several problems:
+
+1. **Unnecessary re-renders.** Every consumer subscribes to the entire cart, so a price change re-renders the quantity badge.
+2. **Hidden coupling.** Consumers depend on the full cart shape even when they only use one field, making refactors harder.
+3. **Opaque intent.** When reading the consuming component, you can't tell which fields it actually needs — you have to trace through the returned object.
+
+When you need data from the same query in multiple components, write a small hook per concern that selects just what that concern needs. Name the hook after the data it provides (`useCartQuantity`, `useProductTitle`), not after the query it reads from.
 
 ## Do Not Prop Drill — Pull Data Where You Need It
 

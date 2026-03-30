@@ -33,11 +33,12 @@ When uncertain about the right choice, ask the user.
 
 ## Data Loading
 
-- **Component + hook pattern**: Each component pairs with a co-located hook that owns all data access (queries, mutations, derived state). The component is a thin renderer.
+- **Component + hook pattern**: Each component pairs with a co-located hook that owns all data access (queries, mutations, derived state). The hook returns only what the component actually uses — named variables and callbacks, never raw query objects or large data structures. The component is a thin renderer.
 - **Route loaders**: Prefetch with `ensureQueryData` (or `ensureInfiniteQueryData`). Declare `loaderDeps` when the loader depends on search params.
 - **Centralized query definitions**: All queries — Convex and non-Convex — should be centralized into `*Queries` files using `queryOptions`. For Convex, wrap `convexQuery()` in `queryOptions()` — no explicit `queryKey` needed since `convexQuery` generates keys automatically.
 - **Centralized mutation definitions**: Use `mutationOptions` for all mutations. Convex mutations must be defined inside a hook (since `useConvexMutation` is a hook).
 - **Components**: Consume prefetched data with `useSuspenseQuery`. Since the loader already populated the cache, this resolves synchronously. Pull data at the leaf component — do not drill it from parents.
+- **Fine-grained data hooks**: Prefer many small hooks that each `select` the minimum data one consumer needs over a single shared hook that returns a large object. The query cache deduplicates fetches, so multiple hooks hitting the same query key with different `select` functions cost nothing. Name hooks after the data they provide (`useCartQuantity`, `useProductTitle`), not the query they read from.
 - **Optimistic updates**: For TanStack Query — cancel in-flight queries in `onMutate`, snapshot previous data, apply optimistic change, roll back in `onError`. For Convex — use `.withOptimisticUpdate`. Prioritize for actions where perceived latency matters (cart ops, toggles, inline edits).
 - **Loading/error states**: Do NOT manually write loading spinners or error checks. TanStack Start handles this at the route level via `defaultPendingComponent`, `defaultErrorComponent`, and `defaultNotFoundComponent`. Only check mutation status (`isPending`, `isError`) for mutation-driven UI feedback.
 
