@@ -3,9 +3,6 @@ import reactCompiler from "eslint-plugin-react-compiler";
 import reactHooks from "eslint-plugin-react-hooks";
 import { defineConfig } from "eslint/config";
 
-const MAX_COMPONENT_PROPS = 6;
-const maxComponentPropsPattern = `[properties.${MAX_COMPONENT_PROPS}]`;
-
 export const reactConfig = defineConfig(
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -56,16 +53,69 @@ export const strictAppBoundariesConfig = defineConfig({
           "Use `import { env } from '~/env'` instead to ensure validated types.",
       },
       {
-        selector: `ObjectPattern[parent.type='FunctionDeclaration'][parent.id.name=/^[A-Z]/]${maxComponentPropsPattern}`,
-        message: `Components cannot declare more than ${MAX_COMPONENT_PROPS} props.`,
+        selector:
+          "FunctionDeclaration[returnType]:not([returnType.typeAnnotation.type='TSTypePredicate'])",
+        message:
+          "Do not annotate return types. Let TypeScript infer them so the types stay in sync with the implementation.",
       },
       {
-        selector: `ObjectPattern[parent.type='ArrowFunctionExpression'][parent.parent.type='VariableDeclarator'][parent.parent.id.name=/^[A-Z]/]${maxComponentPropsPattern}`,
-        message: `Components cannot declare more than ${MAX_COMPONENT_PROPS} props.`,
+        selector:
+          "ArrowFunctionExpression[returnType][parent.type='VariableDeclarator']:not([returnType.typeAnnotation.type='TSTypePredicate'])",
+        message:
+          "Do not annotate return types. Let TypeScript infer them so the types stay in sync with the implementation.",
       },
       {
-        selector: `ObjectPattern[parent.type='FunctionExpression'][parent.parent.type='VariableDeclarator'][parent.parent.id.name=/^[A-Z]/]${maxComponentPropsPattern}`,
-        message: `Components cannot declare more than ${MAX_COMPONENT_PROPS} props.`,
+        selector:
+          "CallExpression:matches([callee.name='useSearch'], [callee.property.name='useSearch']):not(:has(Property[key.name='select']))",
+        message:
+          "useSearch must include a `select` option so the component only re-renders when the selected slice changes.",
+      },
+      {
+        selector:
+          "CallExpression:matches([callee.name='useSuspenseQuery'], [callee.property.name='useSuspenseQuery']):not(:has(Property[key.name='select']))",
+        message:
+          "useSuspenseQuery must include a `select` option so the component only subscribes to the data it needs.",
+      },
+      {
+        selector:
+          "CallExpression:matches([callee.name='useRouteContext'], [callee.property.name='useRouteContext']):not(:has(Property[key.name='select']))",
+        message:
+          "useRouteContext must include a `select` option so the component only re-renders when the selected slice changes.",
+      },
+      {
+        selector:
+          "CallExpression:matches([callee.name='useLoaderData'], [callee.property.name='useLoaderData']):not(:has(Property[key.name='select']))",
+        message:
+          "useLoaderData must include a `select` option so the component only re-renders when the selected slice changes.",
+      },
+      {
+        selector: "CallExpression[callee.name='useContext']",
+        message:
+          "useContext does not support fine-grained selection and causes re-renders on every context change. Use a Rostra store with a selector instead. Use the rostra skill for more information.",
+      },
+      {
+        selector: "CallExpression[callee.name='useEffect']",
+        message:
+          "useEffect is banned by default. If you genuinely need an effect to sync with an external system and no better solution exists, add an eslint-disable comment with an explanation of why an effect is necessary. For more information on why you should typically avoid useEffect, see: https://react.dev/learn/you-might-not-need-an-effect",
+      },
+      {
+        selector:
+          "Property[key.name='select'][value.type='ArrowFunctionExpression'][value.params.length=1][value.body.type='Identifier']",
+        message:
+          "Identity select (e.g. `select: (data) => data`) is not allowed. The select must narrow to only the fields the component needs.",
+      },
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          {
+            name: "react",
+            importNames: ["useMemo", "useCallback", "memo"],
+            message:
+              "React Compiler handles memoization automatically. Only use manual memoization as an escape hatch with a comment explaining why.",
+          },
+        ],
       },
     ],
   },

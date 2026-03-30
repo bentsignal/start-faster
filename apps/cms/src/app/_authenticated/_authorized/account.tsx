@@ -11,7 +11,15 @@ export const Route = createFileRoute("/_authenticated/_authorized/account")({
 });
 
 function RouteComponent() {
-  const { data: user } = useSuspenseQuery(userQueries.currentUser());
+  const { data: user } = useSuspenseQuery({
+    ...userQueries.currentUser(),
+    select: (data) => ({
+      name: data.name,
+      email: data.email,
+      adminLevel: data.adminLevel,
+      cmsScopes: data.cmsScopes,
+    }),
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 py-10 sm:px-8">

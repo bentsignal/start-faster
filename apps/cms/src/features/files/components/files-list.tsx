@@ -7,7 +7,18 @@ import { Card, CardContent } from "@acme/ui/card";
 import { formatDate, formatFileSize } from "~/features/files/lib/format";
 
 export function FilesList() {
-  const { data: files } = useSuspenseQuery(convexQuery(api.files.list, {}));
+  const { data: files } = useSuspenseQuery({
+    ...convexQuery(api.files.list, {}),
+    select: (data) =>
+      data.map((file) => ({
+        _id: file._id,
+        fileName: file.fileName,
+        contentType: file.contentType,
+        size: file.size,
+        uploadedBy: file.uploadedBy,
+        _creationTime: file._creationTime,
+      })),
+  });
 
   if (files.length === 0) {
     return (

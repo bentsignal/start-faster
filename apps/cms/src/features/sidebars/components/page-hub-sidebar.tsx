@@ -170,9 +170,15 @@ function ReleasesList() {
     select: (ctx) => ctx.pageId,
   });
 
-  const { data: releases } = useSuspenseQuery(
-    pageQueries.listRecentReleases(pageId),
-  );
+  const { data: releases } = useSuspenseQuery({
+    ...pageQueries.listRecentReleases(pageId),
+    select: (data) =>
+      data.map((release) => ({
+        _id: release._id,
+        name: release.name,
+        _creationTime: release._creationTime,
+      })),
+  });
 
   if (releases.length === 0) {
     return null;

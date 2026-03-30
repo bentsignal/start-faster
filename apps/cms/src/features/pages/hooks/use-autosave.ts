@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 
@@ -34,27 +34,18 @@ export function useAutosave({
   const lastSavedContentRef = useRef(content);
 
   // Sync refs in an effect to avoid writing during render
+  // eslint-disable-next-line no-restricted-syntax -- syncs prop to ref for imperative access without retriggering the debounce timer
   useEffect(() => {
     contentRef.current = content;
   }, [content]);
 
+  // eslint-disable-next-line no-restricted-syntax -- syncs prop to ref for imperative access without retriggering the debounce timer
   useEffect(() => {
     draftIdRef.current = draftId;
   }, [draftId]);
 
-  const flush = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (contentRef.current !== lastSavedContentRef.current) {
-      lastSavedContentRef.current = contentRef.current;
-      mutate({ draftId: draftIdRef.current, content: contentRef.current });
-    }
-  }, [mutate]);
-
   /** Flush pending changes and wait for the save to complete. */
-  const flushAndAwait = useCallback(async () => {
+  const flushAndAwait = async () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -66,8 +57,9 @@ export function useAutosave({
         content: contentRef.current,
       });
     }
-  }, [mutateAsync]);
+  };
 
+  // eslint-disable-next-line no-restricted-syntax -- debounced save timer that syncs content to the backend
   useEffect(() => {
     if (content === lastSavedContentRef.current) {
       return;
@@ -90,12 +82,19 @@ export function useAutosave({
     };
   }, [content, mutate]);
 
-  // Flush on unmount
+  // eslint-disable-next-line no-restricted-syntax -- flushes pending changes on unmount to prevent data loss
   useEffect(() => {
     return () => {
-      flush();
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (contentRef.current !== lastSavedContentRef.current) {
+        lastSavedContentRef.current = contentRef.current;
+        mutate({ draftId: draftIdRef.current, content: contentRef.current });
+      }
     };
-  }, [flush]);
+  }, [mutate]);
 
   // Only show the browser's "unsaved changes" dialog when there are actually
   // unsaved changes: either content diverged from last save or a mutation is

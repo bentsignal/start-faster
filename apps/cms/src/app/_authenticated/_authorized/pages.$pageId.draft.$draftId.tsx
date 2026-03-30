@@ -32,6 +32,8 @@ export const Route = createFileRoute(
     mode: editorModeValidator.default(defaultEditorMode),
   }),
   beforeLoad: ({ params }) => {
+    // No harm in asserting the type here as pageDrafts id
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const draftId = params.draftId as Id<"pageDrafts">;
     return { draftId };
   },

@@ -7,42 +7,43 @@ description: Code refactor to improve implementation details, only use when expl
 
 This skill turns "working enough" code into code that is robust, maintainable, and aligned with the project's standards. It is activated only when the user explicitly asks for a refactor, audit, cleanup pass, or specifically asks you to use the `Refactor` skill.
 
-The target is the active change set, not the entire repository.
+Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents — one per skill. Each subagent becomes a deep expert on its skill and evaluates the current changes entirely through that lens.
 
-Each reference file under the `typescript` and `react` skills represents an independent concern (composition, data loading, performance, state management, TypeScript patterns, etc.). Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents -- one per reference file. Each subagent becomes a deep expert on its single rule and evaluates the current changes entirely through that lens.
+## 1. Determine the scope
 
-## 1. Spawn one subagent per reference file
+The user may specify a scope — for example, "refactor the convex package" or "just look at the CMS app changes." When they do, pass that scope to each subagent so it only examines the relevant subset of changes.
 
-Enumerate every file under these directories:
+If the user does not specify a scope, the default is the entire active change set (all staged and unstaged changes across the repo).
 
-- `typescript/references/`
-- `react/references/`
+## 2. Spawn one subagent per skill
 
-These paths are relative to this skill's parent directory (i.e. the `skills/` directory).
+Spawn two subagents in parallel:
 
-For each reference file, spawn a subagent with the following instructions:
+1. **TypeScript** — use the `typescript` skill (invoke it to load the full skill file including any references)
+2. **React** — use the `react` skill (invoke it to load the full skill file including any references)
 
-1. **Role:** You are a senior engineer mentoring a junior teammate. You have been given one rule file that describes a coding standard the team has agreed on. Your job is to deeply internalize this rule, study the current changes, and produce a thorough assessment of how the code should be overhauled to fully align with the standard.
+For each subagent, provide these instructions:
+
+1. **Role:** You are a senior engineer mentoring a junior teammate. You have been given a skill that describes coding standards the team has agreed on. Your job is to deeply internalize every rule in the skill, study the current changes, and produce a thorough assessment of how the code should be overhauled to fully align with these standards.
 2. **Read-only constraint:** Do NOT edit, create, or delete any files. Your only job is to read code, analyze it, and return findings.
-3. **Rule file:** Read the rule file at `<absolute path>` carefully and completely before doing anything else.
-4. **Getting the diff:** Run `git diff` and `git diff --cached` to see the current change set. Also read the full contents of every changed file so you have complete context, not just the diff hunks.
-5. **What to return:** Return a thorough, ambitious assessment. Note small fixes and style nits, but do not limit yourself to them. Look for places where the implementation approach itself is wrong and needs to be overhauled. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions -- recommend ripping out the current approach and replacing it with one that properly aligns with the rule. Partial adjustments are not enough when the foundation is wrong.
+3. **Skill:** Read the skill file and all of its reference files carefully and completely before doing anything else.
+4. **Getting the changes:** Run `git diff` and `git diff --cached` to see the current change set. If the user specified a scope (e.g. a specific package or app), filter to only those paths — for example `git diff -- packages/convex/` or `git diff -- apps/cms/`. Also read the full contents of every changed file so you have complete context, not just the diff hunks.
+5. **What to return:** Report **every single finding** — no filtering, no prioritizing, no "I'll skip the small stuff." Every violation of the skill standards, from major architectural missteps down to the smallest style nit, must be included. Do not summarize or group findings to save space. Do not omit issues you consider minor. The main agent needs the complete, unabridged list to present to the user. Look for places where the implementation approach itself is wrong and needs to be overhauled — but also catch every small issue along the way. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions — recommend ripping out the current approach and replacing it with one that properly aligns with the standards. Partial adjustments are not enough when the foundation is wrong.
    For each finding, include:
 
-- What is wrong with the current approach and why it does not satisfy the rule
+- What is wrong with the current approach and why it does not satisfy the standard
 - Where the problem is (file path and relevant code)
-- What the correct approach looks like -- described in enough detail that someone could implement it without having to re-read the rule
+- What the correct approach looks like — described in enough detail that someone could implement it without having to re-read the skill
 - Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
-  Prioritize being correct, thorough, and detailed over finishing quickly. Do not hold back.
 
-6. **If no issues are found:** Explicitly state that the current changes already satisfy the rule and no changes are needed.
+6. **If no issues are found:** Explicitly state that the current changes already satisfy the standards and no changes are needed.
 
-## 2. Synthesize findings
+## 3. Synthesize findings
 
-Once all subagents have returned their findings, consolidate everything they reported. Identify overlaps, dependencies, and conflicts between findings from different rules. Do not leave out any details provided by sub agents.
+Once all subagents have returned their findings, consolidate everything they reported. Identify overlaps, dependencies, and conflicts between findings from different skills. Do not leave out any details provided by subagents.
 
-Present the combined findings to the user as a proposed plan. Ask the user questions about how they want to proceed -- which findings to act on, which to skip, and any tradeoffs between competing concerns.
+Present the combined findings to the user as a proposed plan. Ask the user questions about how they want to proceed — which findings to act on, which to skip, and any tradeoffs between competing concerns.
 
 ### Handling conflicts
 
-Different rules will sometimes recommend incompatible approaches for the same code. When this happens, do not resolve the conflict yourself. Present the conflict to the user, explain what each rule is asking for and why they are at odds, and let the user decide. Every conflict is its own question. Do not bundle multiple conflicts into a single question and do not silently pick a side.
+Different skills will sometimes recommend incompatible approaches for the same code. When this happens, do not resolve the conflict yourself. Present the conflict to the user, explain what each skill is asking for and why they are at odds, and let the user decide. Every conflict is its own question. Do not bundle multiple conflicts into a single question and do not silently pick a side.

@@ -5,7 +5,9 @@ description: React coding standards for this project. Use when writing or modify
 
 # React
 
-These are the React standards for this project. Follow them when writing or modifying any React code. For detailed rationale, examples, and edge cases, see the individual [reference files](references/).
+These are the React standards for this project. Follow them when writing or modifying any React code. For detailed rationale, examples, and edge cases on composition and data patterns, see the individual [reference files](references/).
+
+Many performance rules (useEffect, manual memoization, fine-grained `select`, useContext, file size limits) are now enforced by ESLint. The linter will catch violations automatically — your job is to understand the _why_ so you write correct code in the first place.
 
 ## Composition
 
@@ -23,7 +25,7 @@ These are the React standards for this project. Follow them when writing or modi
 TanStack Query is the primary state management solution for server data. Components should pull data directly using hooks (`useSuspenseQuery`, `useSearch`, `useRouteContext`, `useStore`) at the leaf level where it's needed — **never prop drill data that a hook can provide directly**.
 
 1. **Query caches** (TanStack Query for all data sources): The default for server data. Query at the component level — no prop drilling required. Centralize all query definitions (including Convex) into `*Queries` files using `queryOptions`.
-2. **URL state** (TanStack Router `validateSearch` + `useSearch`): For state that should persist across refreshes, be shareable via link, or be bookmarkable. Always use `select` with `useSearch` to avoid unnecessary re-renders.
+2. **URL state** (TanStack Router `validateSearch` + `useSearch`): For state that should persist across refreshes, be shareable via link, or be bookmarkable.
 3. **Rostra stores**: Only for non-server state — form inputs before submission, global concerns (auth, theme), UI state shared across a subtree. See the `rostra` skill for implementation details.
 4. **Prop drilling**: Least preferred, and usually unnecessary. One level of props is normal for component-specific configuration. Passing data available via hooks through multiple intermediary components is always wrong. Before prop drilling though, you should always ask yourself if one of the solutions above could be used instead, typically the answer is yes.
 
@@ -41,9 +43,10 @@ When uncertain about the right choice, ask the user.
 
 ## Performance
 
-- **No unnecessary `useEffect`**: Only use `useEffect` to sync an external system with React state. If you think you need it for something else, pause and confirm with the user.
-- **React Compiler**: This project has the React Compiler enabled. Default to relying on it instead of manual `useMemo`/`useCallback`/`memo`. Manual memoization is an escape hatch — use it only for precise referential stability needs with a comment explaining why.
-- **Fine-grained selection**: Always use `select` to narrow subscriptions. Applies to `useSearch`, `useSuspenseQuery`, and `useStore`. Never subscribe to an entire state object when you only use part of it.
+The linter enforces: useEffect is banned (escape hatch with eslint-disable + explanation), manual `useMemo`/`useCallback`/`memo` are banned (escape hatch with eslint-disable), `select` is required on `useSearch`/`useSuspenseQuery`/`useRouteContext`/`useLoaderData`, and `useContext` is banned in favor of Rostra stores.
+
+Beyond what the linter catches, follow these architectural patterns:
+
 - **Push state down**: Own state in the leaf component that needs it, not in a shared parent.
 - **Split at render boundaries**: Separate frequently-changing state from expensive-to-render UI into different components.
 - **Compose with children**: When a wrapper needs state but its children don't depend on it, pass children through as a prop to avoid re-rendering the subtree.

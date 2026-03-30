@@ -82,6 +82,12 @@ export const baseConfig = defineConfig(
         },
       ],
       "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "never" },
+      ],
+      "@typescript-eslint/switch-exhaustiveness-check": "error",
+      "no-else-return": "error",
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
     },
   },

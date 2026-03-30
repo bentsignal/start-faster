@@ -15,6 +15,8 @@ export const Route = createFileRoute("/$")({
   loaderDeps: ({ search }) => ({ draftId: search.draftId }),
   loader: async ({ context, params, deps }) => {
     if (deps.draftId) {
+      // No harm in asserting the type here as pageDrafts id
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const draftId = deps.draftId as Id<"pageDrafts">;
       await context.queryClient.ensureQueryData(
         shopQueries.getDraftPreview(draftId),

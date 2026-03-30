@@ -1,4 +1,3 @@
-import { useCallback, useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
@@ -70,27 +69,25 @@ function useAuthFromWorkOS() {
   const { loading, user } = useAuth();
   const { getAccessToken, refresh } = useAccessToken();
 
-  const fetchAccessToken = useCallback(
-    async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
-      if (!user) {
-        return null;
-      }
-      if (forceRefreshToken) {
-        return (await refresh()) ?? null;
-      }
-      return (await getAccessToken()) ?? null;
-    },
-    [user, refresh, getAccessToken],
-  );
+  const fetchAccessToken = async ({
+    forceRefreshToken,
+  }: {
+    forceRefreshToken: boolean;
+  }) => {
+    if (!user) {
+      return null;
+    }
+    if (forceRefreshToken) {
+      return (await refresh()) ?? null;
+    }
+    return (await getAccessToken()) ?? null;
+  };
 
-  return useMemo(
-    () => ({
-      isLoading: loading,
-      isAuthenticated: !!user,
-      fetchAccessToken,
-    }),
-    [loading, user, fetchAccessToken],
-  );
+  return {
+    isLoading: loading,
+    isAuthenticated: !!user,
+    fetchAccessToken,
+  };
 }
 
 declare module "@tanstack/react-router" {

@@ -9,6 +9,8 @@ export const Route = createFileRoute(
 )({
   component: RouteComponent,
   beforeLoad: ({ params }) => {
+    // No harm in asserting the type here as pages id
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const pageId = params.pageId as Id<"pages">;
     return { pageId };
   },

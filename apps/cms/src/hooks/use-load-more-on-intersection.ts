@@ -11,6 +11,7 @@ export function useLoadMoreOnIntersection({
 }) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // eslint-disable-next-line no-restricted-syntax -- manages IntersectionObserver lifecycle (browser API)
   useEffect(() => {
     if (!canLoadMore) {
       return;
