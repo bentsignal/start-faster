@@ -1,3 +1,6 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
+
 import {
   Carousel,
   CarouselContent,
@@ -7,12 +10,12 @@ import {
 
 import type { ProductGalleryImage } from "../types";
 import { Image } from "~/components/image";
-import { useProductPageStore } from "~/features/product/stores/product-page-store";
+import { useGalleryOrdering } from "~/features/product/hooks/use-gallery-ordering";
+import { productQueries } from "~/features/product/lib/product-queries";
+import { useProductGalleryStore } from "~/features/product/stores/product-gallery-store";
 
 export function ProductImageGalleryMobile() {
-  const images = useProductPageStore((store) => store.galleryImages);
-  const productTitle = useProductPageStore((store) => store.product.title);
-  const setCarouselApi = useProductPageStore((store) => store.setCarouselApi);
+  const { images, productTitle, setCarouselApi } = useMobileGalleryHook();
 
   if (images.length === 0) {
     return <div className="bg-muted h-[min(75vh,640px)] w-full lg:hidden" />;
@@ -39,6 +42,20 @@ export function ProductImageGalleryMobile() {
       </Carousel>
     </div>
   );
+}
+
+function useMobileGalleryHook() {
+  const { handle } = useParams({ from: "/shop/$handle" });
+  const productTitle = useSuspenseQuery({
+    ...productQueries.productByHandle(handle),
+    select: (p) => p.title,
+  }).data;
+  const { images } = useGalleryOrdering();
+  const setCarouselApi = useProductGalleryStore(
+    (store) => store.setCarouselApi,
+  );
+
+  return { images, productTitle, setCarouselApi };
 }
 
 function MobileImageSlide({

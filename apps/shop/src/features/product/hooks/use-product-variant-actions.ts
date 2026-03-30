@@ -6,12 +6,9 @@ import { ScreenSize, useScreenStore } from "@acme/features/screen";
 
 import type { Product } from "~/features/product/types";
 import { isColorOptionName } from "~/features/product/lib/option-names";
-import { useProductPurchaseActions } from "./use-product-purchase-actions";
 
-interface UseProductVariantActionsArgs {
+interface UseSelectOptionArgs {
   variants: Product["variants"]["nodes"];
-  productTitle: string;
-  productHandle: string;
   selectedVariant: Product["variants"]["nodes"][number] | null;
   selectedOptions: Record<string, string>;
   carouselApi: RefObject<CarouselApi | null>;
@@ -19,23 +16,16 @@ interface UseProductVariantActionsArgs {
   variantImageIndexById: Record<string, number>;
 }
 
-export function useProductVariantActions({
+export function useSelectOption({
   variants,
-  productTitle,
-  productHandle,
   selectedVariant,
   selectedOptions,
   carouselApi,
   scrollDesktopGalleryToImage,
   variantImageIndexById,
-}: UseProductVariantActionsArgs) {
+}: UseSelectOptionArgs) {
   const navigate = useNavigate({ from: "/shop/$handle" });
   const screen = useScreenStore((store) => store.screen);
-  const purchaseActions = useProductPurchaseActions({
-    productTitle,
-    productHandle,
-    selectedVariant,
-  });
 
   function selectOption(optionName: string, optionValue: string) {
     if (selectedVariant === null) {
@@ -83,8 +73,5 @@ export function useProductVariantActions({
     });
   }
 
-  return {
-    selectOption,
-    ...purchaseActions,
-  };
+  return { selectOption };
 }

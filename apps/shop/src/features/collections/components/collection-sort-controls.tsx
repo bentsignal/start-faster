@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "@acme/ui/utils";
 
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { useCollectionFilterActions } from "~/features/collections/hooks/use-collection-filter-actions";
 
 function SortSelect<TValue extends string>({
   value,
@@ -61,10 +61,7 @@ export function CollectionSortByControl({
     from: "/collections/$handle",
     select: (search) => search.sortBy,
   });
-  const onSortByChange = useCollectionPageStore(
-    (store) => store.onSortByChange,
-  );
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
+  const { onSortByChange, isFiltering } = useCollectionFilterActions();
 
   return (
     <SortSelect
@@ -92,10 +89,7 @@ export function CollectionSortDirectionControl({
     from: "/collections/$handle",
     select: (search) => search.sortDirection,
   });
-  const onSortDirectionChange = useCollectionPageStore(
-    (store) => store.onSortDirectionChange,
-  );
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
+  const { onSortDirectionChange, isFiltering } = useCollectionFilterActions();
 
   return (
     <SortSelect

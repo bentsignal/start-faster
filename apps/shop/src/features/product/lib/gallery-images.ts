@@ -1,4 +1,8 @@
-import type { Product, ProductGalleryImage } from "~/features/product/types";
+import type {
+  Product,
+  ProductForGallery,
+  ProductGalleryImage,
+} from "~/features/product/types";
 import { isColorOptionName } from "~/features/product/lib/option-names";
 import {
   buildCanonicalColorOrder,
@@ -33,7 +37,9 @@ export function getDefaultVariantIdFromGalleryOrdering({
   return defaultVariantId ?? variants[0]?.id;
 }
 
-export function getProductGalleryImages(product: Product) {
+export function getProductGalleryImages(
+  product: Pick<Product, "id" | "images" | "featuredImage">,
+) {
   const galleryImages = product.images.nodes
     .filter((image) => image.url)
     .map((image, index) => ({
@@ -140,7 +146,7 @@ export function getProductGalleryOrdering({
   variants,
   initialVariantId,
 }: {
-  product: Product;
+  product: ProductForGallery;
   variants: Product["variants"]["nodes"];
   initialVariantId?: string;
 }) {

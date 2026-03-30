@@ -1,4 +1,4 @@
-import { infiniteQueryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import type { ProductFilter } from "@acme/shopify/storefront/types";
 import {
@@ -24,19 +24,20 @@ function getSearchSortKey(sortBy: SearchSortBy) {
 }
 
 export const searchQueries = {
-  predictive: ({ query }: { query: string }) => ({
-    queryKey: ["search", "predictive", query] as const,
-    queryFn: async () => {
-      const response = await shopify.request(getPredictiveSearch, {
-        variables: {
-          query,
-          limit: PREDICTIVE_SEARCH_PAGE_SIZE,
-        },
-      });
+  predictive: ({ query }: { query: string }) =>
+    queryOptions({
+      queryKey: ["search", "predictive", query] as const,
+      queryFn: async () => {
+        const response = await shopify.request(getPredictiveSearch, {
+          variables: {
+            query,
+            limit: PREDICTIVE_SEARCH_PAGE_SIZE,
+          },
+        });
 
-      return response.data?.predictiveSearch;
-    },
-  }),
+        return response.data?.predictiveSearch;
+      },
+    }),
   productsInfinite: ({
     query,
     sortBy,

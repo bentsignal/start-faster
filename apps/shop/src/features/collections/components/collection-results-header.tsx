@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { useSearch } from "@tanstack/react-router";
 import { ArrowDownWideNarrow, ListFilter, Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -17,17 +15,17 @@ import {
   CollectionSortByControl,
   CollectionSortDirectionControl,
 } from "~/features/collections/components/collection-sort-controls";
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { useCollectionResultsHeader } from "~/features/collections/hooks/use-collection-results-header";
 
 export function CollectionResultsHeader() {
-  const [sortOpen, setSortOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const selectedFilters = useSearch({
-    from: "/collections/$handle",
-    select: (search) => search.filters,
-  });
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
-  const activeFilterCount = selectedFilters.length;
+  const {
+    sortOpen,
+    setSortOpen,
+    filtersOpen,
+    setFiltersOpen,
+    isFiltering,
+    activeFilterCount,
+  } = useCollectionResultsHeader();
 
   return (
     <header className="space-y-3 lg:hidden">

@@ -13,7 +13,6 @@ import {
   COLLECTION_PAGE_SIZE,
   collectionQueries,
 } from "~/features/collections/lib/collection-queries";
-import { CollectionPageStore } from "~/features/collections/stores/collection-page-store";
 import {
   buildSeoHead,
   defaultSeoDescription,
@@ -90,27 +89,25 @@ export const Route = createFileRoute("/collections/$handle")({
 
 function CollectionPage() {
   return (
-    <CollectionPageStore>
-      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 lg:py-14 xl:px-16">
-        <CollectionResultsHeader />
+    <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 lg:py-14 xl:px-16">
+      <CollectionResultsHeader />
 
-        <section className="space-y-8 lg:hidden">
-          <CollectionHeroImage />
+      <section className="space-y-8 lg:hidden">
+        <CollectionHeroImage />
+        <CollectionProductResultsView />
+        <CollectionPagination />
+      </section>
+
+      <div className="hidden lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
+        <CollectionHeroImage className="lg:col-start-2 lg:pb-14" />
+
+        <CollectionFilters />
+
+        <section className="space-y-8 lg:col-start-2">
           <CollectionProductResultsView />
           <CollectionPagination />
         </section>
-
-        <div className="hidden lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
-          <CollectionHeroImage className="lg:col-start-2 lg:pb-14" />
-
-          <CollectionFilters />
-
-          <section className="space-y-8 lg:col-start-2">
-            <CollectionProductResultsView />
-            <CollectionPagination />
-          </section>
-        </div>
-      </main>
-    </CollectionPageStore>
+      </div>
+    </main>
   );
 }

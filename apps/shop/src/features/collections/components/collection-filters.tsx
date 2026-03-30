@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSearch } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
@@ -15,19 +14,20 @@ import {
   CollectionSortByControl,
   CollectionSortDirectionControl,
 } from "~/features/collections/components/collection-sort-controls";
+import { useCollectionFilterActions } from "~/features/collections/hooks/use-collection-filter-actions";
+import { useCollectionPriceRangeFilter } from "~/features/collections/hooks/use-collection-price-range-filter";
+import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
 import {
   getPriceRangeFromFilters,
   hasSelectedFilterValue,
   parseCollectionFilter,
 } from "~/features/collections/lib/collection-filter-utils";
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
 
 type CollectionFiltersMode = "desktop" | "mobile";
 
 export function CollectionFilters() {
-  const title = useCollectionPageStore(
-    (store) => store.collection?.title ?? "Collection",
-  );
+  const { collection } = useCollectionProducts();
+  const title = collection?.title ?? "Collection";
 
   return (
     <aside className="lg:border-border hidden lg:sticky lg:top-32 lg:block lg:h-fit lg:pr-8 xl:top-42">
@@ -55,9 +55,8 @@ export function CollectionFiltersContent({
 }: {
   mode: CollectionFiltersMode;
 }) {
-  const filters = useCollectionPageStore(
-    (store) => store.collection?.products.filters ?? [],
-  );
+  const { collection } = useCollectionProducts();
+  const filters = collection?.products.filters ?? [];
   const visibleFilters = filters.filter((filter) => {
     if (String(filter.type) === "PRICE_RANGE") {
       return true;
@@ -121,23 +120,13 @@ function FilterSectionContent({ filter }: { filter: CollectionFilter }) {
     from: "/collections/$handle",
     select: (search) => search.filters,
   });
-  const onToggleFilter = useCollectionPageStore(
-    (store) => store.onToggleFilter,
-  );
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
+  const { onToggleFilter, isFiltering } = useCollectionFilterActions();
 
   if (String(filter.type) === "PRICE_RANGE") {
     const priceRange = getPriceRangeFromFilters(selectedFilters);
     const priceInputKey = `${filter.id}:${priceRange.min}:${priceRange.max}`;
 
-    return (
-      <PriceRangeFilterContent
-        key={priceInputKey}
-        filterId={filter.id}
-        initialMin={priceRange.min}
-        initialMax={priceRange.max}
-      />
-    );
+    return <PriceRangeFilterContent key={priceInputKey} filterId={filter.id} />;
   }
 
   return (
@@ -162,7 +151,7 @@ function FilterSectionContent({ filter }: { filter: CollectionFilter }) {
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               }`}
               onClick={() => {
-                onToggleFilter(input);
+                void onToggleFilter(input);
               }}
             >
               <span>{value.label}</span>
@@ -175,24 +164,16 @@ function FilterSectionContent({ filter }: { filter: CollectionFilter }) {
   );
 }
 
-function PriceRangeFilterContent({
-  filterId,
-  initialMin,
-  initialMax,
-}: {
-  filterId: string;
-  initialMin: string;
-  initialMax: string;
-}) {
-  const [priceMin, setPriceMin] = useState(initialMin);
-  const [priceMax, setPriceMax] = useState(initialMax);
-  const onApplyPriceRange = useCollectionPageStore(
-    (store) => store.onApplyPriceRange,
-  );
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
-  const isPriceApplyLoading = useCollectionPageStore(
-    (store) => store.isPriceApplyLoading,
-  );
+function PriceRangeFilterContent({ filterId }: { filterId: string }) {
+  const {
+    priceMin,
+    priceMax,
+    setPriceMin,
+    setPriceMax,
+    isFiltering,
+    isPriceApplyLoading,
+    onApply,
+  } = useCollectionPriceRangeFilter();
 
   return (
     <section className="space-y-3">
@@ -225,9 +206,7 @@ function PriceRangeFilterContent({
         size="sm"
         disabled={isFiltering}
         className="w-full rounded-full"
-        onClick={() => {
-          onApplyPriceRange(priceMin, priceMax);
-        }}
+        onClick={onApply}
       >
         {isPriceApplyLoading ? (
           <Loader className="size-3.5 animate-spin" />

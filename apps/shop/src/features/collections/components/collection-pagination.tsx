@@ -2,15 +2,11 @@ import { Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
 
 export function CollectionPagination() {
-  const hasNextPage = useCollectionPageStore((store) => store.hasNextPage);
-  const canLoadMore = useCollectionPageStore((store) => store.canLoadMore);
-  const isFetchingNextPage = useCollectionPageStore(
-    (store) => store.isFetchingNextPage,
-  );
-  const fetchNextPage = useCollectionPageStore((store) => store.fetchNextPage);
+  const { hasNextPage, canLoadMore, isFetchingNextPage, fetchNextPage } =
+    useCollectionProducts();
 
   return (
     <div className="flex min-h-12 justify-center">

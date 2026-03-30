@@ -3,8 +3,16 @@ import { convexQuery } from "@convex-dev/react-query";
 
 import type { Id } from "@acme/convex/model";
 import { api } from "@acme/convex/api";
+import { getThemeFromCookie } from "@acme/features/theme";
 
 export const shopQueries = {
+  theme: () =>
+    queryOptions({
+      queryKey: ["theme"],
+      queryFn: getThemeFromCookie,
+      staleTime: Infinity,
+      gcTime: Infinity,
+    }),
   getByPath: (path: string) =>
     queryOptions({ ...convexQuery(api.pages.manage.getByPath, { path }) }),
   getDraftPreview: (draftId: Id<"pageDrafts">) =>

@@ -1,13 +1,12 @@
 import { QuickLink } from "@acme/features/quick-link";
 
 import { Image } from "~/components/image";
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
 
 export function CollectionHeroImage({ className }: { className?: string }) {
-  const imageURL = useCollectionPageStore(
-    (store) => store.collection?.image?.url,
-  );
-  const handle = useCollectionPageStore((store) => store.collection?.handle);
+  const { collection } = useCollectionProducts();
+  const imageURL = collection?.image?.url;
+  const handle = collection?.handle;
 
   if (imageURL === undefined) {
     return null;
@@ -30,16 +29,10 @@ export function CollectionHeroImage({ className }: { className?: string }) {
   );
 }
 
-export function CollectionHeroImageContent({ url }: { url: string }) {
-  const imageFromStore = useCollectionPageStore(
-    (store) => store.collection?.image,
-  );
-  const titleFromStore = useCollectionPageStore(
-    (store) => store.collection?.title,
-  );
-
-  const image = imageFromStore;
-  const title = titleFromStore ?? "Collection";
+function CollectionHeroImageContent({ url }: { url: string }) {
+  const { collection } = useCollectionProducts();
+  const image = collection?.image;
+  const title = collection?.title ?? "Collection";
 
   return (
     <Image

@@ -16,12 +16,14 @@ export function formatMoney(amount: number | string, currencyCode: string) {
   }).format(parsedAmount);
 }
 
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
 export function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
+  return dateFormatter.format(new Date(value));
 }
 
 export function getReorderLines({

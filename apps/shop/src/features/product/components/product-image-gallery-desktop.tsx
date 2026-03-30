@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 
 import { cn } from "@acme/ui/utils";
 
@@ -6,11 +8,12 @@ import type { ProductGalleryImage } from "~/features/product/types";
 import { stickyHeaderTokens } from "~/components/header/header";
 import { Image } from "~/components/image";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
-import { useProductPageStore } from "~/features/product/stores/product-page-store";
+import { useGalleryOrdering } from "~/features/product/hooks/use-gallery-ordering";
+import { productQueries } from "~/features/product/lib/product-queries";
+import { useProductGalleryStore } from "~/features/product/stores/product-gallery-store";
 
 export function ProductImageGalleryDesktop() {
-  const images = useProductPageStore((store) => store.galleryImages);
-  const productTitle = useProductPageStore((store) => store.product.title);
+  const { images, productTitle } = useDesktopGalleryHook();
 
   if (images.length === 0) {
     return (
@@ -19,6 +22,17 @@ export function ProductImageGalleryDesktop() {
   }
 
   return <DesktopGalleryContent images={images} productTitle={productTitle} />;
+}
+
+function useDesktopGalleryHook() {
+  const { handle } = useParams({ from: "/shop/$handle" });
+  const productTitle = useSuspenseQuery({
+    ...productQueries.productByHandle(handle),
+    select: (p) => p.title,
+  }).data;
+  const { images } = useGalleryOrdering();
+
+  return { images, productTitle };
 }
 
 function DesktopGalleryContent({
@@ -32,7 +46,7 @@ function DesktopGalleryContent({
     useDesktopProductImageGallery({
       imageCount: images.length,
     });
-  const setDesktopScrollToImage = useProductPageStore(
+  const setDesktopScrollToImage = useProductGalleryStore(
     (store) => store.setDesktopScrollToImage,
   );
 

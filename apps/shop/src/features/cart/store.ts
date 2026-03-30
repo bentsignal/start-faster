@@ -1,31 +1,39 @@
+import { useEffect, useRef, useState } from "react";
 import { createStore } from "rostra";
 
-import {
-  useAddCartLine,
-  useCheckForPendingMutations,
-  useUpdateCartLine,
-} from "~/features/cart/hooks/use-cart-mutations";
-import { useCart } from "./hooks/use-cart";
-import { useCartModal } from "./hooks/use-cart-modal";
-
 function useInternalStore() {
-  const { isCartOpen, setIsCartOpen, openCartWithDelay } = useCartModal();
-  const { cartId, cart, cartQuery, cartQuantity } = useCart();
-  const addLine = useAddCartLine({ cartId });
-  const { changeLineQuantity } = useUpdateCartLine({ cartId, cart });
-  const checkForPendingMutations = useCheckForPendingMutations();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const openTimerIdRef = useRef<number | null>(null);
+
+  const openCartWithDelay = (delayMs = 500) => {
+    if (typeof window === "undefined") {
+      setIsCartOpen(true);
+      return;
+    }
+
+    if (openTimerIdRef.current !== null) {
+      window.clearTimeout(openTimerIdRef.current);
+    }
+
+    openTimerIdRef.current = window.setTimeout(() => {
+      setIsCartOpen(true);
+      openTimerIdRef.current = null;
+    }, delayMs);
+  };
+
+  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
+  useEffect(() => {
+    return () => {
+      if (openTimerIdRef.current !== null) {
+        window.clearTimeout(openTimerIdRef.current);
+      }
+    };
+  }, []);
 
   return {
     isCartOpen,
     setIsCartOpen,
     openCartWithDelay,
-    cartId,
-    cart,
-    cartQuery,
-    cartQuantity,
-    addLine,
-    changeLineQuantity,
-    checkForPendingMutations,
   };
 }
 

@@ -1,4 +1,3 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
@@ -10,7 +9,7 @@ import { ProductDetailsPanel } from "~/features/product/components/product-detai
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
 import { productQueries } from "~/features/product/lib/product-queries";
-import { ProductPageStore } from "~/features/product/stores/product-page-store";
+import { ProductGalleryStore } from "~/features/product/stores/product-gallery-store";
 import { useIsHydrated } from "~/hooks/use-is-hydrated";
 import {
   buildSeoHead,
@@ -97,22 +96,6 @@ export const Route = createFileRoute("/shop/$handle")({
 function ProductPage() {
   const isHydrated = useIsHydrated();
   const screen = useScreenStore((store) => store.screen);
-  const { handle } = Route.useParams();
-  const variant = Route.useSearch({ select: (search) => search.variant });
-  const { data: product } = useSuspenseQuery({
-    ...productQueries.productByHandle(handle),
-    select: (p) => ({
-      id: p.id,
-      title: p.title,
-      handle: p.handle,
-      description: p.description,
-      featuredImage: p.featuredImage,
-      images: p.images,
-      options: p.options,
-      priceRange: p.priceRange,
-      variants: p.variants,
-    }),
-  });
   const shouldRenderSingleGallery = isHydrated && screen.size !== undefined;
   const showDesktopGallery = shouldRenderSingleGallery
     ? screen.isBiggerThan(ScreenSize.LG)
@@ -122,7 +105,7 @@ function ProductPage() {
     : true;
 
   return (
-    <ProductPageStore variant={variant} product={product}>
+    <ProductGalleryStore>
       <main className="mx-auto w-full max-w-[1700px] lg:px-8 xl:px-12">
         <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch lg:gap-10 xl:gap-16">
           <section className="lg:py-14">
@@ -132,6 +115,6 @@ function ProductPage() {
           <ProductDetailsPanel />
         </div>
       </main>
-    </ProductPageStore>
+    </ProductGalleryStore>
   );
 }

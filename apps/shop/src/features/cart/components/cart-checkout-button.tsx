@@ -4,18 +4,18 @@ import { Loader } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/toaster";
 
-import { useCartStore } from "../store";
+import { useCart } from "~/features/cart/hooks/use-cart";
+import { useCheckForPendingMutations } from "~/features/cart/hooks/use-check-for-pending-mutations";
 
 export function CartCheckoutButton() {
   const [navigatingToCheckout, setNavigatingToCheckout] = useState(false);
-  const checkoutUrl = useCartStore((store) => store.cart?.checkoutUrl);
-  const totalQuantity = useCartStore((store) => store.cartQuantity);
-  const cartExists = useCartStore((store) => store.cart !== null);
-  const checkForPendingMutations = useCartStore(
-    (store) => store.checkForPendingMutations,
-  );
+  const { cart, cartQuantity } = useCart();
+  const checkForPendingMutations = useCheckForPendingMutations();
+
+  const checkoutUrl = cart?.checkoutUrl;
+  const cartExists = cart !== null;
   const canCheckout =
-    cartExists && totalQuantity > 0 && checkoutUrl && checkoutUrl.length > 0;
+    cartExists && cartQuantity > 0 && checkoutUrl && checkoutUrl.length > 0;
 
   const goToCheckout = async () => {
     if (navigatingToCheckout) {

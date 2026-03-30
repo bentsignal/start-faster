@@ -7,6 +7,7 @@ import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
 
 import { accountQueries } from "~/features/account/lib/account-queries";
+import { authQueries } from "~/features/auth/lib/auth-queries";
 
 export function SignOutButton({ className }: { className?: string }) {
   const navigate = useNavigate();
@@ -33,14 +34,16 @@ export function SignOutButton({ className }: { className?: string }) {
         () => {
           void (async () => {
             await navigate({ to: "/", replace: true });
-            queryClient.setQueryData(["auth"], {
+            queryClient.setQueryData(authQueries.state().queryKey, {
               isSignedIn: false,
               customer: null,
             });
             queryClient.removeQueries({
               queryKey: accountQueries.all().queryKey,
             });
-            await queryClient.invalidateQueries({ queryKey: ["auth"] });
+            await queryClient.invalidateQueries({
+              queryKey: authQueries.state().queryKey,
+            });
             await router.invalidate();
           })();
         },

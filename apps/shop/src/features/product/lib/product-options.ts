@@ -1,4 +1,4 @@
-import type { Product } from "~/features/product/types";
+import type { ProductForOptions } from "~/features/product/types";
 import {
   isColorOptionName,
   isSizeOptionName,
@@ -16,8 +16,8 @@ function getOptionSortRank(optionName: string) {
   return 2;
 }
 
-function getOrderedProductOptions(
-  product: Product,
+export function getOrderedProductOptions(
+  product: ProductForOptions,
   canonicalColorOrder: string[],
 ) {
   const optionValuesByName = new Map<string, string[]>();
@@ -79,11 +79,4 @@ function getOrderedProductOptions(
     .map(({ sortRank: _sortRank, optionIndex: _optionIndex, ...option }) => ({
       ...option,
     }));
-}
-
-export function useProductOptions(
-  product: Product,
-  canonicalColorOrder: string[],
-) {
-  return getOrderedProductOptions(product, canonicalColorOrder);
 }

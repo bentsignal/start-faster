@@ -6,6 +6,13 @@ import type {
 
 export type Product = NonNullable<ProductByHandleQuery["product"]>;
 
+export type ProductForGallery = Pick<
+  Product,
+  "id" | "images" | "featuredImage" | "options" | "variants"
+>;
+
+export type ProductForOptions = Pick<Product, "options" | "variants">;
+
 export interface ProductGalleryImage {
   id: string;
   url: string;

@@ -12,6 +12,7 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
+import { useCart } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
 
 function AccountIcon() {
@@ -28,7 +29,7 @@ export function TopRightControls() {
     from: "__root__",
     select: (context) => context.auth.isSignedIn,
   });
-  const cartQuantity = useCartStore((store) => store.cartQuantity);
+  const { cartQuantity } = useCart();
   const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
 
   return (

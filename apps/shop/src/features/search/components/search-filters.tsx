@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSearch } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
 import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
@@ -15,11 +15,14 @@ import {
   SortByControl,
   SortDirectionControl,
 } from "~/features/search/components/search-sort-controls";
+import { useSearchFilterActions } from "~/features/search/hooks/use-search-filter-actions";
+import { useSearchPriceRangeFilter } from "~/features/search/hooks/use-search-price-range-filter";
+import { useSearchProducts } from "~/features/search/hooks/use-search-products";
+import { useSearchVisibleFilters } from "~/features/search/hooks/use-search-visible-filters";
 import {
   getPriceRangeFromFilters,
   hasSelectedFilterValue,
 } from "~/features/search/lib/search-filter-utils";
-import { useSearchPageStore } from "~/features/search/stores/search-page-store";
 
 type SearchResultFilter =
   SearchProductsQuery["search"]["productFilters"][number];
@@ -27,17 +30,15 @@ type SearchResultFilter =
 type SearchFiltersMode = "desktop" | "mobile";
 
 export function SearchFilters() {
-  const query = useSearchPageStore((store) => store.search.q);
-  const totalCount = useSearchPageStore((store) => store.totalCount);
-  const sortBy = useSearchPageStore((store) => store.search.sortBy);
-  const sortDirection = useSearchPageStore(
-    (store) => store.search.sortDirection,
-  );
-  const onSortByChange = useSearchPageStore((store) => store.onSortByChange);
-  const onSortDirectionChange = useSearchPageStore(
-    (store) => store.onSortDirectionChange,
-  );
-  const isFiltering = useSearchPageStore((store) => store.isFiltering);
+  const query = useSearch({ from: "/search", select: (s) => s.q });
+  const sortBy = useSearch({ from: "/search", select: (s) => s.sortBy });
+  const sortDirection = useSearch({
+    from: "/search",
+    select: (s) => s.sortDirection,
+  });
+  const { totalCount } = useSearchProducts();
+  const { onSortByChange, onSortDirectionChange, isFiltering } =
+    useSearchFilterActions();
 
   return (
     <aside className="lg:border-border hidden lg:sticky lg:top-32 lg:block lg:h-fit lg:pr-8 xl:top-42">
@@ -74,27 +75,7 @@ export function SearchFilters() {
 }
 
 export function SearchFiltersContent({ mode }: { mode: SearchFiltersMode }) {
-  const filters = useSearchPageStore(
-    (store) => store.data?.productFilters ?? [],
-  );
-  const visibleFilters = filters.filter((filter) => {
-    if (String(filter.type) === "PRICE_RANGE") {
-      return true;
-    }
-
-    return filter.values.some(
-      (value) => typeof value.input === "object" && value.input !== null,
-    );
-  });
-  const selectedFilters = useSearchPageStore((store) => store.filters);
-  const onToggleFilter = useSearchPageStore((store) => store.onToggleFilter);
-  const onApplyPriceRange = useSearchPageStore(
-    (store) => store.onApplyPriceRange,
-  );
-  const isFiltering = useSearchPageStore((store) => store.isFiltering);
-  const isPriceApplyLoading = useSearchPageStore(
-    (store) => store.isPriceApplyLoading,
-  );
+  const visibleFilters = useSearchVisibleFilters();
 
   if (mode === "mobile") {
     return (
@@ -107,14 +88,7 @@ export function SearchFiltersContent({ mode }: { mode: SearchFiltersMode }) {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <FilterSectionContent
-                filter={filter}
-                selectedFilters={selectedFilters}
-                onToggleFilter={onToggleFilter}
-                onApplyPriceRange={onApplyPriceRange}
-                isFiltering={isFiltering}
-                isPriceApplyLoading={isPriceApplyLoading}
-              />
+              <FilterSectionContent filter={filter} />
             </AccordionContent>
           </AccordionItem>
         ))}
@@ -128,12 +102,7 @@ export function SearchFiltersContent({ mode }: { mode: SearchFiltersMode }) {
         <FilterSectionDesktop
           key={filter.id}
           filter={filter}
-          selectedFilters={selectedFilters}
           isLast={index === visibleFilters.length - 1}
-          onToggleFilter={onToggleFilter}
-          onApplyPriceRange={onApplyPriceRange}
-          isFiltering={isFiltering}
-          isPriceApplyLoading={isPriceApplyLoading}
         />
       ))}
     </div>
@@ -142,54 +111,29 @@ export function SearchFiltersContent({ mode }: { mode: SearchFiltersMode }) {
 
 function FilterSectionDesktop({
   filter,
-  selectedFilters,
   isLast,
-  onToggleFilter,
-  onApplyPriceRange,
-  isFiltering,
-  isPriceApplyLoading,
 }: {
   filter: SearchResultFilter;
-  selectedFilters: ProductFilter[];
   isLast: boolean;
-  onToggleFilter: (input: ProductFilter) => void;
-  onApplyPriceRange: (min: string, max: string) => void;
-  isFiltering: boolean;
-  isPriceApplyLoading: boolean;
 }) {
   return (
     <section className="space-y-3">
       <p className="text-xs font-semibold tracking-wide uppercase">
         {filter.label}
       </p>
-      <FilterSectionContent
-        filter={filter}
-        selectedFilters={selectedFilters}
-        onToggleFilter={onToggleFilter}
-        onApplyPriceRange={onApplyPriceRange}
-        isFiltering={isFiltering}
-        isPriceApplyLoading={isPriceApplyLoading}
-      />
+      <FilterSectionContent filter={filter} />
       {!isLast && <div className="bg-border mt-3 h-px" />}
     </section>
   );
 }
 
-function FilterSectionContent({
-  filter,
-  selectedFilters,
-  onToggleFilter,
-  onApplyPriceRange,
-  isFiltering,
-  isPriceApplyLoading,
-}: {
-  filter: SearchResultFilter;
-  selectedFilters: ProductFilter[];
-  onToggleFilter: (input: ProductFilter) => void;
-  onApplyPriceRange: (min: string, max: string) => void;
-  isFiltering: boolean;
-  isPriceApplyLoading: boolean;
-}) {
+function FilterSectionContent({ filter }: { filter: SearchResultFilter }) {
+  const selectedFilters = useSearch({
+    from: "/search",
+    select: (s) => s.filters,
+  });
+  const { onToggleFilter, isFiltering } = useSearchFilterActions();
+
   if (String(filter.type) === "PRICE_RANGE") {
     const priceRange = getPriceRangeFromFilters(selectedFilters);
     const priceInputKey = `${filter.id}:${priceRange.min}:${priceRange.max}`;
@@ -200,9 +144,6 @@ function FilterSectionContent({
         filterId={filter.id}
         initialMin={priceRange.min}
         initialMax={priceRange.max}
-        onApplyPriceRange={onApplyPriceRange}
-        isFiltering={isFiltering}
-        isPriceApplyLoading={isPriceApplyLoading}
       />
     );
   }
@@ -233,7 +174,7 @@ function FilterSectionContent({
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               }`}
               onClick={() => {
-                onToggleFilter(input);
+                void onToggleFilter(input);
               }}
             >
               <span>{value.label}</span>
@@ -250,19 +191,20 @@ function PriceRangeFilterContent({
   filterId,
   initialMin,
   initialMax,
-  onApplyPriceRange,
-  isFiltering,
-  isPriceApplyLoading,
 }: {
   filterId: string;
   initialMin: string;
   initialMax: string;
-  onApplyPriceRange: (min: string, max: string) => void;
-  isFiltering: boolean;
-  isPriceApplyLoading: boolean;
 }) {
-  const [priceMin, setPriceMin] = useState(initialMin);
-  const [priceMax, setPriceMax] = useState(initialMax);
+  const {
+    priceMin,
+    setPriceMin,
+    priceMax,
+    setPriceMax,
+    apply,
+    isFiltering,
+    isPriceApplyLoading,
+  } = useSearchPriceRangeFilter({ initialMin, initialMax });
 
   return (
     <section className="space-y-3">
@@ -291,9 +233,7 @@ function PriceRangeFilterContent({
         size="sm"
         disabled={isFiltering}
         className="w-full rounded-full"
-        onClick={() => {
-          onApplyPriceRange(priceMin, priceMax);
-        }}
+        onClick={apply}
       >
         {isPriceApplyLoading ? (
           <Loader className="size-3.5 animate-spin" />

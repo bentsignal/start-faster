@@ -4,6 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import type { CurrencyCode } from "@acme/shopify/storefront/types";
 import { toast } from "@acme/ui/toaster";
 
+import { useAddCartLine } from "~/features/cart/hooks/use-add-cart-line";
+import { useCart } from "~/features/cart/hooks/use-cart";
 import {
   getStoredCartId,
   setStoredCartId,
@@ -32,20 +34,8 @@ interface PurchasableVariant {
   }[];
 }
 
-export function useProductPurchaseActions({
-  productTitle,
-  productHandle,
-  selectedVariant,
-}: {
-  productTitle: string;
-  productHandle: string;
-  selectedVariant: PurchasableVariant | null;
-}) {
-  const openCartWithDelay = useCartStore((store) => store.openCartWithDelay);
-  const addCartLine = useCartStore((store) => store.addLine);
-  const [wasAddedToCart, setWasAddedToCart] = useState(false);
-  const addToCartFeedbackTimeoutId = useRef<number | null>(null);
-  const buyNowMutation = useMutation({
+function useBuyNow(selectedVariant: PurchasableVariant | null) {
+  const mutation = useMutation({
     mutationFn: async (merchandiseId: string) => {
       return prepareCheckoutFn({
         data: {
@@ -65,15 +55,6 @@ export function useProductPurchaseActions({
     },
   });
 
-  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
-  useEffect(() => {
-    return () => {
-      if (addToCartFeedbackTimeoutId.current !== null) {
-        window.clearTimeout(addToCartFeedbackTimeoutId.current);
-      }
-    };
-  }, []);
-
   function buyNow() {
     if (
       selectedVariant === null ||
@@ -82,8 +63,35 @@ export function useProductPurchaseActions({
       return;
     }
 
-    buyNowMutation.mutate(selectedVariant.id);
+    mutation.mutate(selectedVariant.id);
   }
+
+  return { buyNow, isBuyingNow: mutation.isPending };
+}
+
+function useAddToCart({
+  productTitle,
+  productHandle,
+  selectedVariant,
+}: {
+  productTitle: string;
+  productHandle: string;
+  selectedVariant: PurchasableVariant | null;
+}) {
+  const openCartWithDelay = useCartStore((store) => store.openCartWithDelay);
+  const { cartId } = useCart();
+  const addCartLine = useAddCartLine({ cartId });
+  const [wasAddedToCart, setWasAddedToCart] = useState(false);
+  const feedbackTimeoutId = useRef<number | null>(null);
+
+  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
+  useEffect(() => {
+    return () => {
+      if (feedbackTimeoutId.current !== null) {
+        window.clearTimeout(feedbackTimeoutId.current);
+      }
+    };
+  }, []);
 
   function addToCart() {
     if (
@@ -94,12 +102,12 @@ export function useProductPurchaseActions({
     }
 
     setWasAddedToCart(true);
-    if (addToCartFeedbackTimeoutId.current !== null) {
-      window.clearTimeout(addToCartFeedbackTimeoutId.current);
+    if (feedbackTimeoutId.current !== null) {
+      window.clearTimeout(feedbackTimeoutId.current);
     }
-    addToCartFeedbackTimeoutId.current = window.setTimeout(() => {
+    feedbackTimeoutId.current = window.setTimeout(() => {
       setWasAddedToCart(false);
-      addToCartFeedbackTimeoutId.current = null;
+      feedbackTimeoutId.current = null;
     }, 500);
 
     const variantImage = selectedVariant.image ?? null;
@@ -130,10 +138,24 @@ export function useProductPurchaseActions({
     openCartWithDelay(250);
   }
 
-  return {
-    addToCart,
-    wasAddedToCart,
-    buyNow,
-    isBuyingNow: buyNowMutation.isPending,
-  };
+  return { addToCart, wasAddedToCart };
+}
+
+export function useProductPurchaseActions({
+  productTitle,
+  productHandle,
+  selectedVariant,
+}: {
+  productTitle: string;
+  productHandle: string;
+  selectedVariant: PurchasableVariant | null;
+}) {
+  const { buyNow, isBuyingNow } = useBuyNow(selectedVariant);
+  const { addToCart, wasAddedToCart } = useAddToCart({
+    productTitle,
+    productHandle,
+    selectedVariant,
+  });
+
+  return { addToCart, wasAddedToCart, buyNow, isBuyingNow };
 }

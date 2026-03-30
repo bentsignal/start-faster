@@ -4,27 +4,9 @@ import { createStore } from "rostra";
 
 import useDebouncedInput from "~/hooks/use-debounced-input";
 
-function useInternalStore({
-  debounceTime = 500,
-  initialSearchTerm,
-}: {
-  debounceTime?: number;
-  initialSearchTerm?: string;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+function useSearchPrefetch(debouncedSearchTerm: string) {
   const router = useRouter();
   const lastPrefetchedQueryRef = useRef<string | null>(null);
-
-  const {
-    value: searchTerm,
-    setValue: setSearchTerm,
-    debouncedValue: debouncedSearchTerm,
-  } = useDebouncedInput({
-    time: debounceTime,
-    initialValue: initialSearchTerm,
-  });
-  const [isPredictiveOpen, setIsPredictiveOpen] = useState(false);
 
   // eslint-disable-next-line no-restricted-syntax -- syncs debounced search term with router preloading (external system)
   useEffect(() => {
@@ -60,6 +42,14 @@ function useInternalStore({
         lastPrefetchedQueryRef.current = null;
       });
   }, [debouncedSearchTerm, router]);
+}
+
+function useSearchBarActions(
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  searchTerm: string,
+  setIsPredictiveOpen: (open: boolean) => void,
+) {
+  const navigate = useNavigate();
 
   function focusInput() {
     if (inputRef.current) {
@@ -82,6 +72,34 @@ function useInternalStore({
     });
     setIsPredictiveOpen(false);
   }
+
+  return { focusInput, performSearch };
+}
+
+function useInternalStore({
+  debounceTime = 500,
+  initialSearchTerm,
+}: {
+  debounceTime?: number;
+  initialSearchTerm?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    value: searchTerm,
+    setValue: setSearchTerm,
+    debouncedValue: debouncedSearchTerm,
+  } = useDebouncedInput({
+    time: debounceTime,
+    initialValue: initialSearchTerm,
+  });
+  const [isPredictiveOpen, setIsPredictiveOpen] = useState(false);
+
+  useSearchPrefetch(debouncedSearchTerm);
+  const { focusInput, performSearch } = useSearchBarActions(
+    inputRef,
+    searchTerm,
+    setIsPredictiveOpen,
+  );
 
   return {
     searchTerm,

@@ -11,13 +11,14 @@ import {
 
 import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
+import { useCart } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
 import { CartEmpty } from "./cart-empty";
 
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);
   const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
-  const cartQuantity = useCartStore((store) => store.cartQuantity);
+  const { cartQuantity } = useCart();
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -40,9 +41,10 @@ export function CartSheet() {
 }
 
 function Body() {
-  const isCartLoading = useCartStore((store) => store.cartQuery.isLoading);
-  const cartExists = useCartStore((store) => store.cart !== null);
-  const lines = useCartStore((store) => store.cart?.lines.nodes ?? []);
+  const { cart, cartQuery } = useCart();
+  const isCartLoading = cartQuery.isLoading;
+  const cartExists = cart !== null;
+  const lines = cart?.lines.nodes ?? [];
 
   if (isCartLoading && !cartExists) {
     return (

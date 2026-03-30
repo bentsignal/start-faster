@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useMutationState, useQuery } from "@tanstack/react-query";
 
-import { clearCartStorage } from "~/features/cart/hooks/use-cart-mutations";
+import { clearCartStorage } from "~/features/cart/hooks/cart-mutation-shared";
 import {
   applyPendingMutationsToCart,
   parsePendingCartMutation,
@@ -24,7 +24,6 @@ function getFallbackQuantity(
   return stored > 0 ? stored : (cookieData?.quantity ?? 0);
 }
 
-// this hook should only be used in the cart store, not directly in components. use the cart store instead.
 export function useCart() {
   const cookieCartQuery = useQuery({
     ...cartQueries.cookie(),

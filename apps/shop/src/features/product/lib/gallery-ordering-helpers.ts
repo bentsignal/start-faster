@@ -10,7 +10,7 @@ function getVariantColorValue(variant: Product["variants"]["nodes"][number]) {
   return colorOption?.value ?? null;
 }
 
-function getSourceColorOrder(product: Product) {
+function getSourceColorOrder(product: Pick<Product, "options" | "variants">) {
   const productColorOption = product.options.find((option) =>
     isColorOptionName(option.name),
   );
@@ -88,7 +88,7 @@ export function buildFirstImageIndexByColor(
 }
 
 export function buildCanonicalColorOrder(
-  product: Product,
+  product: Pick<Product, "options" | "variants">,
   firstImageIndexByColor: Map<string, number>,
   variantColorById: Map<string, string>,
   initialVariantId: string | undefined,

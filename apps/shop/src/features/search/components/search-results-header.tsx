@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowDownWideNarrow, ListFilter, Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -16,24 +15,23 @@ import {
   SortByControl,
   SortDirectionControl,
 } from "~/features/search/components/search-sort-controls";
-import { useSearchPageStore } from "~/features/search/stores/search-page-store";
+import { useSearchResultsHeader } from "~/features/search/hooks/use-search-results-header";
 
 export function SearchResultsHeader() {
-  const [sortOpen, setSortOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const query = useSearchPageStore((store) => store.search.q);
-  const totalCount = useSearchPageStore((store) => store.totalCount);
-  const sortBy = useSearchPageStore((store) => store.search.sortBy);
-  const sortDirection = useSearchPageStore(
-    (store) => store.search.sortDirection,
-  );
-  const selectedFilters = useSearchPageStore((store) => store.filters);
-  const onSortByChange = useSearchPageStore((store) => store.onSortByChange);
-  const onSortDirectionChange = useSearchPageStore(
-    (store) => store.onSortDirectionChange,
-  );
-  const isFiltering = useSearchPageStore((store) => store.isFiltering);
-  const activeFilterCount = selectedFilters.length;
+  const {
+    sortOpen,
+    setSortOpen,
+    filtersOpen,
+    setFiltersOpen,
+    query,
+    sortBy,
+    sortDirection,
+    totalCount,
+    onSortByChange,
+    onSortDirectionChange,
+    isFiltering,
+    activeFilterCount,
+  } = useSearchResultsHeader();
 
   return (
     <header className="space-y-3 lg:hidden">

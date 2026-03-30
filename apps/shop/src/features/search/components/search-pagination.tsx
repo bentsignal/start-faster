@@ -2,15 +2,12 @@ import { Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 
-import { useSearchPageStore } from "~/features/search/stores/search-page-store";
+import { useSearchProducts } from "~/features/search/hooks/use-search-products";
 
 export function SearchPagination() {
-  const hasNextPage = useSearchPageStore((store) => store.hasNextPage);
-  const canLoadMore = useSearchPageStore((store) => store.canLoadMore);
-  const isFetchingNextPage = useSearchPageStore(
-    (store) => store.isFetchingNextPage,
-  );
-  const fetchNextPage = useSearchPageStore((store) => store.fetchNextPage);
+  const { hasNextPage, canLoadMore, isFetchingNextPage, fetchNextPage } =
+    useSearchProducts();
+
   if (!hasNextPage) {
     return null;
   }

@@ -10,7 +10,6 @@ import {
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
-import { SearchPageStore } from "~/features/search/stores/search-page-store";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({
@@ -47,19 +46,17 @@ export const Route = createFileRoute("/search")({
 
 function SearchPage() {
   return (
-    <SearchPageStore>
-      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 lg:py-14 xl:px-16">
-        <SearchResultsHeader />
+    <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-4 sm:px-8 sm:py-6 lg:py-14 xl:px-16">
+      <SearchResultsHeader />
 
-        <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
-          <SearchFilters />
+      <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-0">
+        <SearchFilters />
 
-          <section className="space-y-8">
-            <SearchProductResultsView />
-            <SearchPagination />
-          </section>
-        </div>
-      </main>
-    </SearchPageStore>
+        <section className="space-y-8">
+          <SearchProductResultsView />
+          <SearchPagination />
+        </section>
+      </div>
+    </main>
   );
 }

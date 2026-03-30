@@ -26,51 +26,7 @@ function SubscribeButtonContent({ status }: { status: MailingListState }) {
   return <>Subscribe</>;
 }
 
-function MailingListForm({
-  email,
-  status,
-  errorMessage,
-  onEmailChange,
-  onSubmit,
-}: {
-  email: string;
-  status: MailingListState;
-  errorMessage: string | null;
-  onEmailChange: (nextEmail: string) => void;
-  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-}) {
-  const isSubmitting = status !== "idle";
-
-  return (
-    <form
-      className="border-input focus-within:border-ring focus-within:ring-ring/50 mx-auto flex max-w-sm rounded-4xl border transition-colors focus-within:ring-[3px]"
-      onSubmit={onSubmit}
-      noValidate
-    >
-      <Input
-        type="email"
-        value={email}
-        onChange={(e) => onEmailChange(e.target.value)}
-        placeholder="Your email address"
-        className="rounded-r-none border-0 focus-visible:border-transparent focus-visible:ring-0"
-        disabled={isSubmitting}
-        aria-invalid={errorMessage !== null}
-      />
-      <Button
-        className="min-w-28 rounded-l-none data-[success=true]:bg-green-600 data-[success=true]:text-white data-[success=true]:hover:bg-green-600"
-        disabled={isSubmitting || email.trim().length === 0}
-        type="submit"
-        aria-label={getButtonAriaLabel(status)}
-        variant={status === "success" ? "default" : "outline"}
-        data-success={status === "success"}
-      >
-        <SubscribeButtonContent status={status} />
-      </Button>
-    </form>
-  );
-}
-
-export function MailingList() {
+function useMailingList() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<MailingListState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -132,6 +88,26 @@ export function MailingList() {
     }, 1000);
   };
 
+  return {
+    email,
+    status,
+    errorMessage,
+    isSubmitting,
+    handleEmailChange,
+    handleSubmit,
+  };
+}
+
+export function MailingList() {
+  const {
+    email,
+    status,
+    errorMessage,
+    isSubmitting,
+    handleEmailChange,
+    handleSubmit,
+  } = useMailingList();
+
   return (
     <section className="border-border border-t py-20">
       <div className="mx-auto max-w-xl px-6 text-center">
@@ -145,13 +121,31 @@ export function MailingList() {
           Get early access to new drops, exclusive offers, and style inspiration
           delivered straight to your inbox.
         </p>
-        <MailingListForm
-          email={email}
-          status={status}
-          errorMessage={errorMessage}
-          onEmailChange={handleEmailChange}
+        <form
+          className="border-input focus-within:border-ring focus-within:ring-ring/50 mx-auto flex max-w-sm rounded-4xl border transition-colors focus-within:ring-[3px]"
           onSubmit={handleSubmit}
-        />
+          noValidate
+        >
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => handleEmailChange(e.target.value)}
+            placeholder="Your email address"
+            className="rounded-r-none border-0 focus-visible:border-transparent focus-visible:ring-0"
+            disabled={isSubmitting}
+            aria-invalid={errorMessage !== null}
+          />
+          <Button
+            className="min-w-28 rounded-l-none data-[success=true]:bg-green-600 data-[success=true]:text-white data-[success=true]:hover:bg-green-600"
+            disabled={isSubmitting || email.trim().length === 0}
+            type="submit"
+            aria-label={getButtonAriaLabel(status)}
+            variant={status === "success" ? "default" : "outline"}
+            data-success={status === "success"}
+          >
+            <SubscribeButtonContent status={status} />
+          </Button>
+        </form>
         {errorMessage !== null ? (
           <p className="mt-3 text-xs text-red-500">{errorMessage}</p>
         ) : null}

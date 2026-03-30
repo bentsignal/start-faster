@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$")({
   validateSearch: z.object({
     draftId: z.string().optional(),
   }),
-  component: CmsPage,
+  component: DynamicPage,
   loaderDeps: ({ search }) => ({ draftId: search.draftId }),
   loader: async ({ context, params, deps }) => {
     if (deps.draftId) {
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/$")({
   },
 });
 
-function CmsPage() {
+function DynamicPage() {
   const loaderData = Route.useLoaderData({
     select: (d) =>
       d.mode === "draft"
@@ -64,14 +64,7 @@ function CmsPage() {
     return <LiveDraftPreview draftId={loaderData.draftId} />;
   }
 
-  return <StaticPage page={loaderData.page} />;
-}
-
-function StaticPage({
-  page,
-}: {
-  page: { title: string; path: string; content: string };
-}) {
+  const { page } = loaderData;
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-16 sm:px-8">
       <h1 className="text-3xl font-semibold tracking-tight">{page.title}</h1>

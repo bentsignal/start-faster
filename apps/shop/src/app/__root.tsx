@@ -7,15 +7,10 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { convert } from "great-time";
 import { z } from "zod";
 
 import { ScreenStore } from "@acme/features/screen";
-import {
-  DEFAULT_THEME,
-  getThemeFromCookie,
-  ThemeStore,
-} from "@acme/features/theme";
+import { DEFAULT_THEME, ThemeStore } from "@acme/features/theme";
 import { Toaster } from "@acme/ui/toaster";
 import { cn } from "@acme/ui/utils";
 
@@ -24,12 +19,14 @@ import appStyles from "~/app/styles.css?url";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
+import { ReactScan } from "~/components/react-scan";
 import { env } from "~/env";
 import { LoginModal } from "~/features/auth/components/login-modal";
-import { getAuthState } from "~/features/auth/server/get-auth-state";
+import { authQueries } from "~/features/auth/lib/auth-queries";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { CartStore } from "~/features/cart/store";
+import { shopQueries } from "~/lib/queries";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -73,21 +70,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   beforeLoad: async ({ context }) => {
     const [auth, theme, cart] = await Promise.all([
-      context.queryClient.fetchQuery({
-        queryKey: ["auth"],
-        queryFn: getAuthState,
-        staleTime: convert(50, "minutes", "to ms"),
-        gcTime: Infinity,
-      }),
-      context.queryClient.fetchQuery({
-        queryKey: ["theme"],
-        queryFn: getThemeFromCookie,
-        staleTime: Infinity,
-        gcTime: Infinity,
-      }),
-      context.queryClient.fetchQuery({
-        ...cartQueries.cookie(),
-      }),
+      context.queryClient.fetchQuery(authQueries.state()),
+      context.queryClient.fetchQuery(shopQueries.theme()),
+      context.queryClient.fetchQuery(cartQueries.cookie()),
     ]);
 
     return {
@@ -98,9 +83,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   },
   loader: async ({ context }) => {
     if (context.cart.id !== null) {
-      await context.queryClient.ensureQueryData({
-        ...cartQueries.detail(context.cart.id),
-      });
+      await context.queryClient.ensureQueryData(
+        cartQueries.detail(context.cart.id),
+      );
     }
   },
   validateSearch: z.object({
@@ -161,17 +146,5 @@ function RootComponent() {
         </QueryClientProvider>
       </body>
     </html>
-  );
-}
-
-function ReactScan() {
-  if (env.VITE_NODE_ENV !== "development") {
-    return null;
-  }
-  return (
-    <script
-      crossOrigin="anonymous"
-      src="//unpkg.com/react-scan/dist/auto.global.js"
-    />
   );
 }

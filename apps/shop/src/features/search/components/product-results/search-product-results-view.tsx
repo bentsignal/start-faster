@@ -1,9 +1,10 @@
 import { SearchResultProductCard } from "~/features/search/components/product-results/search-result-product-card";
-import { useSearchPageStore } from "~/features/search/stores/search-page-store";
+import { useSearchFilterLoading } from "~/features/search/hooks/use-search-filter-actions";
+import { useSearchProducts } from "~/features/search/hooks/use-search-products";
 
 export function SearchProductResultsView() {
-  const products = useSearchPageStore((store) => store.products);
-  const isFiltering = useSearchPageStore((store) => store.isFiltering);
+  const { products } = useSearchProducts();
+  const { isFiltering } = useSearchFilterLoading();
 
   if (products.length === 0) {
     return (

@@ -5,7 +5,6 @@ import {
   useLocation,
   useNavigate,
 } from "@tanstack/react-router";
-import { Package, Settings, User } from "lucide-react";
 
 import { QuickLink } from "@acme/features/quick-link";
 import { buttonVariants } from "@acme/ui/button";
@@ -13,22 +12,9 @@ import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { cn } from "@acme/ui/utils";
 
 import { stickyHeaderTokens } from "~/components/header/header";
+import { getSelectedRoute, navItems } from "~/features/account/lib/nav-items";
 import { SignOutButton } from "~/features/auth/components/sign-out-button";
 
-const navItems = [
-  { icon: User, label: "Account", to: "/account" },
-  { icon: Package, label: "Orders", to: "/orders" },
-  { icon: Settings, label: "Settings", to: "/settings" },
-] as const;
-
-function getSelectedRoute(pathname: string) {
-  const matchingItem = navItems.find((item) => pathname.startsWith(item.to));
-  if (matchingItem !== undefined) {
-    return matchingItem.to;
-  }
-
-  return "/orders";
-}
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
   beforeLoad: ({ location, context }) => {

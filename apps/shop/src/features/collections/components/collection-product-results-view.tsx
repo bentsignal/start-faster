@@ -1,9 +1,11 @@
-import { useCollectionPageStore } from "~/features/collections/stores/collection-page-store";
+import { useRouterState } from "@tanstack/react-router";
+
+import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
 import { SearchResultProductCard } from "~/features/search/components/product-results/search-result-product-card";
 
 export function CollectionProductResultsView() {
-  const products = useCollectionPageStore((store) => store.products);
-  const isFiltering = useCollectionPageStore((store) => store.isFiltering);
+  const { products } = useCollectionProducts();
+  const isFiltering = useRouterState({ select: (s) => s.isLoading });
 
   if (products.length === 0) {
     return (
