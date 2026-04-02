@@ -53,8 +53,10 @@ export function HorizontalMenu() {
                   <div className="grid w-[min(90vw,72rem)] grid-cols-[1fr_1.5fr] gap-3 p-6">
                     <div className="flex h-full items-center justify-center">
                       <Image
-                        src={item.ad?.image ?? fallbackPromoImage}
-                        alt={item.ad?.alt ?? `${item.label} promotion`}
+                        src={"ad" in item ? item.ad.image : fallbackPromoImage}
+                        alt={
+                          "ad" in item ? item.ad.alt : `${item.label} promotion`
+                        }
                         width={960}
                         height={720}
                         sizes="(min-width: 1280px) 432px, 35vw"
@@ -72,14 +74,8 @@ export function HorizontalMenu() {
                         />
                       ))}
                       <HorizontalMenuItem
-                        label={
-                          item.label === "Advice" ? "Learn more" : "View all"
-                        }
-                        description={
-                          item.label === "Advice"
-                            ? "Explore more expert advice from our team."
-                            : `Shop all items from ${item.label}.`
-                        }
+                        label="View all"
+                        description={`Shop all items from ${item.label}.`}
                       />
                     </div>
                   </div>

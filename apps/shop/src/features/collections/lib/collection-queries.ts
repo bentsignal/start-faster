@@ -4,14 +4,15 @@ import type { ProductFilter } from "@acme/shopify/storefront/types";
 import { getProductsByCollection } from "@acme/shopify/storefront/product";
 import { ProductCollectionSortKeys } from "@acme/shopify/storefront/types";
 
+import type {
+  SortBy,
+  SortDirection,
+} from "~/features/shared/filters/sort-schemas";
 import { shopify } from "~/lib/shopify";
 
 export const COLLECTION_PAGE_SIZE = 30;
 
-export type CollectionSortBy = "relevance" | "price";
-export type CollectionSortDirection = "asc" | "desc";
-
-function getCollectionSortKey(sortBy: CollectionSortBy) {
+function getCollectionSortKey(sortBy: SortBy) {
   if (sortBy === "price") {
     return ProductCollectionSortKeys.Price;
   }
@@ -28,8 +29,8 @@ export const collectionQueries = {
     first = COLLECTION_PAGE_SIZE,
   }: {
     handle: string;
-    sortBy: CollectionSortBy;
-    sortDirection: CollectionSortDirection;
+    sortBy: SortBy;
+    sortDirection: SortDirection;
     filters: ProductFilter[];
     first?: number;
   }) =>

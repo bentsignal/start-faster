@@ -1,10 +1,44 @@
-import { useRouterState } from "@tanstack/react-router";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useParams, useRouterState, useSearch } from "@tanstack/react-router";
 
-import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
+import {
+  COLLECTION_PAGE_SIZE,
+  collectionQueries,
+} from "~/features/collections/lib/collection-queries";
 import { SearchResultProductCard } from "~/features/search/components/product-results/search-result-product-card";
 
+function useCollectionProductsList() {
+  const handle = useParams({
+    from: "/collections/$handle",
+    select: (params) => params.handle,
+  });
+  const searchState = useSearch({
+    from: "/collections/$handle",
+    select: (search) => ({
+      sortBy: search.sortBy,
+      sortDirection: search.sortDirection,
+      urlFilters: search.filters,
+    }),
+  });
+
+  const { data } = useSuspenseInfiniteQuery({
+    ...collectionQueries.productsInfinite({
+      handle,
+      sortBy: searchState.sortBy,
+      sortDirection: searchState.sortDirection,
+      filters: searchState.urlFilters,
+      first: COLLECTION_PAGE_SIZE,
+    }),
+    refetchOnMount: false,
+    select: (queryData) =>
+      queryData.pages.flatMap((page) => page?.products.nodes ?? []),
+  });
+
+  return data;
+}
+
 export function CollectionProductResultsView() {
-  const { products } = useCollectionProducts();
+  const products = useCollectionProductsList();
   const isFiltering = useRouterState({ select: (s) => s.isLoading });
 
   if (products.length === 0) {

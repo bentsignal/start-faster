@@ -1,23 +1,49 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/toaster";
 
-import { useCart } from "~/features/cart/hooks/use-cart";
-import { useCheckForPendingMutations } from "~/features/cart/hooks/use-check-for-pending-mutations";
+import { useCartStore } from "~/features/cart/store";
+import { cartMutations } from "../lib/cart-mutations";
 
-export function CartCheckoutButton() {
+// we want to make sure that all cart mutations finish before we redirect to checkout
+function useCheckForPendingMutations() {
+  const queryClient = useQueryClient();
+  const CHECKOUT_SYNC_POLL_INTERVAL_MS = 50;
+
+  return async (options?: { timeoutMs?: number }) => {
+    const timeoutMs = options?.timeoutMs ?? 8000;
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
+      const activeMutations = queryClient.isMutating({
+        mutationKey: cartMutations.lineAll().mutationKey,
+      });
+
+      if (activeMutations === 0) {
+        return true;
+      }
+
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, CHECKOUT_SYNC_POLL_INTERVAL_MS);
+      });
+    }
+    return false;
+  };
+}
+
+function useCartCheckout() {
   const [navigatingToCheckout, setNavigatingToCheckout] = useState(false);
-  const { cart, cartQuantity } = useCart();
+  const checkoutUrl = useCartStore((store) => store.checkoutUrl);
+  const cartQuantity = useCartStore((store) => store.cartQuantity);
   const checkForPendingMutations = useCheckForPendingMutations();
 
-  const checkoutUrl = cart?.checkoutUrl;
-  const cartExists = cart !== null;
   const canCheckout =
-    cartExists && cartQuantity > 0 && checkoutUrl && checkoutUrl.length > 0;
+    checkoutUrl !== null && cartQuantity > 0 && checkoutUrl.length > 0;
 
-  const goToCheckout = async () => {
+  async function goToCheckout() {
     if (navigatingToCheckout) {
       return;
     }
@@ -40,7 +66,13 @@ export function CartCheckoutButton() {
     }
 
     window.location.assign(checkoutUrl);
-  };
+  }
+
+  return { navigatingToCheckout, canCheckout, goToCheckout };
+}
+
+export function CartCheckoutButton() {
+  const { navigatingToCheckout, canCheckout, goToCheckout } = useCartCheckout();
 
   return (
     <Button
@@ -48,9 +80,7 @@ export function CartCheckoutButton() {
       size="lg"
       className="my-3 w-full rounded-md"
       disabled={canCheckout === false}
-      onClick={() => {
-        void goToCheckout();
-      }}
+      onClick={goToCheckout}
     >
       {navigatingToCheckout ? (
         <Loader className="size-4 animate-spin" />

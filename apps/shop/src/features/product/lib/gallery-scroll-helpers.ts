@@ -1,4 +1,4 @@
-export const SCROLL_INTERRUPT_KEYS = new Set([
+const SCROLL_INTERRUPT_KEY_LIST = [
   "ArrowUp",
   "ArrowDown",
   "PageUp",
@@ -7,7 +7,9 @@ export const SCROLL_INTERRUPT_KEYS = new Set([
   "End",
   " ",
   "Spacebar",
-]);
+] as const;
+
+export const SCROLL_INTERRUPT_KEYS = new Set<string>(SCROLL_INTERRUPT_KEY_LIST);
 
 export function getHeaderHeight() {
   const headerElement =
@@ -147,7 +149,7 @@ export function setupScrollInterruptListeners(
 
 export function createIntersectionHandler(
   scrollRefs: ProgrammaticScrollRefs,
-  activeImageIndexRef: React.MutableRefObject<number>,
+  activeImageIndexRef: React.RefObject<number>,
   setActiveImageIndex: (index: number) => void,
 ) {
   return () => {

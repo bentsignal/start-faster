@@ -38,24 +38,24 @@ export function applyPendingMutationsToCart(
   );
 
   for (const mutation of sortedMutations) {
-    if (mutation.action === "add") {
-      nextCart = applyOptimisticAdd(
-        nextCart,
-        mutation.variables.optimisticLine ?? null,
-      );
-      continue;
+    switch (mutation.action) {
+      case "add":
+        nextCart = applyOptimisticAdd(
+          nextCart,
+          mutation.variables.optimisticLine ?? null,
+        );
+        break;
+      case "update":
+        nextCart = applyOptimisticQuantityUpdate(
+          nextCart,
+          mutation.variables.lineId,
+          mutation.variables.quantity,
+        );
+        break;
+      case "remove":
+        nextCart = applyOptimisticRemove(nextCart, mutation.variables.lineId);
+        break;
     }
-
-    if (mutation.action === "update") {
-      nextCart = applyOptimisticQuantityUpdate(
-        nextCart,
-        mutation.variables.lineId,
-        mutation.variables.quantity,
-      );
-      continue;
-    }
-
-    nextCart = applyOptimisticRemove(nextCart, mutation.variables.lineId);
   }
 
   return nextCart;

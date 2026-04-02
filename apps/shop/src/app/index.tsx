@@ -1,23 +1,19 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { GetProductsByCollectionQueryVariables } from "@acme/shopify/storefront/generated";
-
 import { Hero, heroImageUrl } from "~/components/hero";
 import { env } from "~/env";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
-import { productQueries } from "~/features/product/lib/product-queries";
+import {
+  frontpageCollectionArgs,
+  productQueries,
+} from "~/features/product/lib/product-queries";
 import { buildSeoHead, defaultSeoDescription } from "~/lib/seo";
-
-const args = {
-  handle: "frontpage",
-  first: 24,
-} as const satisfies GetProductsByCollectionQueryVariables;
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(
-      productQueries.getProductsByCollection(args),
+      productQueries.getProductsByCollection(frontpageCollectionArgs),
     );
   },
   component: RouteComponent,
@@ -33,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   const { data: products } = useSuspenseQuery({
-    ...productQueries.getProductsByCollection(args),
+    ...productQueries.getProductsByCollection(frontpageCollectionArgs),
     select: (collection) => collection?.products.nodes ?? [],
   });
 

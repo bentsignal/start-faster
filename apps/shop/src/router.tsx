@@ -8,7 +8,7 @@ import { Error } from "~/components/error";
 import { NotFound } from "~/components/not-found";
 import { Pending } from "~/components/pending";
 import { env } from "~/env";
-import { cartMutationKeys } from "~/features/cart/lib/cart-queries";
+import { cartMutations } from "~/features/cart/lib/cart-mutations";
 import { routeTree } from "./routeTree.gen";
 
 export interface RouterContext {
@@ -35,7 +35,7 @@ export function getRouter() {
   });
   convexQueryClient.connect(queryClient);
 
-  queryClient.setMutationDefaults(cartMutationKeys.lineAll, {
+  queryClient.setMutationDefaults(cartMutations.lineAll().mutationKey, {
     retry: 3,
     retryDelay: mutationRetryDelay,
   });

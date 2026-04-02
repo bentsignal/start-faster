@@ -33,6 +33,7 @@
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
     "convex": "catalog:",
+    "fast-deep-equal": "catalog:",
     "great-time": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",

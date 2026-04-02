@@ -1,33 +1,47 @@
 import { useSearch } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
 
 import type { SearchProductsQuery } from "@acme/shopify/storefront/generated";
 import type { ProductFilter } from "@acme/shopify/storefront/types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@acme/ui/accordion";
-import { Button } from "@acme/ui/button";
 
+import type { FilterGroup } from "~/features/shared/filters/components/filter-section";
 import {
   SortByControl,
   SortDirectionControl,
 } from "~/features/search/components/search-sort-controls";
 import { useSearchFilterActions } from "~/features/search/hooks/use-search-filter-actions";
 import { useSearchPriceRangeFilter } from "~/features/search/hooks/use-search-price-range-filter";
-import { useSearchProducts } from "~/features/search/hooks/use-search-products";
+import { useSearchTotalCount } from "~/features/search/hooks/use-search-total-count";
 import { useSearchVisibleFilters } from "~/features/search/hooks/use-search-visible-filters";
 import {
-  getPriceRangeFromFilters,
-  hasSelectedFilterValue,
-} from "~/features/search/lib/search-filter-utils";
+  FilterSectionListDesktop,
+  FilterSectionListMobile,
+  FilterValueList,
+  PriceRangeFilterContent,
+} from "~/features/shared/filters/components/filter-section";
+import { getPriceRangeFromFilters } from "~/features/shared/filters/filter-utils";
 
 type SearchResultFilter =
   SearchProductsQuery["search"]["productFilters"][number];
 
 type SearchFiltersMode = "desktop" | "mobile";
+
+function toFilterGroup(filter: SearchResultFilter) {
+  return {
+    id: filter.id,
+    label: filter.label,
+    type: String(filter.type),
+    values: filter.values.map((v) => ({
+      id: v.id,
+      label: v.label,
+      count: v.count,
+      input:
+        typeof v.input === "object" && v.input !== null
+          ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Shopify JSON scalar has no narrower static type
+            (v.input as ProductFilter)
+          : undefined,
+    })),
+  };
+}
 
 export function SearchFilters() {
   const query = useSearch({ from: "/search", select: (s) => s.q });
@@ -36,7 +50,7 @@ export function SearchFilters() {
     from: "/search",
     select: (s) => s.sortDirection,
   });
-  const { totalCount } = useSearchProducts();
+  const totalCount = useSearchTotalCount();
   const { onSortByChange, onSortDirectionChange, isFiltering } =
     useSearchFilterActions();
 
@@ -76,70 +90,42 @@ export function SearchFilters() {
 
 export function SearchFiltersContent({ mode }: { mode: SearchFiltersMode }) {
   const visibleFilters = useSearchVisibleFilters();
+  const filterGroups = visibleFilters.map(toFilterGroup);
+
+  const renderContent = (filter: FilterGroup) => (
+    <SearchFilterSectionContent filter={filter} />
+  );
 
   if (mode === "mobile") {
     return (
-      <Accordion defaultValue={[]} className="border-border/70 rounded-2xl">
-        {visibleFilters.map((filter) => (
-          <AccordionItem key={filter.id} value={filter.id}>
-            <AccordionTrigger className="py-3.5">
-              <span className="text-xs font-semibold tracking-wide uppercase">
-                {filter.label}
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-4">
-              <FilterSectionContent filter={filter} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <FilterSectionListMobile
+        filters={filterGroups}
+        renderContent={renderContent}
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
-      {visibleFilters.map((filter, index) => (
-        <FilterSectionDesktop
-          key={filter.id}
-          filter={filter}
-          isLast={index === visibleFilters.length - 1}
-        />
-      ))}
-    </div>
+    <FilterSectionListDesktop
+      filters={filterGroups}
+      renderContent={renderContent}
+    />
   );
 }
 
-function FilterSectionDesktop({
-  filter,
-  isLast,
-}: {
-  filter: SearchResultFilter;
-  isLast: boolean;
-}) {
-  return (
-    <section className="space-y-3">
-      <p className="text-xs font-semibold tracking-wide uppercase">
-        {filter.label}
-      </p>
-      <FilterSectionContent filter={filter} />
-      {!isLast && <div className="bg-border mt-3 h-px" />}
-    </section>
-  );
-}
-
-function FilterSectionContent({ filter }: { filter: SearchResultFilter }) {
+function SearchFilterSectionContent({ filter }: { filter: FilterGroup }) {
   const selectedFilters = useSearch({
     from: "/search",
     select: (s) => s.filters,
   });
   const { onToggleFilter, isFiltering } = useSearchFilterActions();
 
-  if (String(filter.type) === "PRICE_RANGE") {
+  if (filter.type === "PRICE_RANGE") {
     const priceRange = getPriceRangeFromFilters(selectedFilters);
     const priceInputKey = `${filter.id}:${priceRange.min}:${priceRange.max}`;
 
     return (
-      <PriceRangeFilterContent
+      <SearchPriceRangeSection
         key={priceInputKey}
         filterId={filter.id}
         initialMin={priceRange.min}
@@ -149,45 +135,16 @@ function FilterSectionContent({ filter }: { filter: SearchResultFilter }) {
   }
 
   return (
-    <section className="space-y-2">
-      <div className="space-y-0.5">
-        {filter.values.map((value) => {
-          if (typeof value.input !== "object" || value.input === null) {
-            return null;
-          }
-
-          // Shopify returns FilterValue.input as `unknown` (JSON scalar).
-          // After the object guard above we know it's a non-null object, but
-          // there is no runtime schema to validate the full ProductFilter shape.
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Shopify JSON scalar has no narrower static type
-          const input = value.input as ProductFilter;
-          const active = hasSelectedFilterValue(selectedFilters, input);
-
-          return (
-            <button
-              key={value.id}
-              type="button"
-              disabled={isFiltering}
-              className={`flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-sm transition-colors ${
-                active
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              }`}
-              onClick={() => {
-                void onToggleFilter(input);
-              }}
-            >
-              <span>{value.label}</span>
-              <span className="text-xs tabular-nums">{value.count}</span>
-            </button>
-          );
-        })}
-      </div>
-    </section>
+    <FilterValueList
+      values={filter.values}
+      selectedFilters={selectedFilters}
+      isFiltering={isFiltering}
+      onToggleFilter={onToggleFilter}
+    />
   );
 }
 
-function PriceRangeFilterContent({
+function SearchPriceRangeSection({
   filterId,
   initialMin,
   initialMax,
@@ -207,40 +164,15 @@ function PriceRangeFilterContent({
   } = useSearchPriceRangeFilter({ initialMin, initialMax });
 
   return (
-    <section className="space-y-3">
-      <div className="grid grid-cols-2 gap-2">
-        <textarea
-          name={`price-min-${filterId}`}
-          rows={1}
-          value={priceMin}
-          placeholder="Min"
-          disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-sm leading-6"
-          onChange={(event) => setPriceMin(event.target.value)}
-        />
-        <textarea
-          name={`price-max-${filterId}`}
-          rows={1}
-          value={priceMax}
-          placeholder="Max"
-          disabled={isFiltering}
-          className="bg-input/30 border-input min-h-10 resize-none rounded-lg px-3 py-2 text-sm leading-6"
-          onChange={(event) => setPriceMax(event.target.value)}
-        />
-      </div>
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={isFiltering}
-        className="w-full rounded-full"
-        onClick={apply}
-      >
-        {isPriceApplyLoading ? (
-          <Loader className="size-3.5 animate-spin" />
-        ) : (
-          "Apply"
-        )}
-      </Button>
-    </section>
+    <PriceRangeFilterContent
+      filterId={filterId}
+      priceMin={priceMin}
+      priceMax={priceMax}
+      setPriceMin={setPriceMin}
+      setPriceMax={setPriceMax}
+      isFiltering={isFiltering}
+      isPriceApplyLoading={isPriceApplyLoading}
+      onApply={apply}
+    />
   );
 }

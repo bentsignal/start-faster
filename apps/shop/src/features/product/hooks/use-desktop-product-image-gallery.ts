@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -7,10 +8,6 @@ import {
   getVisibleSections,
   setupScrollInterruptListeners,
 } from "~/features/product/lib/gallery-scroll-helpers";
-
-interface UseDesktopProductImageGalleryOptions {
-  imageCount: number;
-}
 
 /** Owns the programmatic-scroll tracking refs and interrupt listeners. */
 function useGalleryScrollManagement() {
@@ -55,7 +52,7 @@ function useGalleryScrollManagement() {
 interface GalleryObserverOptions {
   imageCount: number;
   imageSectionsRef: React.RefObject<(HTMLElement | null)[]>;
-  activeImageIndexRef: React.MutableRefObject<number>;
+  activeImageIndexRef: React.RefObject<number>;
   setActiveImageIndex: (index: number) => void;
   pendingTargetIndexRef: React.RefObject<number | null>;
   pendingTargetScrollYRef: React.RefObject<number | null>;
@@ -102,7 +99,19 @@ function useGalleryIntersectionObserver({
     return () => {
       observer.disconnect();
     };
-  }, [imageCount]);
+  }, [
+    imageCount,
+    activeImageIndexRef,
+    setActiveImageIndex,
+    pendingTargetIndexRef,
+    pendingTargetScrollYRef,
+    wasInterruptedRef,
+    imageSectionsRef,
+  ]);
+}
+
+interface UseDesktopProductImageGalleryOptions {
+  imageCount: number;
 }
 
 export function useDesktopProductImageGallery({
@@ -128,7 +137,7 @@ export function useDesktopProductImageGallery({
         ? Math.min(activeImageIndexRef.current, imageCount - 1)
         : 0;
     clampToImageCount(imageCount);
-  }, [imageCount]);
+  }, [imageCount, clampToImageCount]);
 
   useGalleryIntersectionObserver({
     imageCount,

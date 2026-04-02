@@ -11,9 +11,9 @@ import { buttonVariants } from "@acme/ui/button";
 import { NativeSelect, NativeSelectOption } from "@acme/ui/native-select";
 import { cn } from "@acme/ui/utils";
 
-import { stickyHeaderTokens } from "~/components/header/header";
 import { getSelectedRoute, navItems } from "~/features/account/lib/nav-items";
 import { SignOutButton } from "~/features/auth/components/sign-out-button";
+import { stickyHeaderTokens } from "~/lib/layout-tokens";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
@@ -30,10 +30,23 @@ export const Route = createFileRoute("/_authenticated")({
   },
 });
 
-function RouteComponent() {
+function useAuthenticatedLayout() {
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = useNavigate();
   const selectedRoute = getSelectedRoute(pathname);
+
+  const handleRouteChange = (value: string) => {
+    void navigate({ to: value });
+  };
+
+  const isActiveRoute = (to: string) => pathname.startsWith(to);
+
+  return { pathname, selectedRoute, handleRouteChange, isActiveRoute };
+}
+
+function RouteComponent() {
+  const { selectedRoute, handleRouteChange, isActiveRoute } =
+    useAuthenticatedLayout();
 
   return (
     <main className="container py-8 sm:py-12">
@@ -49,7 +62,7 @@ function RouteComponent() {
               className="w-full"
               value={selectedRoute}
               onChange={(event) => {
-                void navigate({ to: event.target.value });
+                handleRouteChange(event.target.value);
               }}
               aria-label="Select account page"
             >
@@ -67,7 +80,7 @@ function RouteComponent() {
             aria-label="Account navigation"
           >
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.to);
+              const isActive = isActiveRoute(item.to);
 
               return (
                 <QuickLink

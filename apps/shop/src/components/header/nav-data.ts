@@ -20,7 +20,7 @@ interface NavItem {
   items: { label: string; description: string }[];
 }
 
-export const secondaryNavLinks = ["Contact Us", "About Us"];
+export const secondaryNavLinks = ["Contact Us", "About Us"] as const;
 
 export const navItems = [
   {
@@ -253,4 +253,4 @@ export const navItems = [
       },
     ],
   },
-] satisfies NavItem[];
+] as const satisfies readonly NavItem[];

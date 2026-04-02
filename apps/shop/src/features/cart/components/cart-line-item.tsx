@@ -1,12 +1,14 @@
+// eslint-disable-next-line no-restricted-imports -- memo with fast deep equal to avoid re-rendering each line item in cart
+import { memo } from "react";
+import fastDeepEqual from "fast-deep-equal";
 import { Minus, Plus } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 
 import type { CartLine } from "~/features/cart/types";
 import { Image } from "~/components/image";
-import { useCart } from "~/features/cart/hooks/use-cart";
 import { useUpdateCartLine } from "~/features/cart/hooks/use-update-cart-line";
-import { formatPrice } from "~/features/product/lib/price";
+import { formatMoney } from "~/lib/format-money";
 
 function formatSelectedOptions(line: CartLine) {
   return line.merchandise.selectedOptions
@@ -14,15 +16,15 @@ function formatSelectedOptions(line: CartLine) {
     .join(" | ");
 }
 
-export function CartLineItem({ line }: { line: CartLine }) {
+function CartLineItemComponent({ line }: { line: CartLine }) {
   const selectedOptionsLabel = formatSelectedOptions(line);
   const merchandiseImage = line.merchandise.image ?? null;
-  const { cartId, cart } = useCart();
-  const { changeLineQuantity } = useUpdateCartLine({ cartId, cart });
+  const { changeLineQuantity } = useUpdateCartLine();
 
   const decrement = () => {
     changeLineQuantity({
       lineId: line.id,
+      currentQuantity: line.quantity,
       delta: -1,
     });
   };
@@ -30,6 +32,7 @@ export function CartLineItem({ line }: { line: CartLine }) {
   const increment = () => {
     changeLineQuantity({
       lineId: line.id,
+      currentQuantity: line.quantity,
       delta: 1,
     });
   };
@@ -88,7 +91,7 @@ export function CartLineItem({ line }: { line: CartLine }) {
             </div>
           </div>
           <p className="text-sm font-medium tabular-nums">
-            {formatPrice(
+            {formatMoney(
               line.cost.totalAmount.amount,
               line.cost.totalAmount.currencyCode,
             )}
@@ -98,3 +101,9 @@ export function CartLineItem({ line }: { line: CartLine }) {
     </article>
   );
 }
+
+export const CartLineItem = memo(
+  CartLineItemComponent,
+  (previousProps, nextProps) =>
+    fastDeepEqual(previousProps.line, nextProps.line),
+);

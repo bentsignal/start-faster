@@ -25,6 +25,38 @@ import {
   DrawerTitle,
 } from "@acme/ui/drawer";
 
+function useLoginModal() {
+  const screen = useScreenStore((store) => store.screen);
+  const navigate = useNavigate();
+
+  const isLoggedIn = useRouteContext({
+    from: "__root__",
+    select: (context) => context.auth.isSignedIn,
+  });
+  const urlSaysShowLogin = useSearch({
+    from: "__root__",
+    select: (search) => search.showLogin === true,
+  });
+
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      void navigate({
+        to: ".",
+        search: (previousSearch) => ({
+          ...previousSearch,
+          showLogin: undefined,
+          returnTo: undefined,
+        }),
+        resetScroll: false,
+      });
+    }
+  }
+
+  const showLogin = isLoggedIn ? false : urlSaysShowLogin ? true : false;
+
+  return { screen, showLogin, handleOpenChange };
+}
+
 function LoginButton() {
   const returnTo = useSearch({
     from: "__root__",
@@ -100,33 +132,7 @@ function LoginModalContent() {
 }
 
 export function LoginModal() {
-  const screen = useScreenStore((store) => store.screen);
-  const navigate = useNavigate();
-
-  const isLoggedIn = useRouteContext({
-    from: "__root__",
-    select: (context) => context.auth.isSignedIn,
-  });
-  const urlSaysShowLogin = useSearch({
-    from: "__root__",
-    select: (search) => search.showLogin,
-  });
-
-  function handleOpenChange(open: boolean) {
-    if (!open) {
-      void navigate({
-        to: ".",
-        search: (previousSearch) => ({
-          ...previousSearch,
-          showLogin: undefined,
-          returnTo: undefined,
-        }),
-        resetScroll: false,
-      });
-    }
-  }
-
-  const showLogin = urlSaysShowLogin && isLoggedIn === false ? true : false;
+  const { screen, showLogin, handleOpenChange } = useLoginModal();
 
   if (screen.isSmallerThan(ScreenSize.MD)) {
     return (

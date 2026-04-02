@@ -14,11 +14,14 @@ export function useSearchPriceRangeFilter({
   const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
   const { onApplyPriceRange, isFiltering } = useSearchFilterActions();
 
-  const apply = () => {
+  const apply = async () => {
     setIsPriceApplyLoading(true);
-    void onApplyPriceRange(priceMin, priceMax).finally(() => {
-      setIsPriceApplyLoading(false);
-    });
+    try {
+      await onApplyPriceRange(priceMin, priceMax);
+    } catch (error) {
+      console.error(error);
+    }
+    setIsPriceApplyLoading(false);
   };
 
   return {

@@ -4,7 +4,6 @@ import { z } from "zod/v4";
 
 import { getCustomerOrders } from "@acme/shopify/customer/account";
 
-import type { CustomerOrdersConnection } from "~/features/account/types";
 import { createHydrogenCustomerAuthContext } from "~/lib/auth";
 
 const getCustomerOrdersInputSchema = z.object({
@@ -14,7 +13,7 @@ const getCustomerOrdersInputSchema = z.object({
 
 export const getCustomerOrdersPage = createServerFn({ method: "GET" })
   .inputValidator(getCustomerOrdersInputSchema)
-  .handler(async ({ data }): Promise<CustomerOrdersConnection> => {
+  .handler(async ({ data }) => {
     const request = getRequest();
     const { customerAccount } = await createHydrogenCustomerAuthContext({
       request,

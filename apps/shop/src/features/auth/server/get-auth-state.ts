@@ -5,6 +5,12 @@ import { getCustomerIdentity } from "@acme/shopify/customer/account";
 
 import { createHydrogenCustomerAuthContext, toIdentity } from "~/lib/auth";
 
+type CustomerIdentity = ReturnType<typeof toIdentity>;
+
+type AuthState =
+  | { isSignedIn: false; customer: null }
+  | { isSignedIn: true; customer: CustomerIdentity };
+
 export const getAuthState = createServerFn({ method: "GET" }).handler(
   async () => {
     const request = getRequest();
@@ -16,7 +22,7 @@ export const getAuthState = createServerFn({ method: "GET" }).handler(
       return {
         isSignedIn: false,
         customer: null,
-      } as const;
+      } as const satisfies AuthState;
     }
 
     const accessToken = await customerAccount.getAccessToken();
@@ -24,13 +30,13 @@ export const getAuthState = createServerFn({ method: "GET" }).handler(
       return {
         isSignedIn: false,
         customer: null,
-      } as const;
+      } as const satisfies AuthState;
     }
     const { data } = await customerAccount.query(getCustomerIdentity);
 
     return {
       isSignedIn: true,
       customer: toIdentity(data.customer),
-    } as const;
+    } as const satisfies AuthState;
   },
 );

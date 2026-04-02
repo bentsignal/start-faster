@@ -3,19 +3,6 @@ import type { CartLineInput } from "@acme/shopify/storefront/types";
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type { LiveOrderProducts } from "~/features/account/types";
 
-export function formatMoney(amount: number | string, currencyCode: string) {
-  const parsedAmount =
-    typeof amount === "number" ? amount : Number.parseFloat(amount);
-  if (Number.isNaN(parsedAmount)) {
-    return `${amount} ${currencyCode}`;
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currencyCode,
-  }).format(parsedAmount);
-}
-
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",

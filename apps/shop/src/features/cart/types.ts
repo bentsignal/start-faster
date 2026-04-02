@@ -6,14 +6,14 @@ import type {
   CartLinesUpdateForCartMutation,
 } from "@acme/shopify/storefront/generated";
 
-type CartPayload =
+export type CartSource =
   | CartByIdQuery["cart"]
   | NonNullable<CartCreateForCartMutation["cartCreate"]>["cart"]
   | NonNullable<CartLinesAddForCartMutation["cartLinesAdd"]>["cart"]
   | NonNullable<CartLinesUpdateForCartMutation["cartLinesUpdate"]>["cart"]
   | NonNullable<CartLinesRemoveForCartMutation["cartLinesRemove"]>["cart"];
 
-export type ServerCart = NonNullable<CartPayload>;
+export type ServerCart = NonNullable<CartSource>;
 
 type ServerCartLine = ServerCart["lines"]["nodes"][number];
 

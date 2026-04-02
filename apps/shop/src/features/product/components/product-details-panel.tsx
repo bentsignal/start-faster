@@ -5,11 +5,12 @@ import { Loader } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/utils";
 
-import { stickyHeaderTokens } from "~/components/header/header";
 import { ProductOptionSelector } from "~/features/product/components/product-option-selector";
 import { useProductActions } from "~/features/product/hooks/use-product-actions";
-import { useProductPrice } from "~/features/product/hooks/use-product-price";
+import { useSelectedVariant } from "~/features/product/hooks/use-selected-variant";
 import { productQueries } from "~/features/product/lib/product-queries";
+import { formatMoney } from "~/lib/format-money";
+import { stickyHeaderTokens } from "~/lib/layout-tokens";
 
 export function ProductDetailsPanel() {
   return (
@@ -47,6 +48,19 @@ function ProductTitle() {
       {title}
     </h1>
   );
+}
+
+function useProductPrice() {
+  const { handle } = useParams({ from: "/shop/$handle" });
+  const fallbackPrice = useSuspenseQuery({
+    ...productQueries.productByHandle(handle),
+    select: (p) => p.priceRange.minVariantPrice,
+  }).data;
+  const { selectedVariant } = useSelectedVariant();
+  const selectedPrice = selectedVariant?.price ?? fallbackPrice;
+  return {
+    price: formatMoney(selectedPrice.amount, selectedPrice.currencyCode),
+  };
 }
 
 function ProductPrice() {

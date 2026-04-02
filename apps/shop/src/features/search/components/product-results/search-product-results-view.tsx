@@ -1,9 +1,44 @@
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useSearch } from "@tanstack/react-router";
+
 import { SearchResultProductCard } from "~/features/search/components/product-results/search-result-product-card";
 import { useSearchFilterLoading } from "~/features/search/hooks/use-search-filter-actions";
-import { useSearchProducts } from "~/features/search/hooks/use-search-products";
+import {
+  SEARCH_PAGE_SIZE,
+  searchQueries,
+} from "~/features/search/lib/search-queries";
+
+function useSearchProductsList() {
+  const search = useSearch({
+    from: "/search",
+    select: (s) => ({
+      q: s.q,
+      sortBy: s.sortBy,
+      sortDirection: s.sortDirection,
+      filters: s.filters,
+    }),
+  });
+
+  const { data } = useSuspenseInfiniteQuery({
+    ...searchQueries.productsInfinite({
+      query: search.q,
+      sortBy: search.sortBy,
+      sortDirection: search.sortDirection,
+      filters: search.filters,
+      first: SEARCH_PAGE_SIZE,
+    }),
+    refetchOnMount: false,
+    select: (queryData) =>
+      queryData.pages.flatMap((page) =>
+        (page?.nodes ?? []).filter((node) => node.__typename === "Product"),
+      ),
+  });
+
+  return data;
+}
 
 export function SearchProductResultsView() {
-  const { products } = useSearchProducts();
+  const products = useSearchProductsList();
   const { isFiltering } = useSearchFilterLoading();
 
   if (products.length === 0) {

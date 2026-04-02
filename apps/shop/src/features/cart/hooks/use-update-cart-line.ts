@@ -3,39 +3,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@acme/ui/toaster";
 
 import type { CartMutationContext } from "./cart-mutation-shared";
-import type { Cart } from "~/features/cart/types";
-import {
-  cartMutationKeys,
-  cartQueries,
-} from "~/features/cart/lib/cart-queries";
+import { cartMutations } from "~/features/cart/lib/cart-mutations";
+import { cartQueries } from "~/features/cart/lib/cart-queries";
 import { storeCart } from "~/features/cart/lib/cart-storage";
-import {
-  removeCartLineFn,
-  updateCartLineFn,
-} from "~/features/cart/lib/manage-cart";
-import { CART_WRITE_SCOPE_ID } from "./cart-mutation-shared";
+import { useCartStore } from "~/features/cart/store";
 
 function useInternalUpdateCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: cartMutationKeys.lineUpdate,
-    scope: {
-      id: CART_WRITE_SCOPE_ID,
-    },
-    mutationFn: async (variables: {
-      cartId: string;
-      lineId: string;
-      quantity: number;
-    }) => {
-      return updateCartLineFn({
-        data: {
-          cartId: variables.cartId,
-          lineId: variables.lineId,
-          quantity: variables.quantity,
-        },
-      });
-    },
+    ...cartMutations.lineUpdate(),
     onMutate: async (variables): Promise<CartMutationContext> => {
       const activeQueryKey = cartQueries.detail(variables.cartId).queryKey;
       await queryClient.cancelQueries({
@@ -62,18 +39,7 @@ function useInternalRemoveCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: cartMutationKeys.lineRemove,
-    scope: {
-      id: CART_WRITE_SCOPE_ID,
-    },
-    mutationFn: async (variables: { cartId: string; lineId: string }) => {
-      return removeCartLineFn({
-        data: {
-          cartId: variables.cartId,
-          lineId: variables.lineId,
-        },
-      });
-    },
+    ...cartMutations.lineRemove(),
     onMutate: async (variables): Promise<CartMutationContext> => {
       const activeQueryKey = cartQueries.detail(variables.cartId).queryKey;
       await queryClient.cancelQueries({
@@ -96,29 +62,25 @@ function useInternalRemoveCartLineMutation() {
   });
 }
 
-export function useUpdateCartLine({
-  cartId,
-  cart,
-}: {
-  cartId: string | null;
-  cart: Cart | null;
-}) {
+export function useUpdateCartLine() {
+  const cartId = useCartStore((store) => store.cartId);
   const updateLineMutation = useInternalUpdateCartLineMutation();
   const removeLineMutation = useInternalRemoveCartLineMutation();
 
   const changeLineQuantity = ({
     lineId,
+    currentQuantity,
     delta,
   }: {
     lineId: string;
+    currentQuantity: number;
     delta: number;
   }) => {
-    const cartLine = cart?.lines.nodes.find((line) => line.id === lineId);
-    if (cartLine === undefined || cartId === null) {
+    if (cartId === null) {
       return;
     }
 
-    const nextQuantity = cartLine.quantity + delta;
+    const nextQuantity = currentQuantity + delta;
     if (nextQuantity <= 0) {
       removeLineMutation.mutate({
         cartId,

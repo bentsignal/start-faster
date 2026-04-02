@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearch } from "@tanstack/react-router";
 
 import { useCollectionFilterActions } from "~/features/collections/hooks/use-collection-filter-actions";
-import { getPriceRangeFromFilters } from "~/features/collections/lib/collection-filter-utils";
+import { getPriceRangeFromFilters } from "~/features/shared/filters/filter-utils";
 
 export function useCollectionPriceRangeFilter() {
   const selectedFilters = useSearch({
@@ -16,11 +16,14 @@ export function useCollectionPriceRangeFilter() {
   const [isPriceApplyLoading, setIsPriceApplyLoading] = useState(false);
   const { onApplyPriceRange, isFiltering } = useCollectionFilterActions();
 
-  const onApply = () => {
+  const onApply = async () => {
     setIsPriceApplyLoading(true);
-    void onApplyPriceRange(priceMin, priceMax).finally(() => {
-      setIsPriceApplyLoading(false);
-    });
+    try {
+      await onApplyPriceRange(priceMin, priceMax);
+    } catch (error) {
+      console.error(error);
+    }
+    setIsPriceApplyLoading(false);
   };
 
   return {

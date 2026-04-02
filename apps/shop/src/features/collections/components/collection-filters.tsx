@@ -1,38 +1,124 @@
-import { useSearch } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useParams, useSearch } from "@tanstack/react-router";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@acme/ui/accordion";
-import { Button } from "@acme/ui/button";
-
-import type { CollectionFilter } from "~/features/collections/types";
+import type { FilterGroup } from "~/features/shared/filters/components/filter-section";
 import {
   CollectionSortByControl,
   CollectionSortDirectionControl,
 } from "~/features/collections/components/collection-sort-controls";
 import { useCollectionFilterActions } from "~/features/collections/hooks/use-collection-filter-actions";
 import { useCollectionPriceRangeFilter } from "~/features/collections/hooks/use-collection-price-range-filter";
-import { useCollectionProducts } from "~/features/collections/hooks/use-collection-products";
+import { parseCollectionFilter } from "~/features/collections/lib/collection-filter-utils";
 import {
-  getPriceRangeFromFilters,
-  hasSelectedFilterValue,
-  parseCollectionFilter,
-} from "~/features/collections/lib/collection-filter-utils";
+  COLLECTION_PAGE_SIZE,
+  collectionQueries,
+} from "~/features/collections/lib/collection-queries";
+import {
+  FilterSectionListDesktop,
+  FilterSectionListMobile,
+  FilterValueList,
+  PriceRangeFilterContent,
+} from "~/features/shared/filters/components/filter-section";
+import { getPriceRangeFromFilters } from "~/features/shared/filters/filter-utils";
+
+function useCollectionFilters() {
+  const handle = useParams({
+    from: "/collections/$handle",
+    select: (params) => params.handle,
+  });
+  const searchState = useSearch({
+    from: "/collections/$handle",
+    select: (search) => ({
+      sortBy: search.sortBy,
+      sortDirection: search.sortDirection,
+      urlFilters: search.filters,
+    }),
+  });
+
+  const { data } = useSuspenseInfiniteQuery({
+    ...collectionQueries.productsInfinite({
+      handle,
+      sortBy: searchState.sortBy,
+      sortDirection: searchState.sortDirection,
+      filters: searchState.urlFilters,
+      first: COLLECTION_PAGE_SIZE,
+    }),
+    refetchOnMount: false,
+    select: (queryData) => queryData.pages[0]?.products.filters ?? [],
+  });
+
+  const filters = data
+    .filter((filter) => {
+      if (String(filter.type) === "PRICE_RANGE") {
+        return true;
+      }
+
+      return filter.values.some(
+        (value) => parseCollectionFilter(value.input) !== undefined,
+      );
+    })
+    .map(toFilterGroup);
+
+  return filters;
+}
+
+function useCollectionTitle() {
+  const handle = useParams({
+    from: "/collections/$handle",
+    select: (params) => params.handle,
+  });
+  const searchState = useSearch({
+    from: "/collections/$handle",
+    select: (search) => ({
+      sortBy: search.sortBy,
+      sortDirection: search.sortDirection,
+      urlFilters: search.filters,
+    }),
+  });
+
+  const { data } = useSuspenseInfiniteQuery({
+    ...collectionQueries.productsInfinite({
+      handle,
+      sortBy: searchState.sortBy,
+      sortDirection: searchState.sortDirection,
+      filters: searchState.urlFilters,
+      first: COLLECTION_PAGE_SIZE,
+    }),
+    refetchOnMount: false,
+    select: (queryData) => queryData.pages[0]?.title,
+  });
+
+  return data;
+}
 
 type CollectionFiltersMode = "desktop" | "mobile";
 
+function toFilterGroup(filter: {
+  id: string;
+  label: string;
+  type: string;
+  values: { id: string; label: string; count: number; input: unknown }[];
+}) {
+  return {
+    id: filter.id,
+    label: filter.label,
+    type: String(filter.type),
+    values: filter.values.map((v) => ({
+      id: v.id,
+      label: v.label,
+      count: v.count,
+      input: parseCollectionFilter(v.input),
+    })),
+  };
+}
+
 export function CollectionFilters() {
-  const { collection } = useCollectionProducts();
-  const title = collection?.title ?? "Collection";
+  const title = useCollectionTitle();
 
   return (
     <aside className="lg:border-border hidden lg:sticky lg:top-32 lg:block lg:h-fit lg:pr-8 xl:top-42">
       <div className="space-y-5">
-        <h1 className="text-sm font-bold">{title}</h1>
+        {title ? <h1 className="text-sm font-bold">{title}</h1> : null}
 
         <div>
           <div className="space-y-2.5">
@@ -55,116 +141,53 @@ export function CollectionFiltersContent({
 }: {
   mode: CollectionFiltersMode;
 }) {
-  const { collection } = useCollectionProducts();
-  const filters = collection?.products.filters ?? [];
-  const visibleFilters = filters.filter((filter) => {
-    if (String(filter.type) === "PRICE_RANGE") {
-      return true;
-    }
+  const filters = useCollectionFilters();
 
-    return filter.values.some((value) => parseCollectionFilter(value.input));
-  });
+  const renderContent = (filter: FilterGroup) => (
+    <CollectionFilterSectionContent filter={filter} />
+  );
 
   if (mode === "mobile") {
     return (
-      <Accordion defaultValue={[]} className="border-border/70 rounded-2xl">
-        {visibleFilters.map((filter) => (
-          <AccordionItem key={filter.id} value={filter.id}>
-            <AccordionTrigger className="py-3.5">
-              <span className="text-xs font-semibold tracking-wide uppercase">
-                {filter.label}
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-4">
-              <FilterSectionContent filter={filter} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <FilterSectionListMobile
+        filters={filters}
+        renderContent={renderContent}
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
-      {visibleFilters.map((filter, index) => (
-        <FilterSectionDesktop
-          key={filter.id}
-          filter={filter}
-          isLast={index === visibleFilters.length - 1}
-        />
-      ))}
-    </div>
+    <FilterSectionListDesktop filters={filters} renderContent={renderContent} />
   );
 }
 
-function FilterSectionDesktop({
-  filter,
-  isLast,
-}: {
-  filter: CollectionFilter;
-  isLast: boolean;
-}) {
-  return (
-    <section className="space-y-3">
-      <p className="text-xs font-semibold tracking-wide uppercase">
-        {filter.label}
-      </p>
-      <FilterSectionContent filter={filter} />
-      {!isLast && <div className="bg-border mt-3 h-px" />}
-    </section>
-  );
-}
-
-function FilterSectionContent({ filter }: { filter: CollectionFilter }) {
+function CollectionFilterSectionContent({ filter }: { filter: FilterGroup }) {
   const selectedFilters = useSearch({
     from: "/collections/$handle",
     select: (search) => search.filters,
   });
   const { onToggleFilter, isFiltering } = useCollectionFilterActions();
 
-  if (String(filter.type) === "PRICE_RANGE") {
+  if (filter.type === "PRICE_RANGE") {
     const priceRange = getPriceRangeFromFilters(selectedFilters);
     const priceInputKey = `${filter.id}:${priceRange.min}:${priceRange.max}`;
 
-    return <PriceRangeFilterContent key={priceInputKey} filterId={filter.id} />;
+    return (
+      <CollectionPriceRangeSection key={priceInputKey} filterId={filter.id} />
+    );
   }
 
   return (
-    <section className="space-y-2">
-      <div className="space-y-0.5">
-        {filter.values.map((value) => {
-          const input = parseCollectionFilter(value.input);
-          if (input === undefined) {
-            return null;
-          }
-          const active = hasSelectedFilterValue(selectedFilters, input);
-
-          return (
-            <button
-              key={value.id}
-              type="button"
-              aria-pressed={active}
-              disabled={isFiltering}
-              className={`flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-sm transition-colors ${
-                active
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              }`}
-              onClick={() => {
-                void onToggleFilter(input);
-              }}
-            >
-              <span>{value.label}</span>
-              <span className="text-xs tabular-nums">{value.count}</span>
-            </button>
-          );
-        })}
-      </div>
-    </section>
+    <FilterValueList
+      values={filter.values}
+      selectedFilters={selectedFilters}
+      isFiltering={isFiltering}
+      onToggleFilter={onToggleFilter}
+    />
   );
 }
 
-function PriceRangeFilterContent({ filterId }: { filterId: string }) {
+function CollectionPriceRangeSection({ filterId }: { filterId: string }) {
   const {
     priceMin,
     priceMax,
@@ -176,44 +199,15 @@ function PriceRangeFilterContent({ filterId }: { filterId: string }) {
   } = useCollectionPriceRangeFilter();
 
   return (
-    <section className="space-y-3">
-      <div className="grid grid-cols-2 gap-2">
-        <input
-          type="text"
-          inputMode="decimal"
-          name={`price-min-${filterId}`}
-          aria-label={`Minimum price for ${filterId}`}
-          value={priceMin}
-          placeholder="Min"
-          disabled={isFiltering}
-          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
-          onChange={(event) => setPriceMin(event.target.value)}
-        />
-        <input
-          type="text"
-          inputMode="decimal"
-          name={`price-max-${filterId}`}
-          aria-label={`Maximum price for ${filterId}`}
-          value={priceMax}
-          placeholder="Max"
-          disabled={isFiltering}
-          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
-          onChange={(event) => setPriceMax(event.target.value)}
-        />
-      </div>
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={isFiltering}
-        className="w-full rounded-full"
-        onClick={onApply}
-      >
-        {isPriceApplyLoading ? (
-          <Loader className="size-3.5 animate-spin" />
-        ) : (
-          "Apply"
-        )}
-      </Button>
-    </section>
+    <PriceRangeFilterContent
+      filterId={filterId}
+      priceMin={priceMin}
+      priceMax={priceMax}
+      setPriceMin={setPriceMin}
+      setPriceMax={setPriceMax}
+      isFiltering={isFiltering}
+      isPriceApplyLoading={isPriceApplyLoading}
+      onApply={onApply}
+    />
   );
 }

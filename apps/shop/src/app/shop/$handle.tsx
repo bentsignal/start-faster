@@ -93,7 +93,7 @@ export const Route = createFileRoute("/shop/$handle")({
   },
 });
 
-function ProductPage() {
+function useProductPage() {
   const isHydrated = useIsHydrated();
   const screen = useScreenStore((store) => store.screen);
   const shouldRenderSingleGallery = isHydrated && screen.size !== undefined;
@@ -103,6 +103,12 @@ function ProductPage() {
   const showMobileGallery = shouldRenderSingleGallery
     ? !screen.isBiggerThan(ScreenSize.LG)
     : true;
+
+  return { showDesktopGallery, showMobileGallery };
+}
+
+function ProductPage() {
+  const { showDesktopGallery, showMobileGallery } = useProductPage();
 
   return (
     <ProductGalleryStore>

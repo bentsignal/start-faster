@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$")({
   validateSearch: z.object({
     draftId: z.string().optional(),
   }),
-  component: DynamicPage,
+  component: RouteComponent,
   loaderDeps: ({ search }) => ({ draftId: search.draftId }),
   loader: async ({ context, params, deps }) => {
     if (deps.draftId) {
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/$")({
   },
 });
 
-function DynamicPage() {
+function RouteComponent() {
   const loaderData = Route.useLoaderData({
     select: (d) =>
       d.mode === "draft"

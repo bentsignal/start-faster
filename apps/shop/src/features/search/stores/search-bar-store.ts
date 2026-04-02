@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
-import useDebouncedInput from "~/hooks/use-debounced-input";
+import { useDebouncedInput } from "~/hooks/use-debounced-input";
 
 function useSearchPrefetch(debouncedSearchTerm: string) {
   const router = useRouter();

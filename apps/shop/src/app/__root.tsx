@@ -70,7 +70,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   beforeLoad: async ({ context }) => {
     const [auth, theme, cart] = await Promise.all([
-      context.queryClient.fetchQuery(authQueries.state()),
+      context.queryClient.fetchQuery(authQueries.getAuth()),
       context.queryClient.fetchQuery(shopQueries.theme()),
       context.queryClient.fetchQuery(cartQueries.cookie()),
     ]);

@@ -2,7 +2,6 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import { getProductsByIds } from "@acme/shopify/storefront/product";
 
-import type { LiveOrderProducts } from "~/features/account/types";
 import { getCustomerOrdersPage } from "~/features/account/server/get-customer-orders";
 import { shopify } from "~/lib/shopify";
 
@@ -14,7 +13,7 @@ export const accountQueries = {
   }),
   orders: () =>
     infiniteQueryOptions({
-      queryKey: [...accountQueries.all().queryKey, "orders"] as const,
+      queryKey: ["account", "orders"] as const,
       queryFn: ({ pageParam }) =>
         getCustomerOrdersPage({
           data: {
@@ -34,12 +33,8 @@ export const accountQueries = {
     }),
   liveProducts: (ids: string[]) =>
     queryOptions({
-      queryKey: [
-        ...accountQueries.all().queryKey,
-        "live-products",
-        ids,
-      ] as const,
-      queryFn: async (): Promise<LiveOrderProducts> => {
+      queryKey: ["account", "live-products", ids] as const,
+      queryFn: async () => {
         if (ids.length === 0) {
           return [];
         }

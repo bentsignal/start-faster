@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams, useSearch } from "@tanstack/react-router";
 
-import {
-  getDefaultVariantIdFromGalleryOrdering,
-  getProductGalleryOrdering,
-} from "~/features/product/lib/gallery-images";
+import { useGalleryOrdering } from "~/features/product/hooks/use-gallery-ordering";
+import { getDefaultVariantIdFromGalleryOrdering } from "~/features/product/lib/gallery-images";
 import { productQueries } from "~/features/product/lib/product-queries";
 
 export function useSelectedVariant() {
@@ -17,25 +14,17 @@ export function useSelectedVariant() {
   const { data: product } = useSuspenseQuery({
     ...productQueries.productByHandle(handle),
     select: (p) => ({
-      id: p.id,
-      images: p.images,
-      featuredImage: p.featuredImage,
       options: p.options,
       variants: p.variants,
     }),
   });
 
   const variants = product.variants.nodes;
-  const [initialVariantId] = useState(variant);
+  const { variantImageIndexById } = useGalleryOrdering();
 
-  const galleryOrdering = getProductGalleryOrdering({
-    product,
-    variants,
-    initialVariantId,
-  });
   const defaultVariantId = getDefaultVariantIdFromGalleryOrdering({
     variants,
-    variantImageIndexById: galleryOrdering.variantImageIndexById,
+    variantImageIndexById,
   });
 
   const defaultVariant =

@@ -1,3 +1,4 @@
+import type { OrderStatus } from "~/features/account/lib/order-status";
 import type { CustomerOrder } from "~/features/account/types";
 import {
   getCustomerOrderStatus,
@@ -6,8 +7,8 @@ import {
 } from "~/features/account/lib/order-status";
 
 export type OrderListItem = CustomerOrder & {
-  primaryStatusLabel: string;
-  primaryStatusTone: "primary" | "accent" | "success";
+  primaryStatusLabel: OrderStatus["label"];
+  primaryStatusTone: OrderStatus["tone"];
   fulfillmentStatusLabel: string;
   financialStatusLabel: string;
 };
@@ -24,6 +25,6 @@ export function getOrdersListData(orders: CustomerOrder[]) {
         order.fulfillmentStatus,
       ),
       financialStatusLabel: getFinancialStatusLabel(order.financialStatus),
-    };
+    } satisfies OrderListItem;
   });
 }

@@ -1,3 +1,4 @@
+import { Button } from "@acme/ui/button";
 import { ScrollArea } from "@acme/ui/scroll-area";
 import {
   Sheet,
@@ -9,14 +10,12 @@ import {
 
 import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
-import { useCart } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
-import { CartEmpty } from "./cart-empty";
 
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);
   const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
-  const { cartQuantity } = useCart();
+  const cartQuantity = useCartStore((store) => store.cartQuantity);
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -39,9 +38,8 @@ export function CartSheet() {
 }
 
 function Body() {
-  const { cart } = useCart();
-  const lines = cart?.lines.nodes ?? [];
-
+  const lines = useCartStore((store) => store.cartLines);
+  const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
   if (lines.length > 0) {
     return (
       <>
@@ -57,5 +55,20 @@ function Body() {
     );
   }
 
-  return <CartEmpty />;
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+      <p className="text-base font-medium">Your cart is empty.</p>
+      <p className="text-muted-foreground mt-2 text-sm">
+        Items will appear here after hitting "Add to Cart"
+      </p>
+      <Button
+        type="button"
+        variant="outline"
+        className="mt-4"
+        onClick={() => setIsCartOpen(false)}
+      >
+        Continue Shopping
+      </Button>
+    </div>
+  );
 }

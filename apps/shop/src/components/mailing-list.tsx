@@ -5,7 +5,32 @@ import { Check, Loader } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 
-type MailingListState = "idle" | "loading" | "success";
+function useTimeoutManager() {
+  const timeoutRef = useRef<number | null>(null);
+
+  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const setNextTimeout = (callback: () => void, delay: number) => {
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = window.setTimeout(callback, delay);
+  };
+
+  return { setNextTimeout };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- const array is the source of truth for the MailingListState union type
+const MAILING_LIST_STATES = ["idle", "loading", "success"] as const;
+type MailingListState = (typeof MAILING_LIST_STATES)[number];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getButtonAriaLabel(status: MailingListState) {
@@ -30,26 +55,9 @@ function useMailingList() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<MailingListState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const timeoutRef = useRef<number | null>(null);
+  const { setNextTimeout } = useTimeoutManager();
 
   const isSubmitting = status !== "idle";
-
-  // eslint-disable-next-line no-restricted-syntax -- cleanup timer on unmount (external browser timer)
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const setNextTimeout = (callback: () => void, delay: number) => {
-    if (timeoutRef.current !== null) {
-      window.clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = window.setTimeout(callback, delay);
-  };
 
   const handleEmailChange = (nextEmail: string) => {
     setEmail(nextEmail);

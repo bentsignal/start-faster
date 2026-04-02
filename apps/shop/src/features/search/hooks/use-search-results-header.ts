@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearch } from "@tanstack/react-router";
 
 import { useSearchFilterActions } from "~/features/search/hooks/use-search-filter-actions";
-import { useSearchProducts } from "~/features/search/hooks/use-search-products";
+import { useSearchTotalCount } from "~/features/search/hooks/use-search-total-count";
 
 export function useSearchResultsHeader() {
   const [sortOpen, setSortOpen] = useState(false);
@@ -17,7 +17,7 @@ export function useSearchResultsHeader() {
     from: "/search",
     select: (s) => s.filters,
   });
-  const { totalCount } = useSearchProducts();
+  const totalCount = useSearchTotalCount();
   const { onSortByChange, onSortDirectionChange, isFiltering } =
     useSearchFilterActions();
   const activeFilterCount = selectedFilters.length;

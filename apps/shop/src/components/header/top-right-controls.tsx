@@ -12,8 +12,18 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
-import { useCart } from "~/features/cart/hooks/use-cart";
 import { useCartStore } from "~/features/cart/store";
+
+function useTopRightControls() {
+  const isSignedIn = useRouteContext({
+    from: "__root__",
+    select: (context) => context.auth.isSignedIn,
+  });
+  const cartQuantity = useCartStore((store) => store.cartQuantity);
+  const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
+
+  return { isSignedIn, cartQuantity, setIsCartOpen };
+}
 
 function AccountIcon() {
   return (
@@ -25,12 +35,7 @@ function AccountIcon() {
 }
 
 export function TopRightControls() {
-  const isSignedIn = useRouteContext({
-    from: "__root__",
-    select: (context) => context.auth.isSignedIn,
-  });
-  const { cartQuantity } = useCart();
-  const setIsCartOpen = useCartStore((store) => store.setIsCartOpen);
+  const { isSignedIn, cartQuantity, setIsCartOpen } = useTopRightControls();
 
   return (
     <div className="text-muted-foreground flex w-48 items-center justify-end gap-2 space-x-4">

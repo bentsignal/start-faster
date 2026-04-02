@@ -78,6 +78,9 @@ catalogs:
     eslint:
       specifier: ^9.38.0
       version: 9.39.4
+    fast-deep-equal:
+      specifier: ^3.1.3
+      version: 3.1.3
     great-time:
       specifier: ^1.0.0
       version: 1.0.0
@@ -498,6 +501,9 @@ importers:
       convex:
         specifier: 'catalog:'
         version: 1.31.6(react@19.2.4)
+      fast-deep-equal:
+        specifier: 'catalog:'
+        version: 3.1.3
       great-time:
         specifier: 'catalog:'
         version: 1.0.0

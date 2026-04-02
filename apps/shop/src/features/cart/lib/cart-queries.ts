@@ -1,6 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { getCartFn } from "~/features/cart/lib/manage-cart";
+import { cartById } from "@acme/shopify/storefront/cart";
+
+import { assertNonEmptyValue } from "~/features/cart/lib/cart-validation";
+import { normalizeCart } from "~/features/cart/lib/manage-cart";
+import { shopify } from "~/lib/shopify";
 import { getCartFromCookie } from "../server/cart-cookie";
 
 export const cartQueries = {
@@ -10,34 +14,32 @@ export const cartQueries = {
     }),
   cookie: () =>
     queryOptions({
-      queryKey: [...cartQueries.all().queryKey, "cookie"] as const,
+      queryKey: ["cart", "cookie"] as const,
       queryFn: getCartFromCookie,
       staleTime: Infinity,
       gcTime: Infinity,
     }),
   detailAll: () =>
     queryOptions({
-      queryKey: [...cartQueries.all().queryKey, "detail"] as const,
+      queryKey: ["cart", "detail"] as const,
     }),
   detail: (cartId: string | null) =>
     queryOptions({
-      queryKey: [...cartQueries.detailAll().queryKey, cartId] as const,
+      queryKey: ["cart", "detail", cartId] as const,
       queryFn: async () => {
         if (cartId === null) {
           return null;
         }
-        return getCartFn({
-          data: {
-            cartId,
+
+        assertNonEmptyValue(cartId, "cartId");
+
+        const response = await shopify.request(cartById, {
+          variables: {
+            id: cartId,
           },
         });
+
+        return normalizeCart(response.data?.cart);
       },
     }),
-};
-
-export const cartMutationKeys = {
-  lineAll: ["cart", "mutation", "line"] as const,
-  lineAdd: ["cart", "mutation", "line", "add"] as const,
-  lineRemove: ["cart", "mutation", "line", "remove"] as const,
-  lineUpdate: ["cart", "mutation", "line", "update"] as const,
 };

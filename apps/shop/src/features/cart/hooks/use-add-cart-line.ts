@@ -4,39 +4,18 @@ import { toast } from "@acme/ui/toaster";
 
 import type { CartMutationContext } from "./cart-mutation-shared";
 import type { OptimisticCartLineDraft } from "~/features/cart/types";
-import {
-  cartMutationKeys,
-  cartQueries,
-} from "~/features/cart/lib/cart-queries";
+import { cartMutations } from "~/features/cart/lib/cart-mutations";
+import { cartQueries } from "~/features/cart/lib/cart-queries";
 import {
   clearStoredCartQuantity,
   storeCart,
 } from "~/features/cart/lib/cart-storage";
-import { addCartLineFn } from "~/features/cart/lib/manage-cart";
-import { CART_WRITE_SCOPE_ID } from "./cart-mutation-shared";
 
 function useInternalAddCartLineMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: cartMutationKeys.lineAdd,
-    scope: {
-      id: CART_WRITE_SCOPE_ID,
-    },
-    mutationFn: async (variables: {
-      cartId?: string;
-      merchandiseId: string;
-      quantity?: number;
-      optimisticLine?: OptimisticCartLineDraft;
-    }) => {
-      return addCartLineFn({
-        data: {
-          cartId: variables.cartId,
-          merchandiseId: variables.merchandiseId,
-          quantity: variables.quantity ?? 1,
-        },
-      });
-    },
+    ...cartMutations.lineAdd(),
     onMutate: async (variables): Promise<CartMutationContext> => {
       const activeQueryKey = cartQueries.detail(
         variables.cartId ?? null,

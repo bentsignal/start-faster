@@ -5,12 +5,12 @@ import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generate
 import { QuickLink } from "@acme/features/quick-link";
 
 import { Image } from "~/components/image";
-import { formatPrice } from "~/features/product/lib/price";
 import {
   PREDICTIVE_SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
 import { useSearchBarStore } from "~/features/search/stores/search-bar-store";
+import { formatMoney } from "~/lib/format-money";
 
 type PredictiveSearchProduct = NonNullable<
   GetPredictiveSearchQuery["predictiveSearch"]
@@ -78,7 +78,7 @@ function PredictiveProductRow({
 }) {
   const imageUrl = product.featuredImage?.url;
   const imageAlt = product.featuredImage?.altText ?? product.title;
-  const price = formatPrice(
+  const price = formatMoney(
     product.priceRange.minVariantPrice.amount,
     product.priceRange.minVariantPrice.currencyCode,
   );

@@ -2,7 +2,7 @@ import { QuickLink } from "@acme/features/quick-link";
 
 import type { ProductResultNode } from "~/features/product/types";
 import { Image } from "~/components/image";
-import { formatPrice } from "~/features/product/lib/price";
+import { formatMoney } from "~/lib/format-money";
 
 export function SearchResultProductCard({
   product,
@@ -173,7 +173,7 @@ function ProductCardTitle({
 }
 
 function useProductPrice(product: ProductResultNode) {
-  return formatPrice(
+  return formatMoney(
     product.priceRange.minVariantPrice.amount,
     product.priceRange.minVariantPrice.currencyCode,
   );

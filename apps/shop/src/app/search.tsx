@@ -10,12 +10,16 @@ import {
   SEARCH_PAGE_SIZE,
   searchQueries,
 } from "~/features/search/lib/search-queries";
+import {
+  sortBySchema,
+  sortDirectionSchema,
+} from "~/features/shared/filters/sort-schemas";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({
     q: z.string().default(""),
-    sortBy: z.enum(["relevance", "price"]).default("relevance"),
-    sortDirection: z.enum(["asc", "desc"]).default("desc"),
+    sortBy: sortBySchema,
+    sortDirection: sortDirectionSchema,
     filters: z
       .unknown()
       .optional()

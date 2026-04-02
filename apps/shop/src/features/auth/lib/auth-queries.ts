@@ -4,7 +4,7 @@ import { convert } from "great-time";
 import { getAuthState } from "~/features/auth/server/get-auth-state";
 
 export const authQueries = {
-  state: () =>
+  getAuth: () =>
     queryOptions({
       queryKey: ["auth"],
       queryFn: getAuthState,

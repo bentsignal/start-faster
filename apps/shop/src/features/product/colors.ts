@@ -2,8 +2,7 @@
  * Known product color names mapped to their hex values.
  * Used to render visual color swatches on the PDP instead of plain text buttons.
  */
-// eslint-disable-next-line no-restricted-syntax -- Record<string, string> is needed to allow arbitrary string key lookups
-const KNOWN_COLORS: Record<string, string> = {
+const KNOWN_COLORS = {
   White: "#F9F9F9",
   "Athletic Heather": "#CCCED5",
   Black: "#0D0D0D",
@@ -21,14 +20,15 @@ const KNOWN_COLORS: Record<string, string> = {
   Orchid: "#E3DDE3",
   "Heather Grey": "#CDD1D6",
   Sandshell: "#E8E2D0",
-};
+} as const satisfies Record<string, string>;
 
 /**
  * Look up a hex color for a given color name.
  * Returns the hex string if found, or undefined for unknown colors.
  */
 export function getKnownColorHex(colorName: string) {
-  return KNOWN_COLORS[colorName];
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- runtime lookup against a const map requires widening the key type
+  return (KNOWN_COLORS as Record<string, string>)[colorName];
 }
 
 /**

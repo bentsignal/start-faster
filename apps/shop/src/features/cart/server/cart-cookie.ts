@@ -6,13 +6,12 @@ import {
   CART_QUANTITY_COOKIE_KEY,
 } from "~/features/cart/lib/cart-storage";
 
-export interface CartCookieState {
-  id: string | null;
-  quantity: number;
-}
+export type CartCookieState =
+  | { id: string; quantity: number }
+  | { id: null; quantity: 0 };
 
 export const getCartFromCookie = createServerFn({ method: "GET" }).handler(
-  (): CartCookieState => {
+  () => {
     const cartIdCookie = getCookie(CART_ID_COOKIE_KEY);
     const cartQuantityCookie = getCookie(CART_QUANTITY_COOKIE_KEY);
 
@@ -21,24 +20,19 @@ export const getCartFromCookie = createServerFn({ method: "GET" }).handler(
         ? null
         : cartIdCookie;
 
+    if (id === null) {
+      return { id: null, quantity: 0 };
+    }
+
     if (cartQuantityCookie === undefined || cartQuantityCookie.length === 0) {
-      return {
-        id,
-        quantity: 0,
-      };
+      return { id, quantity: 0 };
     }
 
     const parsedQuantity = Number.parseInt(cartQuantityCookie, 10);
     if (Number.isNaN(parsedQuantity) || parsedQuantity < 0) {
-      return {
-        id,
-        quantity: 0,
-      };
+      return { id, quantity: 0 };
     }
 
-    return {
-      id,
-      quantity: parsedQuantity,
-    };
+    return { id, quantity: parsedQuantity };
   },
 );

@@ -47,6 +47,11 @@ function getLatestShipmentStatuses(order: CustomerOrder) {
   });
 }
 
+export type OrderStatus =
+  | { label: "Delivered"; tone: "success" }
+  | { label: "Shipped"; tone: "accent" }
+  | { label: "In progress"; tone: "primary" };
+
 export function getCustomerOrderStatus(order: CustomerOrder) {
   const latestShipmentStatuses = getLatestShipmentStatuses(order);
 
@@ -54,7 +59,7 @@ export function getCustomerOrderStatus(order: CustomerOrder) {
     return {
       label: "Delivered",
       tone: "success",
-    } as const;
+    } as const satisfies OrderStatus;
   }
 
   if (
@@ -62,14 +67,11 @@ export function getCustomerOrderStatus(order: CustomerOrder) {
     latestShipmentStatuses.length > 0 ||
     order.fulfillmentStatus === OrderFulfillmentStatus.Fulfilled
   ) {
-    return {
-      label: "Shipped",
-      tone: "accent",
-    } as const;
+    return { label: "Shipped", tone: "accent" } as const satisfies OrderStatus;
   }
 
   return {
     label: "In progress",
     tone: "primary",
-  } as const;
+  } as const satisfies OrderStatus;
 }

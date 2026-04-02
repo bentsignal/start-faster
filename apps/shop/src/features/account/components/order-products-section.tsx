@@ -1,83 +1,17 @@
 import { QuickLink } from "@acme/features/quick-link";
 
+import type {
+  DisplayedMoney,
+  ProductImage,
+} from "~/features/account/lib/order-product-helpers";
 import type { OrderListItem } from "~/features/account/lib/orders-list-data";
 import type {
   CustomerOrderLineItem,
   LiveOrderProducts,
 } from "~/features/account/types";
 import { Image } from "~/components/image";
-
-type LiveOrderProduct = Extract<
-  NonNullable<LiveOrderProducts[number]>,
-  { __typename: "Product" }
->;
-
-type ProductImage = CustomerOrderLineItem["image"] | null;
-
-function formatMoney(amount: number | string, currencyCode: string) {
-  const parsedAmount =
-    typeof amount === "number" ? amount : Number.parseFloat(amount);
-  if (Number.isNaN(parsedAmount)) {
-    return `${amount} ${currencyCode}`;
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currencyCode,
-  }).format(parsedAmount);
-}
-
-function getLiveProduct(
-  lineItem: CustomerOrderLineItem,
-  liveProducts: LiveOrderProducts | undefined,
-) {
-  return liveProducts?.find(
-    (product): product is LiveOrderProduct =>
-      product?.__typename === "Product" && product.id === lineItem.productId,
-  );
-}
-
-function getDisplayedMoney(
-  lineItem: CustomerOrderLineItem,
-  liveProducts: LiveOrderProducts | undefined,
-) {
-  const liveProduct = getLiveProduct(lineItem, liveProducts);
-
-  return (
-    lineItem.totalPrice ??
-    lineItem.price ??
-    (liveProduct?.__typename === "Product"
-      ? liveProduct.priceRange.minVariantPrice
-      : null)
-  );
-}
-
-function resolveProductImage(
-  lineItem: CustomerOrderLineItem,
-  liveProduct: LiveOrderProduct | undefined,
-) {
-  const liveVariantImage = liveProduct?.variants.nodes.find(
-    (variant) => variant.id === lineItem.variantId,
-  )?.image;
-
-  return (
-    liveVariantImage ?? lineItem.image ?? liveProduct?.featuredImage ?? null
-  );
-}
-
-function resolveProductDisplayProps(
-  lineItem: CustomerOrderLineItem,
-  liveProducts: LiveOrderProducts | undefined,
-) {
-  const liveProduct = getLiveProduct(lineItem, liveProducts);
-  const image = resolveProductImage(lineItem, liveProduct);
-  const title = liveProduct?.title ?? lineItem.title;
-  const price = getDisplayedMoney(lineItem, liveProducts);
-  const shouldShowVariant =
-    lineItem.variantTitle !== null && lineItem.variantTitle !== "Default Title";
-
-  return { liveProduct, image, title, price, shouldShowVariant };
-}
+import { resolveProductDisplayProps } from "~/features/account/lib/order-product-helpers";
+import { formatMoney } from "~/lib/format-money";
 
 function OrderProductTile({
   lineItem,
@@ -161,7 +95,7 @@ function OrderProductText({
   shouldShowVariant: boolean;
   isLinkedTitle: boolean;
   isUnavailable: boolean;
-  price: ReturnType<typeof getDisplayedMoney>;
+  price: DisplayedMoney;
 }) {
   return (
     <div className="min-w-0 flex-1">
@@ -214,7 +148,7 @@ function OrderProductContent({
   shouldShowVariant: boolean;
   isLinkedTitle: boolean;
   isUnavailable: boolean;
-  price: ReturnType<typeof getDisplayedMoney>;
+  price: DisplayedMoney;
 }) {
   return (
     <>

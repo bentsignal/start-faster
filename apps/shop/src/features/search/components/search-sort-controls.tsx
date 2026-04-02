@@ -1,53 +1,8 @@
-import { ChevronDown } from "lucide-react";
-
-import { cn } from "@acme/ui/utils";
-
 import type {
-  SearchSortBy,
-  SearchSortDirection,
-} from "~/features/search/lib/search-queries";
-
-function SortSelect<TValue extends string>({
-  value,
-  onChange,
-  className,
-  disabled,
-  options,
-}: {
-  value: TValue;
-  onChange: (value: TValue) => void;
-  className?: string;
-  disabled: boolean;
-  options: { value: TValue; label: string }[];
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        disabled={disabled}
-        className={cn(
-          "text-foreground disabled:text-muted-foreground h-8 w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-medium focus:outline-none disabled:cursor-not-allowed",
-          className,
-        )}
-        onChange={(event) => {
-          const nextValue = options.find(
-            (option) => option.value === event.target.value,
-          )?.value;
-          if (nextValue !== undefined) {
-            onChange(nextValue);
-          }
-        }}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2" />
-    </div>
-  );
-}
+  SortBy,
+  SortDirection,
+} from "~/features/shared/filters/sort-schemas";
+import { SortSelect } from "~/features/shared/filters/components/sort-select";
 
 export function SortByControl({
   sortBy,
@@ -55,8 +10,8 @@ export function SortByControl({
   className,
   disabled = false,
 }: {
-  sortBy: SearchSortBy;
-  onSortByChange: (value: SearchSortBy) => void;
+  sortBy: SortBy;
+  onSortByChange: (value: SortBy) => void;
   className?: string;
   disabled?: boolean;
 }) {
@@ -69,6 +24,7 @@ export function SortByControl({
         { value: "relevance", label: "Relevance" },
         { value: "price", label: "Price" },
       ]}
+      ariaLabel="Sort by"
       onChange={onSortByChange}
     />
   );
@@ -80,8 +36,8 @@ export function SortDirectionControl({
   className,
   disabled = false,
 }: {
-  sortDirection: SearchSortDirection;
-  onSortDirectionChange: (value: SearchSortDirection) => void;
+  sortDirection: SortDirection;
+  onSortDirectionChange: (value: SortDirection) => void;
   className?: string;
   disabled?: boolean;
 }) {
@@ -94,6 +50,7 @@ export function SortDirectionControl({
         { value: "asc", label: "Low to high" },
         { value: "desc", label: "High to low" },
       ]}
+      ariaLabel="Sort direction"
       onChange={onSortDirectionChange}
     />
   );

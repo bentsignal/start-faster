@@ -1,6 +1,12 @@
 import type { Product } from "~/features/product/types";
 
-export type OptionValueAvailability = "available" | "sold-out" | "unavailable";
+export const OPTION_VALUE_AVAILABILITY_STATES = [
+  "available",
+  "sold-out",
+  "unavailable",
+] as const;
+export type OptionValueAvailability =
+  (typeof OPTION_VALUE_AVAILABILITY_STATES)[number];
 
 export function getOptionValueAvailability({
   variants,

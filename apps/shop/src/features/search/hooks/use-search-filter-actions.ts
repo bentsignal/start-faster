@@ -3,13 +3,13 @@ import { useNavigate, useRouterState, useSearch } from "@tanstack/react-router";
 import type { ProductFilter } from "@acme/shopify/storefront/types";
 
 import type {
-  SearchSortBy,
-  SearchSortDirection,
-} from "~/features/search/lib/search-queries";
+  SortBy,
+  SortDirection,
+} from "~/features/shared/filters/sort-schemas";
 import {
   applyPriceRangeFilter,
   toggleFilter,
-} from "~/features/search/lib/search-filter-utils";
+} from "~/features/shared/filters/filter-utils";
 
 // ---------------------------------------------------------------------------
 // Read-only hook for loading state (used by components that only render)
@@ -28,8 +28,8 @@ type SearchNavigateFn = (opts: {
   to: "/search";
   search: {
     q: string;
-    sortBy: SearchSortBy;
-    sortDirection: SearchSortDirection;
+    sortBy: SortBy;
+    sortDirection: SortDirection;
     filters: ProductFilter[];
   };
 }) => Promise<void>;
@@ -41,18 +41,18 @@ function buildNavigationActions({
   navigate: SearchNavigateFn;
   searchState: {
     q: string;
-    sortBy: SearchSortBy;
-    sortDirection: SearchSortDirection;
+    sortBy: SortBy;
+    sortDirection: SortDirection;
     filters: ProductFilter[];
   };
 }) {
-  const onSortByChange = (nextSortBy: SearchSortBy) =>
+  const onSortByChange = (nextSortBy: SortBy) =>
     navigate({
       to: "/search",
       search: { ...searchState, sortBy: nextSortBy },
     });
 
-  const onSortDirectionChange = (nextSortDirection: SearchSortDirection) =>
+  const onSortDirectionChange = (nextSortDirection: SortDirection) =>
     navigate({
       to: "/search",
       search: { ...searchState, sortDirection: nextSortDirection },

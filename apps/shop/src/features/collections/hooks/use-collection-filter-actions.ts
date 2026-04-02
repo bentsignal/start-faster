@@ -8,13 +8,13 @@ import {
 import type { ProductFilter } from "@acme/shopify/storefront/types";
 
 import type {
-  CollectionSortBy,
-  CollectionSortDirection,
-} from "~/features/collections/lib/collection-queries";
+  SortBy,
+  SortDirection,
+} from "~/features/shared/filters/sort-schemas";
 import {
   applyPriceRangeFilter,
   toggleFilter,
-} from "~/features/collections/lib/collection-filter-utils";
+} from "~/features/shared/filters/filter-utils";
 
 function navigateToCollection({
   navigate,
@@ -27,14 +27,14 @@ function navigateToCollection({
     to: "/collections/$handle";
     params: { handle: string };
     search: {
-      sortBy: CollectionSortBy;
-      sortDirection: CollectionSortDirection;
+      sortBy: SortBy;
+      sortDirection: SortDirection;
       filters: ProductFilter[];
     };
   }) => Promise<void>;
   handle: string;
-  sortBy: CollectionSortBy;
-  sortDirection: CollectionSortDirection;
+  sortBy: SortBy;
+  sortDirection: SortDirection;
   filters: ProductFilter[];
 }) {
   return navigate({
@@ -61,7 +61,7 @@ export function useCollectionFilterActions() {
 
   const isFiltering = useRouterState({ select: (s) => s.isLoading });
 
-  const onSortByChange = (nextSortBy: CollectionSortBy) =>
+  const onSortByChange = (nextSortBy: SortBy) =>
     navigateToCollection({
       navigate,
       handle,
@@ -70,7 +70,7 @@ export function useCollectionFilterActions() {
       filters: searchState.urlFilters,
     });
 
-  const onSortDirectionChange = (nextSortDirection: CollectionSortDirection) =>
+  const onSortDirectionChange = (nextSortDirection: SortDirection) =>
     navigateToCollection({
       navigate,
       handle,

@@ -1,14 +1,8 @@
-import { useCart } from "~/features/cart/hooks/use-cart";
-import { formatPrice } from "~/features/product/lib/price";
+import { useCartStore } from "~/features/cart/store";
 import { CartCheckoutButton } from "./cart-checkout-button";
 
 export function CartSummary() {
-  const { cart } = useCart();
-  const amount = cart?.cost.totalAmount;
-  const totalLabel =
-    amount === undefined
-      ? formatPrice(0, "USD")
-      : formatPrice(amount.amount, amount.currencyCode);
+  const totalLabel = useCartStore((store) => store.totalLabel);
 
   return (
     <footer className="border-t p-4 sm:p-6">

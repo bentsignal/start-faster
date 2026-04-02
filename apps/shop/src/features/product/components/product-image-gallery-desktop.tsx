@@ -5,12 +5,12 @@ import { useParams } from "@tanstack/react-router";
 import { cn } from "@acme/ui/utils";
 
 import type { ProductGalleryImage } from "~/features/product/types";
-import { stickyHeaderTokens } from "~/components/header/header";
 import { Image } from "~/components/image";
 import { useDesktopProductImageGallery } from "~/features/product/hooks/use-desktop-product-image-gallery";
 import { useGalleryOrdering } from "~/features/product/hooks/use-gallery-ordering";
 import { productQueries } from "~/features/product/lib/product-queries";
 import { useProductGalleryStore } from "~/features/product/stores/product-gallery-store";
+import { stickyHeaderTokens } from "~/lib/layout-tokens";
 
 export function ProductImageGalleryDesktop() {
   const { images, productTitle } = useDesktopGalleryHook();

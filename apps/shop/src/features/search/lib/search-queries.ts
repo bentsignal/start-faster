@@ -7,15 +7,16 @@ import {
 } from "@acme/shopify/storefront/search";
 import { SearchSortKeys } from "@acme/shopify/storefront/types";
 
+import type {
+  SortBy,
+  SortDirection,
+} from "~/features/shared/filters/sort-schemas";
 import { shopify } from "~/lib/shopify";
 
 export const PREDICTIVE_SEARCH_PAGE_SIZE = 6;
 export const SEARCH_PAGE_SIZE = 30;
 
-export type SearchSortBy = "relevance" | "price";
-export type SearchSortDirection = "asc" | "desc";
-
-function getSearchSortKey(sortBy: SearchSortBy) {
+function getSearchSortKey(sortBy: SortBy) {
   if (sortBy === "price") {
     return SearchSortKeys.Price;
   }
@@ -46,8 +47,8 @@ export const searchQueries = {
     first = SEARCH_PAGE_SIZE,
   }: {
     query: string;
-    sortBy: SearchSortBy;
-    sortDirection: SearchSortDirection;
+    sortBy: SortBy;
+    sortDirection: SortDirection;
     filters: ProductFilter[];
     first?: number;
   }) =>

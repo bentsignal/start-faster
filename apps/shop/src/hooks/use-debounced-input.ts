@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useDebouncedInput(options?: {
+export function useDebouncedInput(options?: {
   time?: number;
   initialValue?: string;
 }) {

@@ -14,6 +14,10 @@ import {
   collectionQueries,
 } from "~/features/collections/lib/collection-queries";
 import {
+  sortBySchema,
+  sortDirectionSchema,
+} from "~/features/shared/filters/sort-schemas";
+import {
   buildSeoHead,
   defaultSeoDescription,
   toSeoDescription,
@@ -24,8 +28,8 @@ export const Route = createFileRoute("/collections/$handle")({
     handle: z.string(),
   }),
   validateSearch: z.object({
-    sortBy: z.enum(["relevance", "price"]).default("relevance"),
-    sortDirection: z.enum(["asc", "desc"]).default("desc"),
+    sortBy: sortBySchema,
+    sortDirection: sortDirectionSchema,
     filters: z
       .unknown()
       .optional()
