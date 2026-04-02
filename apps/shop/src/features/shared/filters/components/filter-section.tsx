@@ -170,7 +170,7 @@ export function PriceRangeFilterContent({
           value={priceMin}
           placeholder="Min"
           disabled={isFiltering}
-          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
+          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-base leading-6 lg:text-sm"
           onChange={(event) => setPriceMin(event.target.value)}
         />
         <input
@@ -181,7 +181,7 @@ export function PriceRangeFilterContent({
           value={priceMax}
           placeholder="Max"
           disabled={isFiltering}
-          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-sm leading-6"
+          className="bg-input/30 border-input h-10 rounded-lg px-3 py-2 text-base leading-6 lg:text-sm"
           onChange={(event) => setPriceMax(event.target.value)}
         />
       </div>
