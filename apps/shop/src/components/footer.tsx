@@ -21,8 +21,8 @@ const footerLinks = [
 export function Footer() {
   return (
     <footer className="border-border border-t pt-14 pb-10">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
+      <div className="mx-auto max-w-5xl px-6 md:px-16 lg:px-6">
+        <div className="grid grid-cols-1 gap-y-10 text-center md:grid-cols-4 md:gap-x-8 md:text-left">
           {footerLinks.map((section) => (
             <div key={section.title}>
               <h3 className="mb-4 text-sm font-medium">{section.title}</h3>
