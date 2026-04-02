@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- QuickLink causes the login modal to open and close instantly; Link is needed here for search-param-only navigation
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, User } from "lucide-react";
 

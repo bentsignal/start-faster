@@ -51,6 +51,16 @@ const strictTsSyntaxSelectors = [
 
 const strictReactSyntaxSelectors = [
   {
+    selector: "TryStatement[finalizer]",
+    message:
+      "Do not use `finally` blocks. The React Compiler cannot optimize components and hooks that use `finally` with try/catch blocks..",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='img']",
+    message:
+      "Use the app's `Image` component (`import { Image } from '~/components/image'`) instead of a raw `<img>` tag. The custom component uses Vercel image optimization.",
+  },
+  {
     selector:
       "CallExpression:matches([callee.name='useSearch'], [callee.property.name='useSearch']):not(:has(Property[key.name='select']))",
     message:
@@ -110,6 +120,12 @@ const reactImportRestrictions = [
     importNames: ["useQuery"],
     message:
       "Prefer `useSuspenseQuery` with data preloaded via `ensureQueryData` in the route loader. If `useQuery` is genuinely needed (e.g. conditional fetching), add an eslint-disable comment explaining why.",
+  },
+  {
+    name: "@tanstack/react-router",
+    importNames: ["Link"],
+    message:
+      "Use `QuickLink` from `@acme/features/quick-link` instead. It has the same API as `Link` but with optimizations. If `Link` is genuinely needed, add an eslint-disable comment explaining why.",
   },
 ] as const;
 

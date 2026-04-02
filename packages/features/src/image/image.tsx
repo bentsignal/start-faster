@@ -144,6 +144,7 @@ export function Image({
   }
 
   return (
+    // eslint-disable-next-line no-restricted-syntax -- This is the shared Image component implementation that wraps <img>
     <img
       ref={setImageRef}
       loading={loading}
