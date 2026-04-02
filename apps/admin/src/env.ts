@@ -25,7 +25,7 @@ export const env = createEnv({
       .default("production"),
     VITE_CONVEX_URL: z.url(),
     VITE_SITE_URL: z.url(),
-    VITE_SHOP_URL: z.url(),
+    VITE_CMS_URL: z.url(),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,

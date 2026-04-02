@@ -7,20 +7,10 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(async ({ mode }) => {
-  const [{ createImageConfig }, { imageWidths }, { env }] = await Promise.all([
-    import("@acme/features/image/config"),
-    import("@acme/features/image/sizes"),
-    import("./src/env"),
-  ]);
+  const { env } = await import("./src/env");
 
   const isDevelopment =
     mode === "development" || env.VITE_NODE_ENV === "development";
-
-  const imageConfig = createImageConfig({
-    uploadthingUrl: env.VITE_UT_URL,
-    shopifyImageUrlStoreId: env.VITE_SHOPIFY_IMAGE_URL_STORE_ID,
-    sizes: [...imageWidths],
-  });
 
   return {
     server: {
@@ -44,14 +34,7 @@ export default defineConfig(async ({ mode }) => {
           plugins: ["babel-plugin-react-compiler"],
         },
       }),
-      nitro({
-        vercel: {
-          config: {
-            version: 3,
-            images: imageConfig,
-          },
-        },
-      }),
+      nitro(),
     ],
   };
 });
