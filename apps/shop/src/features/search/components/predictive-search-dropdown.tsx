@@ -20,13 +20,21 @@ export function PredictiveSearchDropdown() {
   const hidePredictiveDropdown = useSearchBarStore(
     (s) => s.isPredictiveOpen === false || s.searchTerm.trim().length < 2,
   );
+  const inputRef = useSearchBarStore((s) => s.inputRef);
 
   if (hidePredictiveDropdown) {
     return null;
   }
 
+  function blurInput() {
+    inputRef.current?.blur();
+  }
+
   return (
-    <div className="bg-background absolute top-full right-0 left-0 z-50 mt-2 rounded-xl border p-3 shadow-lg">
+    <div
+      className="bg-background absolute top-full right-0 left-0 z-50 mt-2 rounded-xl border p-3 shadow-lg"
+      onMouseDown={blurInput}
+    >
       <div className="max-h-96 space-y-3 overflow-auto">
         <PredictiveProductsSection />
         <ViewAllResultsLink />
