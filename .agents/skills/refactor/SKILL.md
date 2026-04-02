@@ -3,11 +3,10 @@ name: refactor
 description: Code refactor to improve implementation details, only use when explicitly requested by user.
 ---
 
-# Refactor
+# Overview
 
-This skill turns "working enough" code into code that is robust, maintainable, and aligned with the project's standards. It is activated only when the user explicitly asks for a refactor, audit, cleanup pass, or specifically asks you to use the `Refactor` skill.
-
-Instead of reading every rule yourself and trying to apply them all at once, you delegate to subagents — one per skill. Each subagent becomes a deep expert on its skill and evaluates the current changes entirely through that lens.
+This skill turns "it works" code into code that is robust, maintainable, and aligned with the project's standards.
+Instead of reading every rule yourself and trying to apply them all at once, delegate to subagents, one per skill. Each subagent becomes a deep expert on its skill and evaluates the current changes entirely through that lens.
 
 ## 1. Determine the scope
 
@@ -17,10 +16,7 @@ If the user does not specify a scope, the default is the entire active change se
 
 ## 2. Spawn one subagent per skill
 
-Spawn two subagents in parallel:
-
-1. **TypeScript** — use the `typescript` skill (invoke it to load the full skill file including any references)
-2. **React** — use the `react` skill (invoke it to load the full skill file including any references)
+Look at which files were changed and determine which skills are necessary to refactor. Once you've figured that out, spawn one subagent per skill so that that specific subagent focuses solely on that one skill. **_IMPORTANT_**: Typically, changes don't require every single skill to be used, so make sure you don't use skills that aren't relevant to the changes made.
 
 For each subagent, provide these instructions:
 
@@ -28,19 +24,14 @@ For each subagent, provide these instructions:
 2. **Read-only constraint:** Do NOT edit, create, or delete any files. Your only job is to read code, analyze it, and return findings.
 3. **Skill:** Read the skill file and all of its reference files carefully and completely before doing anything else.
 4. **Getting the changes:** Run `git diff` and `git diff --cached` to see the current change set. If the user specified a scope (e.g. a specific package or app), filter to only those paths — for example `git diff -- packages/convex/` or `git diff -- apps/cms/`. Also read the full contents of every changed file so you have complete context, not just the diff hunks.
-5. **What to return:** Report **every single finding** — no filtering, no prioritizing, no "I'll skip the small stuff." Every violation of the skill standards, from major architectural missteps down to the smallest style nit, must be included. Do not summarize or group findings to save space. Do not omit issues you consider minor. The main agent needs the complete, unabridged list to present to the user. Look for places where the implementation approach itself is wrong and needs to be overhauled — but also catch every small issue along the way. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions — recommend ripping out the current approach and replacing it with one that properly aligns with the standards. Partial adjustments are not enough when the foundation is wrong.
+5. **What to return:** Report **every single finding** — no filtering, no prioritizing, no "I'll skip the small stuff." Every violation of the skill standards, from major architectural missteps down to the smallest style nit, must be included. Do not summarize or group findings to save space. Do not omit issues you consider minor. The main agent needs the complete, unabridged list to present to the user. Look for places where the implementation approach itself is wrong and needs to be overhauled — but also catch every small issue along the way. If the code uses the wrong patterns, the wrong architecture, the wrong abstractions - recommend ripping out the current approach and replacing it with one that properly aligns with the standards. Partial adjustments are not enough when the foundation is wrong.
    For each finding, include:
-
-- What is wrong with the current approach and why it does not satisfy the standard
-- Where the problem is (file path and relevant code)
-- What the correct approach looks like — described in enough detail that someone could implement it without having to re-read the skill
-- Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
+   - What is wrong with the current approach and why it does not satisfy the standard
+   - Where the problem is (file path and relevant code)
+   - What the correct approach looks like — described in enough detail that someone could implement it without having to re-read the skill
+   - Why this matters (what breaks, degrades, or becomes unmaintainable if left as-is)
 
 6. **If no issues are found:** Explicitly state that the current changes already satisfy the standards and no changes are needed.
-
-## Prohibited patterns
-
-- **No re-export shims.** When moving a function to a new module, update every import site to point to the new location. Never import a function into the old file and re-export it (under the same or a different name) just to avoid updating consumers. This creates indirection that makes the codebase harder to reason about and defeats the purpose of the refactor.
 
 ## 3. Synthesize findings
 

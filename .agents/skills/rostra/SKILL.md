@@ -5,9 +5,9 @@ description: Guides correct usage of the Rostra state management library (create
 
 ## Overview
 
-The big idea with Rostra is that you define your state at a level where it can be shared with a subtree of components, and then pull it in at lower levels exactly where it's needed. It's designed to avoid prop drilling by allowing you to pull state directly into the leaf component where it is needed, even if the store component is many nodes higher in the tree.
+The TL;DR is that its like React context, except with Zustand like selectors to improve performance.
 
-The TL;DR is that you write a React hook just like any other, but then Rostra turns it into a store component. Any component that is a child component of the store component can pull in pieces of the state returned from the store using fine-grained selectors.
+You define your state at a level where it can be shared with a subtree of components, and then pull it in at lower levels exactly where it's needed. It's designed to avoid prop drilling by allowing you to pull state directly into the leaf component where it is needed, even if the store component is many nodes higher in the tree. You write a React hook just like any other, but then Rostra turns it into a store component. Any child component of the store can pull in pieces of the state returned from the store using fine-grained selectors.
 
 ## Core rules
 

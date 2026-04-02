@@ -53,7 +53,7 @@ import { pageQueries } from "~/features/pages/lib/page-queries";
 export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/",
 )({
-  component: RouteComponent,
+  component: PageHub,
   validateSearch: z.object({
     viewport: viewportValidator.default(defaultViewport),
   }),
@@ -71,7 +71,7 @@ export const Route = createFileRoute(
   shouldReload: false,
 });
 
-function RouteComponent() {
+function PageHub() {
   const { title, hasRelease, url, viewport, setViewport } = usePageHub();
 
   if (!hasRelease) {
@@ -291,5 +291,4 @@ Instead, each component that needs cart data should have its own hook (or inline
 - **Route files**: Under ~100 lines. All route-level configuration (search params, loader, beforeLoad, head, meta, error/pending components, static data, etc.) must be defined inline in the route file — never in a separate config file that gets imported. The route file should read like a self-contained table of contents: configuration at the top, then a layout component that composes feature components.
 - **Components**: If a component exceeds ~80 lines or handles more than one distinct UI concern, split it.
 - **Hooks**: If a hook exceeds ~70 lines, extract sub-hooks. Co-located hooks should be specific to their component and return only what that component uses — never raw query objects or large data structures.
-- **Files**: If a file exceeds ~300 lines, it almost certainly has multiple concerns that should be separated.
 - **Business logic in components**: Small inline handlers (a couple of lines) are fine. Anything more substantial should be extracted into a hook or utility function so the component stays focused on rendering.

@@ -63,3 +63,7 @@ function handleResult(result: Result) {
 - Never annotate a variable when the right-hand side already tells the compiler the type.
 - Function parameters are the exception — they have no value to infer from, so explicit types are expected.
 - Heavy annotations are a signal that the code structure should be rethought, not papered over with types.
+
+## Prohibited patterns
+
+- **No re-export shims.** When moving a function to a new module, update every import site to point to the new location. Never import a function into the old file and re-export it (under the same or a different name) just to avoid updating consumers. This creates indirection that makes the codebase harder to reason about and defeats the purpose of the refactor. The same applies to functions that are one line and simply just call another function. These add unnecessary complexity and should always be avoided.

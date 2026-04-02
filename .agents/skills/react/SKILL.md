@@ -7,8 +7,6 @@ description: React coding standards for this project. Use when writing or modify
 
 These are the React standards for this project. Follow them when writing or modifying any React code. For detailed rationale, examples, and edge cases on composition and data patterns, see the individual [reference files](references/).
 
-Many performance rules (useEffect, manual memoization, fine-grained `select`, useContext, file size limits) are now enforced by ESLint. The linter will catch violations automatically — your job is to understand the _why_ so you write correct code in the first place.
-
 ## Composition
 
 - Code should read like prose. Every file should have a clear, single purpose.
@@ -17,7 +15,6 @@ Many performance rules (useEffect, manual memoization, fine-grained `select`, us
 - **Route files**: All route-level configuration (search params, loader, beforeLoad, head, meta, error/pending components, static data, etc.) defined inline — never imported from a separate config file. A route file contains at most **one hook** (showing what data the page needs) and **one route component** (containing the actual page markup). Nothing else — no sub-components, constants, types, or extra hooks. Those belong in feature directories. Do not extract the entire route body into a single feature component; if the route would just render `<SomePage />`, that component's content belongs inline in the route component. If the page is simple, the route component just contains the markup directly.
 - **Components**: Under ~80 lines or one distinct UI concern. Split if larger. Colocate tightly related sub-components in the same file when not reused elsewhere.
 - **Hooks**: Under ~50 lines. Extract sub-hooks when larger. A coordinating hook should mostly be a sequence of calls to smaller hooks plus a return statement.
-- **Files**: Under ~300 lines. Larger files almost certainly have multiple concerns that should be separated.
 - Small inline handlers (a couple of lines) in components are fine. Anything more substantial should be extracted into a hook or utility.
 
 ## State Management
@@ -44,12 +41,7 @@ When uncertain about the right choice, ask the user.
 
 ## Performance
 
-The linter enforces: useEffect is banned (escape hatch with eslint-disable + explanation), manual `useMemo`/`useCallback`/`memo` are banned (escape hatch with eslint-disable), `select` is required on `useSearch`/`useSuspenseQuery`/`useRouteContext`/`useLoaderData`, and `useContext` is banned in favor of Rostra stores.
-
-Beyond what the linter catches, follow these architectural patterns:
-
 - **Push state down**: Own state in the leaf component that needs it, not in a shared parent.
 - **Split at render boundaries**: Separate frequently-changing state from expensive-to-render UI into different components.
 - **Compose with children**: When a wrapper needs state but its children don't depend on it, pass children through as a prop to avoid re-rendering the subtree.
 - **Stable references**: Hoist static objects/arrays to module scope. Inline object/array literals create new references every render, which matters when the receiver relies on referential equality.
-- No using `finally` in Try/Catch blocks.
