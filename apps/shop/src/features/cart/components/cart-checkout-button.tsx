@@ -5,7 +5,7 @@ import { Loader } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/toaster";
 
-import { useCartStore } from "~/features/cart/store";
+import { useCartStore } from "~/features/cart/cart-store";
 import { cartMutations } from "../lib/cart-mutations";
 
 // we want to make sure that all cart mutations finish before we redirect to checkout

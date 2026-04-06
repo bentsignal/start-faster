@@ -1,16 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useMutationState, useSuspenseQuery } from "@tanstack/react-query";
 import { createStore } from "rostra";
 
 import type { Cart } from "~/features/cart/types";
-import { clearCartStorage } from "~/features/cart/hooks/cart-mutation-shared";
-import { useCartStorage } from "~/features/cart/hooks/use-cart-storage";
 import { cartMutations } from "~/features/cart/lib/cart-mutations";
 import {
   applyPendingMutationsToCart,
   parsePendingCartMutation,
 } from "~/features/cart/lib/cart-pending-mutations";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
+import {
+  clearStoredCartId,
+  clearStoredCartQuantity,
+  getCartStorageServerSnapshot,
+  getCartStorageSnapshot,
+  subscribeToCartStorage,
+} from "~/features/cart/lib/cart-storage";
 import { useIsHydrated } from "~/hooks/use-is-hydrated";
 import { formatMoney } from "~/lib/format-money";
 
@@ -96,7 +101,11 @@ function useCartId() {
   });
 
   const isHydrated = useIsHydrated();
-  const storedCart = useCartStorage();
+  const storedCart = useSyncExternalStore(
+    subscribeToCartStorage,
+    getCartStorageSnapshot,
+    getCartStorageServerSnapshot,
+  );
   const cartId = storedCart.id ?? (isHydrated ? null : cookieData.id) ?? null;
 
   return {
@@ -138,7 +147,8 @@ function useOptimisticCart(cartId: string | null) {
       return;
     }
 
-    clearCartStorage();
+    clearStoredCartId();
+    clearStoredCartQuantity();
   }, [cartId, cartData, cartStatus]);
 
   return cart;

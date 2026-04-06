@@ -1,4 +1,4 @@
-import { useCartStore } from "~/features/cart/store";
+import { useCartStore } from "~/features/cart/cart-store";
 import { CartCheckoutButton } from "./cart-checkout-button";
 
 export function CartSummary() {

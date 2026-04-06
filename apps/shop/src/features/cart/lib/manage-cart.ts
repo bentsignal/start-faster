@@ -3,19 +3,10 @@ import {
   cartLinesAddForCart,
 } from "@acme/shopify/storefront/cart";
 
-import type { CartSource } from "~/features/cart/types";
 import { shopify } from "~/lib/shopify";
 
 export interface ShopifyUserError {
   message: string;
-}
-
-export function normalizeCart(cart: CartSource | null | undefined) {
-  if (cart === null || cart === undefined) {
-    return null;
-  }
-
-  return cart;
 }
 
 function getUserErrorMessage(
@@ -78,7 +69,7 @@ export async function tryAddToExistingCart(
     );
   }
 
-  return normalizeCart(existingPayload.cart);
+  return existingPayload.cart ?? null;
 }
 
 export async function createNewCartWithLines(
@@ -97,7 +88,7 @@ export async function createNewCartWithLines(
 
   assertNoUserErrors(newPayload.userErrors, "Unable to create Shopify cart.");
 
-  const newCart = normalizeCart(newPayload.cart);
+  const newCart = newPayload.cart ?? null;
   if (newCart === null) {
     throw new Error("Unable to create Shopify cart.");
   }

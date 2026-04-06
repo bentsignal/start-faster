@@ -6,7 +6,6 @@ import {
 } from "@acme/shopify/storefront/cart";
 
 import type { OptimisticCartLineDraft } from "~/features/cart/types";
-import { CART_WRITE_SCOPE_ID } from "~/features/cart/hooks/cart-mutation-shared";
 import {
   assertNonEmptyValue,
   assertPositiveInteger,
@@ -14,10 +13,11 @@ import {
 import {
   assertNoUserErrors,
   createNewCartWithLines,
-  normalizeCart,
   tryAddToExistingCart,
 } from "~/features/cart/lib/manage-cart";
 import { shopify } from "~/lib/shopify";
+
+const CART_WRITE_SCOPE_ID = "cart-write";
 
 export const cartMutations = {
   lineAll: () => ({
@@ -103,7 +103,7 @@ export const cartMutations = {
           "Unable to update cart quantity.",
         );
 
-        const updatedCart = normalizeCart(payload.cart);
+        const updatedCart = payload.cart ?? null;
         if (updatedCart === null) {
           throw new Error("Unable to update Shopify cart line.");
         }
@@ -141,7 +141,7 @@ export const cartMutations = {
 
         assertNoUserErrors(payload.userErrors, "Unable to remove cart line.");
 
-        const updatedCart = normalizeCart(payload.cart);
+        const updatedCart = payload.cart ?? null;
         if (updatedCart === null) {
           throw new Error("Unable to remove Shopify cart line.");
         }

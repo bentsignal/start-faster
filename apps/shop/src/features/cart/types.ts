@@ -34,6 +34,10 @@ export type CartImage = NonNullable<
 export type CartSelectedOption =
   CartLine["merchandise"]["selectedOptions"][number];
 
+export interface CartMutationContext {
+  previousCartId: string | null;
+}
+
 export interface OptimisticCartLineDraft {
   merchandiseId: string;
   quantity: number;

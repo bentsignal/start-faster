@@ -3,7 +3,6 @@ import { queryOptions } from "@tanstack/react-query";
 import { cartById } from "@acme/shopify/storefront/cart";
 
 import { assertNonEmptyValue } from "~/features/cart/lib/cart-validation";
-import { normalizeCart } from "~/features/cart/lib/manage-cart";
 import { shopify } from "~/lib/shopify";
 import { getCartFromCookie } from "../server/cart-cookie";
 
@@ -39,7 +38,7 @@ export const cartQueries = {
           },
         });
 
-        return normalizeCart(response.data?.cart);
+        return response.data?.cart ?? null;
       },
     }),
 };

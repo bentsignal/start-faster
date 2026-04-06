@@ -8,9 +8,9 @@ import {
   SheetTitle,
 } from "@acme/ui/sheet";
 
+import { useCartStore } from "~/features/cart/cart-store";
 import { CartLineItem } from "~/features/cart/components/cart-line-item";
 import { CartSummary } from "~/features/cart/components/cart-summary";
-import { useCartStore } from "~/features/cart/store";
 
 export function CartSheet() {
   const isCartOpen = useCartStore((store) => store.isCartOpen);

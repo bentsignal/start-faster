@@ -13,7 +13,7 @@ import {
 
 import { secondaryNavLinks } from "~/components/header/nav-data";
 import { VerticalMenu } from "~/components/header/vertical-menu";
-import { useCartStore } from "~/features/cart/store";
+import { useCartStore } from "~/features/cart/cart-store";
 
 function useTopRightControls() {
   const isSignedIn = useRouteContext({

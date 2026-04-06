@@ -2,15 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
 import { ScreenSize, useScreenStore } from "@acme/features/screen";
+import { cn } from "@acme/ui/utils";
 
 import { heroImageUrl } from "~/components/hero";
 import { env } from "~/env";
-import { ProductDetailsPanel } from "~/features/product/components/product-details-panel";
+import { ProductActions } from "~/features/product/components/product-actions";
+import {
+  ProductDescription,
+  ProductPrice,
+  ProductTitle,
+} from "~/features/product/components/product-details-panel";
 import { ProductImageGalleryDesktop } from "~/features/product/components/product-image-gallery-desktop";
 import { ProductImageGalleryMobile } from "~/features/product/components/product-image-gallery-mobile";
+import { ProductOptionSelector } from "~/features/product/components/product-option-selector";
 import { productQueries } from "~/features/product/lib/product-queries";
 import { ProductGalleryStore } from "~/features/product/stores/product-gallery-store";
 import { useIsHydrated } from "~/hooks/use-is-hydrated";
+import { stickyHeaderTokens } from "~/lib/layout-tokens";
 import {
   buildSeoHead,
   defaultSeoDescription,
@@ -118,7 +126,25 @@ function ProductPage() {
             {showMobileGallery ? <ProductImageGalleryMobile /> : null}
             {showDesktopGallery ? <ProductImageGalleryDesktop /> : null}
           </section>
-          <ProductDetailsPanel />
+          <aside
+            className={cn(
+              "px-6 pb-6 sm:px-8 md:px-10 lg:self-stretch lg:px-0",
+              stickyHeaderTokens.spacer,
+            )}
+          >
+            <div className="mx-auto max-w-xl lg:mx-0 lg:h-full lg:max-w-md xl:max-w-lg">
+              <div className={cn(stickyHeaderTokens.stickyContent)}>
+                <ProductTitle />
+                <ProductOptionSelector />
+                <ProductPrice />
+                <ProductActions />
+
+                <div className="bg-border mb-8 h-px" />
+
+                <ProductDescription />
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
     </ProductGalleryStore>

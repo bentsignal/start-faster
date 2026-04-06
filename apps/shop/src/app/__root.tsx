@@ -23,9 +23,9 @@ import { ReactScan } from "~/components/react-scan";
 import { env } from "~/env";
 import { LoginModal } from "~/features/auth/components/login-modal";
 import { authQueries } from "~/features/auth/lib/auth-queries";
+import { CartStore } from "~/features/cart/cart-store";
 import { CartSheet } from "~/features/cart/components/cart-sheet";
 import { cartQueries } from "~/features/cart/lib/cart-queries";
-import { CartStore } from "~/features/cart/store";
 import { shopQueries } from "~/lib/queries";
 
 export const Route = createRootRouteWithContext<RouterContext>()({

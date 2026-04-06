@@ -8,6 +8,7 @@ import { Error } from "~/components/error";
 import { NotFound } from "~/components/not-found";
 import { Pending } from "~/components/pending";
 import { env } from "~/env";
+import { handleCartMutationCacheEvent } from "~/features/cart/lib/cart-cache-sync";
 import { cartMutations } from "~/features/cart/lib/cart-mutations";
 import { routeTree } from "./routeTree.gen";
 
@@ -34,6 +35,10 @@ export function getRouter() {
     },
   });
   convexQueryClient.connect(queryClient);
+
+  queryClient.getMutationCache().subscribe((event) => {
+    handleCartMutationCacheEvent(event, queryClient);
+  });
 
   queryClient.setMutationDefaults(cartMutations.lineAll().mutationKey, {
     retry: 3,
