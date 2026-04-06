@@ -43,18 +43,14 @@ function Body() {
   if (lines.length > 0) {
     return (
       <>
-        <div className="border-b px-1 py-3 sm:px-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground gap-1.5"
-            onClick={() => setIsCartOpen(false)}
-          >
-            <span aria-hidden="true">&larr;</span>
-            Continue Shopping
-          </Button>
-        </div>
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-foreground flex w-full cursor-pointer items-center gap-1.5 border-b px-4 py-4 text-sm font-medium sm:px-6"
+          onClick={() => setIsCartOpen(false)}
+        >
+          <span aria-hidden="true">&larr;</span>
+          Continue Shopping
+        </button>
         <ScrollArea className="min-h-0 flex-1 px-4 sm:px-6">
           <div className="pb-4">
             {lines.map((line) => (
