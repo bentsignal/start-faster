@@ -30,7 +30,7 @@ When uncertain about the right choice, ask the user.
 
 ## Data Loading
 
-- **Component + hook pattern**: Each component pairs with a co-located hook that owns all data access (queries, mutations, derived state). The hook returns only what the component actually uses — named variables and callbacks, never raw query objects or large data structures. The component is a thin renderer.
+- **Component + hook pattern**: Components with more than ~5 lines of business logic (queries, mutations, derived state, handlers) should pair with a co-located hook that owns all that logic. The hook returns only what the component actually uses — named variables and callbacks, never raw query objects or large data structures. The component is a thin renderer. For components with minimal data access (a single query call and a line or two of derivation), inline logic in the component body is fine — extracting a hook for 3 lines of logic adds ceremony without improving readability.
 - **Route loaders**: Prefetch with `ensureQueryData` (or `ensureInfiniteQueryData`). Declare `loaderDeps` when the loader depends on search params.
 - **Centralized query definitions**: All queries — Convex and non-Convex — should be centralized into `*Queries` files using `queryOptions`. For Convex, wrap `convexQuery()` in `queryOptions()` — no explicit `queryKey` needed since `convexQuery` generates keys automatically.
 - **Centralized mutation definitions**: Use `mutationOptions` for all mutations. Convex mutations must be defined inside a hook (since `useConvexMutation` is a hook).

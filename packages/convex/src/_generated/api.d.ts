@@ -14,6 +14,7 @@ import type * as http from "../http.js";
 import type * as pages_drafts from "../pages/drafts.js";
 import type * as pages_manage from "../pages/manage.js";
 import type * as pages_utils from "../pages/utils.js";
+import type * as pages_validators from "../pages/validators.js";
 import type * as privileges from "../privileges.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   "pages/drafts": typeof pages_drafts;
   "pages/manage": typeof pages_manage;
   "pages/utils": typeof pages_utils;
+  "pages/validators": typeof pages_validators;
   privileges: typeof privileges;
   users: typeof users;
   validators: typeof validators;

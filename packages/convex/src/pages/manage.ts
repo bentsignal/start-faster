@@ -41,7 +41,7 @@ export const create = authNmutation({
     const draftId = await ctx.db.insert("pageDrafts", {
       pageId,
       name: "Untitled Draft",
-      content: "",
+      blocks: [],
       createdByUserId: ctx.user._id,
       updatedAt: Date.now(),
     });
@@ -111,14 +111,14 @@ export const publish = authNmutation({
       throw new ConvexError("Draft not found");
     }
 
-    if (!draft.content.trim()) {
-      throw new ConvexError("Cannot publish a draft with empty content");
+    if (draft.blocks.length === 0) {
+      throw new ConvexError("Cannot publish a draft with no blocks");
     }
 
     await ctx.db.insert("pageReleases", {
       pageId: draft.pageId,
       name: draft.name,
-      content: draft.content,
+      blocks: draft.blocks,
       publishedByUserId: ctx.user._id,
     });
 
@@ -235,7 +235,7 @@ export const getByPath = query({
     return {
       title: page.title,
       path: page.path,
-      content: latestRelease.content,
+      blocks: latestRelease.blocks,
     };
   },
 });

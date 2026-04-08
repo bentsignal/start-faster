@@ -1,14 +1,16 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
+import type { Block } from "./validators";
 import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
 import { ensureCmsScopeOrAdmin } from "../privileges";
+import { blockValidator } from "./validators";
 
 export const save = authNmutation({
   args: {
     draftId: v.id("pageDrafts"),
-    content: v.string(),
+    blocks: v.array(blockValidator),
   },
   handler: async (ctx, args) => {
     ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-content");
@@ -19,7 +21,7 @@ export const save = authNmutation({
     }
 
     await ctx.db.patch(args.draftId, {
-      content: args.content,
+      blocks: args.blocks,
       updatedAt: Date.now(),
     });
   },
@@ -47,7 +49,8 @@ export const createNew = authNmutation({
     }
 
     let name = "Untitled Draft";
-    let content = "";
+    // eslint-disable-next-line no-restricted-syntax -- need explicit type for the mutable variable that gets assigned in multiple branches
+    let blocks: Block[] = [];
 
     if (args.source) {
       switch (args.source.kind) {
@@ -55,7 +58,7 @@ export const createNew = authNmutation({
           const release = await ctx.db.get(args.source.releaseId);
           if (release) {
             name = `Copy of ${release.name}`;
-            content = release.content;
+            blocks = release.blocks;
           }
           break;
         }
@@ -63,7 +66,7 @@ export const createNew = authNmutation({
           const draft = await ctx.db.get(args.source.draftId);
           if (draft) {
             name = `Copy of ${draft.name}`;
-            content = draft.content;
+            blocks = draft.blocks;
           }
           break;
         }
@@ -73,7 +76,7 @@ export const createNew = authNmutation({
     const draftId = await ctx.db.insert("pageDrafts", {
       pageId: args.pageId,
       name,
-      content,
+      blocks,
       createdByUserId: ctx.user._id,
       updatedAt: Date.now(),
     });
@@ -168,7 +171,7 @@ export const getPreview = query({
 
     return {
       title: page.title,
-      content: draft.content,
+      blocks: draft.blocks,
     };
   },
 });

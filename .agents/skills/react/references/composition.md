@@ -133,7 +133,7 @@ Notice what this file gives you: the route configuration is self-contained at th
 
 ## Components
 
-Every component that needs business logic should pair with a co-located hook in the same file. The hook owns all data access — queries, mutations, derived state, navigation. The component is a thin renderer that calls the hook and renders UI based on what it returns.
+Components with more than ~5 lines of business logic should pair with a co-located hook in the same file. The hook owns all data access — queries, mutations, derived state, navigation. The component is a thin renderer that calls the hook and renders UI based on what it returns. For components with minimal data access (a single query call and a line or two of derivation), inline logic in the component body is fine — extracting a hook for 3 lines of logic adds ceremony without improving readability.
 
 Components should be small and focused on a single piece of UI. When a component grows beyond a handful of concerns, split it into smaller components that each own one piece. The parent component then becomes a composition of those pieces, readable at a glance.
 

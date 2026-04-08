@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 
 import type { Id } from "@acme/convex/model";
+import type { Block } from "@acme/convex/page-validators";
 
 import { usePageMutations } from "./use-page-mutations";
 
@@ -10,34 +11,38 @@ const DEBOUNCE_MS = 800;
 
 export function useAutosave({
   draftId,
-  content,
+  blocks,
 }: {
   draftId: Id<"pageDrafts">;
-  content: string;
+  blocks: Block[];
 }) {
   const pageMutations = usePageMutations();
 
+  const serialized = JSON.stringify(blocks);
+
   // Reactive state for render-time comparison (updated on successful save)
-  const [lastSavedContent, setLastSavedContent] = useState(content);
+  const [lastSavedSerialized, setLastSavedSerialized] = useState(serialized);
 
   const { mutate, mutateAsync, isPending } = useMutation({
     ...pageMutations.saveDraft,
     onSuccess: (_data, variables) => {
-      setLastSavedContent(variables.content);
+      setLastSavedSerialized(JSON.stringify(variables.blocks));
     },
   });
 
-  const contentRef = useRef(content);
+  const blocksRef = useRef(blocks);
+  const serializedRef = useRef(serialized);
   const draftIdRef = useRef(draftId);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Ref mirror for imperative dedup in callbacks (avoids double-saves)
-  const lastSavedContentRef = useRef(content);
+  const lastSavedSerializedRef = useRef(serialized);
 
   // Sync refs in an effect to avoid writing during render
   // eslint-disable-next-line no-restricted-syntax -- syncs prop to ref for imperative access without retriggering the debounce timer
   useEffect(() => {
-    contentRef.current = content;
-  }, [content]);
+    blocksRef.current = blocks;
+    serializedRef.current = serialized;
+  }, [blocks, serialized]);
 
   // eslint-disable-next-line no-restricted-syntax -- syncs prop to ref for imperative access without retriggering the debounce timer
   useEffect(() => {
@@ -50,18 +55,18 @@ export function useAutosave({
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    if (contentRef.current !== lastSavedContentRef.current) {
-      lastSavedContentRef.current = contentRef.current;
+    if (serializedRef.current !== lastSavedSerializedRef.current) {
+      lastSavedSerializedRef.current = serializedRef.current;
       await mutateAsync({
         draftId: draftIdRef.current,
-        content: contentRef.current,
+        blocks: blocksRef.current,
       });
     }
   };
 
-  // eslint-disable-next-line no-restricted-syntax -- debounced save timer that syncs content to the backend
+  // eslint-disable-next-line no-restricted-syntax -- debounced save timer that syncs blocks to the backend
   useEffect(() => {
-    if (content === lastSavedContentRef.current) {
+    if (serialized === lastSavedSerializedRef.current) {
       return;
     }
 
@@ -71,8 +76,8 @@ export function useAutosave({
 
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      lastSavedContentRef.current = contentRef.current;
-      mutate({ draftId: draftIdRef.current, content: contentRef.current });
+      lastSavedSerializedRef.current = serializedRef.current;
+      mutate({ draftId: draftIdRef.current, blocks: blocksRef.current });
     }, DEBOUNCE_MS);
 
     return () => {
@@ -80,7 +85,7 @@ export function useAutosave({
         clearTimeout(timerRef.current);
       }
     };
-  }, [content, mutate]);
+  }, [serialized, mutate]);
 
   // eslint-disable-next-line no-restricted-syntax -- flushes pending changes on unmount to prevent data loss
   useEffect(() => {
@@ -89,17 +94,17 @@ export function useAutosave({
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-      if (contentRef.current !== lastSavedContentRef.current) {
-        lastSavedContentRef.current = contentRef.current;
-        mutate({ draftId: draftIdRef.current, content: contentRef.current });
+      if (serializedRef.current !== lastSavedSerializedRef.current) {
+        lastSavedSerializedRef.current = serializedRef.current;
+        mutate({ draftId: draftIdRef.current, blocks: blocksRef.current });
       }
     };
   }, [mutate]);
 
   // Only show the browser's "unsaved changes" dialog when there are actually
-  // unsaved changes: either content diverged from last save or a mutation is
+  // unsaved changes: either blocks diverged from last save or a mutation is
   // currently in flight.
-  const hasUnsavedChanges = content !== lastSavedContent || isPending;
+  const hasUnsavedChanges = serialized !== lastSavedSerialized || isPending;
 
   // Block navigation until any pending save completes
   useBlocker({

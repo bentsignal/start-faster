@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+import { blockValidator } from "./pages/validators";
 import {
   adminLevelValidator,
   cmsScopesValidator,
@@ -43,14 +44,14 @@ export default defineSchema(
     pageDrafts: defineTable({
       pageId: v.id("pages"),
       name: v.string(),
-      content: v.string(),
+      blocks: v.array(blockValidator),
       createdByUserId: v.id("users"),
       updatedAt: v.number(),
     }).index("by_pageId", ["pageId"]),
     pageReleases: defineTable({
       pageId: v.id("pages"),
       name: v.string(),
-      content: v.string(),
+      blocks: v.array(blockValidator),
       publishedByUserId: v.id("users"),
     }).index("by_pageId", ["pageId"]),
   },

@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { Id } from "@acme/convex/model";
 
 import { env } from "~/env";
+import { BlockRenderer } from "~/features/pages/components/block-renderer";
 import { shopQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/$")({
@@ -52,6 +53,14 @@ export const Route = createFileRoute("/$")({
   },
 });
 
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 py-6 sm:px-8 lg:py-14">
+      {children}
+    </main>
+  );
+}
+
 function RouteComponent() {
   const loaderData = Route.useLoaderData({
     select: (d) =>
@@ -66,35 +75,29 @@ function RouteComponent() {
 
   const { page } = loaderData;
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16 sm:px-8">
-      <h1 className="text-3xl font-semibold tracking-tight">{page.title}</h1>
-      <p className="text-foreground/80 mt-6 leading-relaxed whitespace-pre-wrap">
-        {page.content}
-      </p>
-    </main>
+    <PageWrapper>
+      <BlockRenderer blocks={page.blocks} />
+    </PageWrapper>
   );
 }
 
 function LiveDraftPreview({ draftId }: { draftId: Id<"pageDrafts"> }) {
   const { data: draft } = useSuspenseQuery({
     ...shopQueries.getDraftPreview(draftId),
-    select: (d) => (d ? { title: d.title, content: d.content } : null),
+    select: (d) => (d ? { title: d.title, blocks: d.blocks } : null),
   });
 
   if (!draft) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-6 py-16 sm:px-8">
+      <PageWrapper>
         <p className="text-muted-foreground">Draft not found</p>
-      </main>
+      </PageWrapper>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16 sm:px-8">
-      <h1 className="text-3xl font-semibold tracking-tight">{draft.title}</h1>
-      <p className="text-foreground/80 mt-6 leading-relaxed whitespace-pre-wrap">
-        {draft.content}
-      </p>
-    </main>
+    <PageWrapper>
+      <BlockRenderer blocks={draft.blocks} />
+    </PageWrapper>
   );
 }

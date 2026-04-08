@@ -8,6 +8,7 @@ import type { Id } from "@acme/convex/model";
 import type { EditorMode } from "~/features/pages/components/edit-preview-toggle";
 import type { Viewport } from "~/features/pages/components/viewport-controls";
 import { env } from "~/env";
+import { BlockList } from "~/features/pages/components/block-list";
 import {
   defaultEditorMode,
   editorModeValidator,
@@ -47,8 +48,8 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const {
-    content,
-    setContent,
+    blocks,
+    setBlocks,
     mode,
     viewport,
     setMode,
@@ -67,13 +68,10 @@ function RouteComponent() {
       </div>
 
       <Activity mode={mode === "edit" ? "visible" : "hidden"}>
-        <div className="flex flex-1 flex-col pt-8">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Start writing..."
-            className="text-foreground placeholder:text-muted-foreground min-h-0 flex-1 resize-none border-0 bg-transparent p-6 text-base leading-relaxed outline-none"
-          />
+        <div className="flex flex-1 flex-col overflow-y-auto pt-4">
+          <div className="mx-auto w-full max-w-3xl">
+            <BlockList blocks={blocks} onChange={setBlocks} />
+          </div>
         </div>
       </Activity>
       <Activity mode={mode === "preview" ? "visible" : "hidden"}>
@@ -95,12 +93,12 @@ function useDraftEditor() {
 
   const { data: draft } = useSuspenseQuery({
     ...pageQueries.getDraft(draftId),
-    select: (data) => ({ _id: data._id, content: data.content }),
+    select: (data) => ({ _id: data._id, blocks: data.blocks }),
   });
 
-  const [content, setContent] = useState(draft.content);
+  const [blocks, setBlocks] = useState(draft.blocks);
 
-  useAutosave({ draftId: draft._id, content });
+  useAutosave({ draftId: draft._id, blocks });
 
   const { mode, viewport } = Route.useSearch({
     select: (search) => ({ mode: search.mode, viewport: search.viewport }),
@@ -127,8 +125,8 @@ function useDraftEditor() {
   const previewUrl = `${env.VITE_SHOP_URL}${page.path}?draftId=${draftId}`;
 
   return {
-    content,
-    setContent,
+    blocks,
+    setBlocks,
     mode,
     viewport,
     setMode,
