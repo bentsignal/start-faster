@@ -24,6 +24,7 @@
     "@shopify/hydrogen": "catalog:",
     "@shopify/storefront-api-client": "catalog:",
     "@t3-oss/env-core": "catalog:",
+    "@tailwindcss/typography": "^0.5.19",
     "@tanstack/devtools-vite": "catalog:",
     "@tanstack/react-devtools": "catalog:",
     "@tanstack/react-form": "catalog:",
@@ -39,6 +40,7 @@
     "next-themes": "catalog:",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
+    "react-markdown": "^10.1.0",
     "rostra": "catalog:",
     "srvx": "catalog:",
     "zod": "catalog:"
