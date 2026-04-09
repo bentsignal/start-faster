@@ -56,5 +56,5 @@ export default defineSchema(
       publishedByUserId: v.id("users"),
     }).index("by_pageId", ["pageId"]),
   },
-  { schemaValidation: false },
+  { schemaValidation: true },
 );
