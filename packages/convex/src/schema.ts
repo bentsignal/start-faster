@@ -37,6 +37,7 @@ export default defineSchema(
     pages: defineTable({
       title: v.string(),
       path: v.string(),
+      isVisible: v.boolean(),
       createdByUserId: v.id("users"),
     })
       .index("by_path", ["path"])
@@ -55,5 +56,5 @@ export default defineSchema(
       publishedByUserId: v.id("users"),
     }).index("by_pageId", ["pageId"]),
   },
-  { schemaValidation: true },
+  { schemaValidation: false },
 );

@@ -1,6 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { EyeOff } from "lucide-react";
 import { z } from "zod";
+
+import { QuickLink } from "@acme/features/quick-link";
+import { Button } from "@acme/ui/button";
 
 import type { Viewport } from "~/features/pages/components/viewport-controls";
 import { env } from "~/env";
@@ -35,7 +39,8 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { title, hasRelease, url, viewport, setViewport } = usePageHub();
+  const { pageId, title, hasRelease, isVisible, url, viewport, setViewport } =
+    usePageHub();
 
   if (!hasRelease) {
     return (
@@ -43,6 +48,32 @@ function RouteComponent() {
         <p className="text-muted-foreground text-lg">
           No version has been published yet
         </p>
+      </div>
+    );
+  }
+
+  if (!isVisible) {
+    return (
+      <div className="flex h-full flex-1 items-center justify-center p-6">
+        <div className="bg-muted/30 flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed p-8 text-center">
+          <div className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
+            <EyeOff className="size-5" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-base font-medium">This page is hidden</p>
+            <p className="text-muted-foreground text-sm">
+              It is not viewable on the shop and is excluded from the sitemap.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            render={
+              <QuickLink to="/pages/$pageId/settings" params={{ pageId }} />
+            }
+          >
+            Go to page settings
+          </Button>
+        </div>
       </div>
     );
   }
@@ -74,6 +105,7 @@ function usePageHub() {
       title: data.title,
       path: data.path,
       hasRelease: data.hasRelease,
+      isVisible: data.isVisible,
     }),
   });
 
@@ -88,5 +120,5 @@ function usePageHub() {
 
   const url = `${env.VITE_SHOP_URL}${data.path}`;
 
-  return { ...data, url, viewport, setViewport };
+  return { pageId, ...data, url, viewport, setViewport };
 }

@@ -35,6 +35,7 @@ export const create = authNmutation({
     const pageId = await ctx.db.insert("pages", {
       title,
       path: pathResult.path,
+      isVisible: true,
       createdByUserId: ctx.user._id,
     });
 
@@ -55,6 +56,7 @@ export const updateMetadata = authNmutation({
     pageId: v.id("pages"),
     title: v.optional(v.string()),
     path: v.optional(v.string()),
+    isVisible: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-metadata");
@@ -65,7 +67,11 @@ export const updateMetadata = authNmutation({
     }
 
     // eslint-disable-next-line no-restricted-syntax -- this is safe, just makes it easier to patch the changes values only
-    const updates: { title?: string; path?: string } = {};
+    const updates: { title?: string; path?: string; isVisible?: boolean } = {};
+
+    if (args.isVisible !== undefined) {
+      updates.isVisible = args.isVisible;
+    }
 
     if (args.title !== undefined) {
       const title = args.title.trim();
@@ -219,6 +225,10 @@ export const getByPath = query({
       .first();
 
     if (!page) {
+      return null;
+    }
+
+    if (!page.isVisible) {
       return null;
     }
 

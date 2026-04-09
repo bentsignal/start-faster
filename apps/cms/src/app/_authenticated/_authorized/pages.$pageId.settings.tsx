@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
-import { Loader, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 import { validatePath } from "@acme/convex/page-utils";
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 import { toast } from "@acme/ui/toaster";
 
+import { PageVisibilityToggle } from "~/features/pages/components/page-visibility-toggle";
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
 import { pageQueries } from "~/features/pages/lib/page-queries";
 import { useIsPending } from "~/hooks/use-is-pending";
@@ -23,6 +24,8 @@ function RouteComponent() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-10 sm:px-8">
+      <h1 className="text-2xl font-semibold tracking-tight">Page Settings</h1>
+      <PageVisibilityToggle pageId={form.pageId} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -30,13 +33,9 @@ function RouteComponent() {
         }}
         className="space-y-6"
       >
-        <h1 className="text-2xl font-semibold tracking-tight">Page Settings</h1>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label
-              htmlFor="page-title"
-              className="text-sm leading-none font-medium"
-            >
+          <div className="flex flex-col gap-2">
+            <label htmlFor="page-title" className="text-sm font-medium">
               Title
             </label>
             <Input
@@ -50,11 +49,8 @@ function RouteComponent() {
               results.
             </p>
           </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="page-path"
-              className="text-sm leading-none font-medium"
-            >
+          <div className="flex flex-col gap-2">
+            <label htmlFor="page-path" className="text-sm font-medium">
               URL Path
             </label>
             <Input
@@ -78,9 +74,7 @@ function RouteComponent() {
           disabled={form.isPending || !form.hasChanges || !!form.pathError}
           variant={form.isError ? "destructive" : "default"}
         >
-          {form.isPending ? (
-            <Loader className="size-4 animate-spin" />
-          ) : form.isError ? (
+          {form.isError ? (
             <>
               <RotateCcw className="size-4" /> Failed to update settings, try
               again
@@ -139,6 +133,7 @@ function usePageSettings() {
   }
 
   return {
+    pageId: page._id,
     title,
     setTitle,
     path,
