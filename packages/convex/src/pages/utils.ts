@@ -3,8 +3,6 @@ const RESERVED_PATHS = [
   "/shop",
   "/collections",
   "/search",
-  "/privacy-policy",
-  "/terms-of-service",
   "/_auth",
   "/_authenticated",
   "/account",
