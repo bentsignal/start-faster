@@ -61,7 +61,7 @@ function LastUpdated() {
   return (
     <SidebarGroup>
       <SidebarGroupContent>
-        <p className="text-sidebar-foreground/40 px-2 text-xs">
+        <p className="text-sidebar-foreground/40 flex h-8 items-center px-2 text-xs">
           Created {formatRelativeTime(data.creationTime)}
         </p>
       </SidebarGroupContent>

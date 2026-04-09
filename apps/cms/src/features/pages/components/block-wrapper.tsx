@@ -115,7 +115,7 @@ function DeleteConfirmation({
 }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-muted-foreground text-xs">Delete?</span>
+      <span className="text-muted-foreground text-xs">Are you sure?</span>
       <TooltipProvider>
         <div className="flex gap-1">
           <Tooltip>

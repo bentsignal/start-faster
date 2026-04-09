@@ -24,7 +24,7 @@
     "@shopify/hydrogen": "catalog:",
     "@shopify/storefront-api-client": "catalog:",
     "@t3-oss/env-core": "catalog:",
-    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/typography": "catalog:",
     "@tanstack/devtools-vite": "catalog:",
     "@tanstack/react-devtools": "catalog:",
     "@tanstack/react-form": "catalog:",

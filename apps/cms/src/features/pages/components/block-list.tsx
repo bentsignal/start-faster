@@ -1,4 +1,5 @@
 import type { DragEndEvent } from "@dnd-kit/core";
+import { useEffect, useRef } from "react";
 import {
   closestCenter,
   DndContext,
@@ -22,13 +23,13 @@ import { BlockWrapper } from "./block-wrapper";
 
 export function BlockList({
   blocks,
-  onChange,
+  setBlocks,
 }: {
   blocks: Block[];
-  onChange: (blocks: Block[]) => void;
+  setBlocks: (blocks: Block[]) => void;
 }) {
   const { sensors, handleDragEnd, handleAdd, handleUpdate, handleDelete } =
-    useBlockList({ blocks, onChange });
+    useBlockList({ blocks, setBlocks });
 
   return (
     <div className="flex flex-col gap-1 p-6">
@@ -70,11 +71,17 @@ export function BlockList({
 
 function useBlockList({
   blocks,
-  onChange,
+  setBlocks,
 }: {
   blocks: Block[];
-  onChange: (blocks: Block[]) => void;
+  setBlocks: (blocks: Block[]) => void;
 }) {
+  const blocksRef = useRef(blocks);
+  // eslint-disable-next-line no-restricted-syntax -- syncs prop to ref so stable callbacks always read the latest blocks
+  useEffect(() => {
+    blocksRef.current = blocks;
+  }, [blocks]);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -90,21 +97,23 @@ function useBlockList({
     const newIndex = blocks.findIndex((b) => b.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
 
-    onChange(arrayMove(blocks, oldIndex, newIndex));
+    setBlocks(arrayMove(blocks, oldIndex, newIndex));
   }
 
   function handleAdd(block: Block, index: number) {
-    const next = [...blocks];
+    const next = [...blocksRef.current];
     next.splice(index, 0, block);
-    onChange(next);
+    setBlocks(next);
   }
 
   function handleUpdate(updated: Block) {
-    onChange(blocks.map((b) => (b.id === updated.id ? updated : b)));
+    setBlocks(
+      blocksRef.current.map((b) => (b.id === updated.id ? updated : b)),
+    );
   }
 
   function handleDelete(id: string) {
-    onChange(blocks.filter((b) => b.id !== id));
+    setBlocks(blocksRef.current.filter((b) => b.id !== id));
   }
 
   return { sensors, handleDragEnd, handleAdd, handleUpdate, handleDelete };

@@ -60,9 +60,11 @@ function RouteComponent() {
   return (
     <div className="flex h-full flex-1 flex-col">
       <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-2">
-        {mode === "preview" && <OpenInNewTab url={previewUrl} />}
         {mode === "preview" && (
-          <ViewportToggle value={viewport} onChange={setViewport} />
+          <>
+            <OpenInNewTab url={previewUrl} />
+            <ViewportToggle value={viewport} onChange={setViewport} />
+          </>
         )}
         <EditPreviewToggle value={mode} onChange={setMode} />
       </div>
@@ -70,7 +72,7 @@ function RouteComponent() {
       <Activity mode={mode === "edit" ? "visible" : "hidden"}>
         <div className="flex flex-1 flex-col overflow-y-auto pt-4">
           <div className="mx-auto w-full max-w-3xl">
-            <BlockList blocks={blocks} onChange={setBlocks} />
+            <BlockList blocks={blocks} setBlocks={setBlocks} />
           </div>
         </div>
       </Activity>
