@@ -9,9 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
-import { Route as TermsOfServiceRouteImport } from './app/terms-of-service'
 import { Route as SearchRouteImport } from './app/search'
-import { Route as PrivacyPolicyRouteImport } from './app/privacy-policy'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as SplatRouteImport } from './app/$'
@@ -24,19 +22,9 @@ import { Route as AuthenticatedAccountRouteImport } from './app/_authenticated/a
 import { Route as AuthLogoutRouteImport } from './app/_auth/logout'
 import { Route as AuthLoginRouteImport } from './app/_auth/login'
 
-const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
-  id: '/terms-of-service',
-  path: '/terms-of-service',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CallbackRoute = CallbackRouteImport.update({
@@ -98,9 +86,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/callback': typeof CallbackRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
   '/search': typeof SearchRoute
-  '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -113,9 +99,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/callback': typeof CallbackRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
   '/search': typeof SearchRoute
-  '/terms-of-service': typeof TermsOfServiceRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -130,9 +114,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
   '/search': typeof SearchRoute
-  '/terms-of-service': typeof TermsOfServiceRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/logout': typeof AuthLogoutRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -147,9 +129,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/callback'
-    | '/privacy-policy'
     | '/search'
-    | '/terms-of-service'
     | '/login'
     | '/logout'
     | '/account'
@@ -162,9 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/callback'
-    | '/privacy-policy'
     | '/search'
-    | '/terms-of-service'
     | '/login'
     | '/logout'
     | '/account'
@@ -178,9 +156,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/_authenticated'
     | '/callback'
-    | '/privacy-policy'
     | '/search'
-    | '/terms-of-service'
     | '/_auth/login'
     | '/_auth/logout'
     | '/_authenticated/account'
@@ -195,9 +171,7 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
-  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SearchRoute: typeof SearchRoute
-  TermsOfServiceRoute: typeof TermsOfServiceRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
   CollectionsHandleRoute: typeof CollectionsHandleRoute
@@ -206,25 +180,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms-of-service': {
-      id: '/terms-of-service'
-      path: '/terms-of-service'
-      fullPath: '/terms-of-service'
-      preLoaderRoute: typeof TermsOfServiceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/callback': {
@@ -328,9 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
-  PrivacyPolicyRoute: PrivacyPolicyRoute,
   SearchRoute: SearchRoute,
-  TermsOfServiceRoute: TermsOfServiceRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
   CollectionsHandleRoute: CollectionsHandleRoute,
