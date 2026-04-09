@@ -114,14 +114,16 @@ function LoginModalContent() {
         By signing in, you agree to our{" "}
         <QuickLink
           className="hover:text-primary transition-colors"
-          to="/terms-of-service"
+          to="/$"
+          params={{ _splat: "terms-of-service" }}
         >
           terms of service
         </QuickLink>{" "}
         and{" "}
         <QuickLink
           className="hover:text-primary transition-colors"
-          to="/privacy-policy"
+          to="/$"
+          params={{ _splat: "privacy-policy" }}
         >
           privacy policy
         </QuickLink>
