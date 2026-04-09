@@ -214,6 +214,36 @@ export const listRecentReleases = authNquery({
   },
 });
 
+export const listForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const pages = await ctx.db.query("pages").collect();
+
+    const visiblePages = pages.filter((page) => page.isVisible);
+
+    const entries = await Promise.all(
+      visiblePages.map(async (page) => {
+        const latestRelease = await ctx.db
+          .query("pageReleases")
+          .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
+          .order("desc")
+          .first();
+
+        if (!latestRelease) {
+          return null;
+        }
+
+        return {
+          path: page.path,
+          updatedAt: latestRelease._creationTime,
+        };
+      }),
+    );
+
+    return entries.filter((entry) => entry !== null);
+  },
+});
+
 export const getByPath = query({
   args: {
     path: v.string(),

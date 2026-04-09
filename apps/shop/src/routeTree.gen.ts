@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
+import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as SearchRouteImport } from './app/search'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
@@ -22,6 +23,11 @@ import { Route as AuthenticatedAccountRouteImport } from './app/_authenticated/a
 import { Route as AuthLogoutRouteImport } from './app/_auth/logout'
 import { Route as AuthLoginRouteImport } from './app/_auth/login'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/callback': typeof CallbackRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/callback': typeof CallbackRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/login': typeof AuthLoginRoute
   '/logout': typeof AuthLogoutRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/logout': typeof AuthLogoutRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/callback'
     | '/search'
+    | '/sitemap.xml'
     | '/login'
     | '/logout'
     | '/account'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/callback'
     | '/search'
+    | '/sitemap.xml'
     | '/login'
     | '/logout'
     | '/account'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/callback'
     | '/search'
+    | '/sitemap.xml'
     | '/_auth/login'
     | '/_auth/logout'
     | '/_authenticated/account'
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
   CollectionsHandleRoute: typeof CollectionsHandleRoute
@@ -180,6 +193,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -289,6 +309,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
   CollectionsHandleRoute: CollectionsHandleRoute,
