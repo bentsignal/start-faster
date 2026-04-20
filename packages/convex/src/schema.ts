@@ -48,7 +48,24 @@ export default defineSchema(
       blocks: v.array(blockValidator),
       createdByUserId: v.id("users"),
       updatedAt: v.number(),
+      // Set when a scheduled version is reverted back to a draft, so the
+      // schedule modal can pre-fill with the previously chosen time.
+      lastScheduledAt: v.optional(v.number()),
     }).index("by_pageId", ["pageId"]),
+    pageScheduled: defineTable({
+      pageId: v.id("pages"),
+      name: v.string(),
+      blocks: v.array(blockValidator),
+      scheduledByUserId: v.id("users"),
+      scheduledAt: v.number(),
+      // Optional only because we need to insert the row to get its id
+      // before we can schedule the publish callback that references it.
+      // It is set in the same mutation, so it is effectively always present.
+      scheduledFunctionId: v.optional(v.id("_scheduled_functions")),
+    })
+      .index("by_pageId", ["pageId"])
+      .index("by_pageId_and_scheduledAt", ["pageId", "scheduledAt"])
+      .index("by_scheduledAt", ["scheduledAt"]),
     pageReleases: defineTable({
       pageId: v.id("pages"),
       name: v.string(),

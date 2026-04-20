@@ -1,12 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@acme/convex/api";
 import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
 
-import { FilesHeader } from "~/features/files/components/files-header";
 import { FilesList } from "~/features/files/components/files-list";
 import { FilesUploadCard } from "~/features/files/components/files-upload-card";
+import { fileQueries } from "~/features/files/lib/file-queries";
 
 export const Route = createFileRoute("/_authenticated/_authorized/files")({
   component: RouteComponent,
@@ -16,14 +14,13 @@ export const Route = createFileRoute("/_authenticated/_authorized/files")({
     }
   },
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(convexQuery(api.files.list, {}));
+    await context.queryClient.ensureQueryData(fileQueries.list());
   },
 });
 
 function RouteComponent() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10 sm:px-8">
-      <FilesHeader />
       <FilesUploadCard />
       <FilesList />
     </div>

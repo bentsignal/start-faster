@@ -6,32 +6,44 @@ import { api } from "@acme/convex/api";
 export function usePageMutations() {
   return {
     createPage: mutationOptions({
-      mutationKey: ["create-page"],
+      mutationKey: ["page-create"],
       mutationFn: useConvexMutation(api.pages.manage.create),
     }),
     createNewDraft: mutationOptions({
-      mutationKey: ["new-draft"],
+      mutationKey: ["draft-create"],
       mutationFn: useConvexMutation(api.pages.drafts.createNew),
     }),
     saveDraft: mutationOptions({
-      mutationKey: ["save-draft"],
+      mutationKey: ["draft-save"],
       mutationFn: useConvexMutation(api.pages.drafts.save),
     }),
     renameDraft: mutationOptions({
-      mutationKey: ["rename-draft"],
+      mutationKey: ["draft-rename"],
       mutationFn: useConvexMutation(api.pages.drafts.rename),
     }),
     publish: mutationOptions({
-      mutationKey: ["publish-page"],
+      mutationKey: ["page-publish"],
       mutationFn: useConvexMutation(api.pages.manage.publish),
     }),
     updatePageMetadata: mutationOptions({
-      mutationKey: ["update-page-metadata"],
+      mutationKey: ["page-update-metadata"],
       mutationFn: useConvexMutation(api.pages.manage.updateMetadata),
     }),
     deleteDraft: mutationOptions({
-      mutationKey: ["delete-draft"],
+      mutationKey: ["draft-delete"],
       mutationFn: useConvexMutation(api.pages.drafts.deleteDraft),
+    }),
+    scheduleDraft: mutationOptions({
+      mutationKey: ["draft-schedule"],
+      mutationFn: useConvexMutation(api.pages.scheduled.schedule),
+    }),
+    rescheduleDraft: mutationOptions({
+      mutationKey: ["scheduled-reschedule"],
+      mutationFn: useConvexMutation(api.pages.scheduled.reschedule),
+    }),
+    revertScheduledToDraft: mutationOptions({
+      mutationKey: ["scheduled-revert"],
+      mutationFn: useConvexMutation(api.pages.scheduled.revertToDraft),
     }),
   };
 }

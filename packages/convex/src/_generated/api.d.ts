@@ -11,8 +11,11 @@
 import type * as custom from "../custom.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as ids from "../ids.js";
 import type * as pages_drafts from "../pages/drafts.js";
 import type * as pages_manage from "../pages/manage.js";
+import type * as pages_releases from "../pages/releases.js";
+import type * as pages_scheduled from "../pages/scheduled.js";
 import type * as pages_utils from "../pages/utils.js";
 import type * as pages_validators from "../pages/validators.js";
 import type * as privileges from "../privileges.js";
@@ -29,8 +32,11 @@ declare const fullApi: ApiFromModules<{
   custom: typeof custom;
   files: typeof files;
   http: typeof http;
+  ids: typeof ids;
   "pages/drafts": typeof pages_drafts;
   "pages/manage": typeof pages_manage;
+  "pages/releases": typeof pages_releases;
+  "pages/scheduled": typeof pages_scheduled;
   "pages/utils": typeof pages_utils;
   "pages/validators": typeof pages_validators;
   privileges: typeof privileges;

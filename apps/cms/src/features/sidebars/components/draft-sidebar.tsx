@@ -16,6 +16,7 @@ import { DeleteDraftButton } from "~/features/pages/components/delete-draft-butt
 import { SaveStatus } from "~/features/pages/components/draft-save-status";
 import { PublishButton } from "~/features/pages/components/publish-draft-button";
 import { RenameDraftButton } from "~/features/pages/components/rename-draft-button";
+import { ScheduleDraftButton } from "~/features/pages/components/schedule-draft-button";
 
 export function DraftSidebar() {
   return (
@@ -31,8 +32,8 @@ export function DraftSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarSeparator className="mx-0" />
         <SaveStatus />
+        <ScheduleDraftButton />
         <PublishButton />
       </SidebarFooter>
     </Sidebar>

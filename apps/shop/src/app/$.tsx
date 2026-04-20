@@ -1,29 +1,55 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
 
-import type { Id } from "@acme/convex/model";
+import { toId } from "@acme/convex/ids";
 
 import { env } from "~/env";
 import { BlockRenderer } from "~/features/pages/components/block-renderer";
+import { DraftPreview } from "~/features/pages/components/draft-preview";
+import { PageWrapper } from "~/features/pages/components/page-wrapper";
+import { ReleasePreview } from "~/features/pages/components/release-preview";
+import { ScheduledPreview } from "~/features/pages/components/scheduled-preview";
 import { shopQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/$")({
   validateSearch: z.object({
     draftId: z.string().optional(),
+    scheduledId: z.string().optional(),
+    releaseId: z.string().optional(),
   }),
   component: RouteComponent,
-  loaderDeps: ({ search }) => ({ draftId: search.draftId }),
+  loaderDeps: ({ search }) => search,
   loader: async ({ context, params, deps }) => {
     if (deps.draftId) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Id is a branded type; the runtime value is a plain string from the URL search params
-      const draftId = deps.draftId as Id<"pageDrafts">;
-      await context.queryClient.ensureQueryData(
+      const draftId = toId<"pageDrafts">(deps.draftId);
+      const draft = await context.queryClient.ensureQueryData(
         shopQueries.getDraftPreview(draftId),
       );
+      if (!draft) throw notFound();
       return { mode: "draft" as const, draftId };
     }
 
+    if (deps.scheduledId) {
+      const scheduledId = toId<"pageScheduled">(deps.scheduledId);
+      const scheduled = await context.queryClient.ensureQueryData(
+        shopQueries.getScheduledPreview(scheduledId),
+      );
+      if (!scheduled) throw notFound();
+      return { mode: "scheduled" as const, scheduledId };
+    }
+
+    if (deps.releaseId) {
+      const releaseId = toId<"pageReleases">(deps.releaseId);
+      const release = await context.queryClient.ensureQueryData(
+        shopQueries.getReleasePreview(releaseId),
+      );
+      if (!release) throw notFound();
+      return { mode: "release" as const, releaseId };
+    }
+
+    // Intentionally fetchQuery, not ensureQueryData: the customer facing page
+    // should not update live. The calls above are for internal previews and subscribe
+    // to live updates, but this one is a 1 time fetch for customer facing published pages
     const path = `/${params._splat}`;
     const page = await context.queryClient.fetchQuery(
       shopQueries.getByPath(path),
@@ -36,7 +62,7 @@ export const Route = createFileRoute("/$")({
     return { mode: "page" as const, page };
   },
   head: ({ loaderData }) => {
-    if (!loaderData || loaderData.mode === "draft") return {};
+    if (loaderData?.mode !== "page") return {};
     return {
       meta: [
         { title: loaderData.page.title },
@@ -53,51 +79,34 @@ export const Route = createFileRoute("/$")({
   },
 });
 
-function PageWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 py-6 sm:px-8 lg:py-14">
-      {children}
-    </main>
-  );
-}
-
 function RouteComponent() {
-  const loaderData = Route.useLoaderData({
-    select: (d) =>
-      d.mode === "draft"
-        ? { mode: d.mode, draftId: d.draftId }
-        : { mode: d.mode, page: d.page },
+  const view = Route.useLoaderData({
+    select: (data) => {
+      switch (data.mode) {
+        case "draft":
+          return { mode: "draft" as const, draftId: data.draftId };
+        case "scheduled":
+          return { mode: "scheduled" as const, scheduledId: data.scheduledId };
+        case "release":
+          return { mode: "release" as const, releaseId: data.releaseId };
+        case "page":
+          return { mode: "page" as const, blocks: data.page.blocks };
+      }
+    },
   });
 
-  if (loaderData.mode === "draft") {
-    return <LiveDraftPreview draftId={loaderData.draftId} />;
+  switch (view.mode) {
+    case "draft":
+      return <DraftPreview id={view.draftId} />;
+    case "scheduled":
+      return <ScheduledPreview id={view.scheduledId} />;
+    case "release":
+      return <ReleasePreview id={view.releaseId} />;
+    case "page":
+      return (
+        <PageWrapper>
+          <BlockRenderer blocks={view.blocks} />
+        </PageWrapper>
+      );
   }
-
-  const { page } = loaderData;
-  return (
-    <PageWrapper>
-      <BlockRenderer blocks={page.blocks} />
-    </PageWrapper>
-  );
-}
-
-function LiveDraftPreview({ draftId }: { draftId: Id<"pageDrafts"> }) {
-  const { data: draft } = useSuspenseQuery({
-    ...shopQueries.getDraftPreview(draftId),
-    select: (d) => (d ? { title: d.title, blocks: d.blocks } : null),
-  });
-
-  if (!draft) {
-    return (
-      <PageWrapper>
-        <p className="text-muted-foreground">Draft not found</p>
-      </PageWrapper>
-    );
-  }
-
-  return (
-    <PageWrapper>
-      <BlockRenderer blocks={draft.blocks} />
-    </PageWrapper>
-  );
 }

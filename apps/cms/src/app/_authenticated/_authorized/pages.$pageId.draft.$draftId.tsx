@@ -3,19 +3,19 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { z } from "zod";
 
-import type { Id } from "@acme/convex/model";
+import { toId } from "@acme/convex/ids";
 
 import type { EditorMode } from "~/features/pages/components/edit-preview-toggle";
 import type { Viewport } from "~/features/pages/components/viewport-controls";
 import { env } from "~/env";
-import { BlockList } from "~/features/pages/components/block-list";
+import { DraftEditPanel } from "~/features/pages/components/draft-edit-panel";
+import { DraftPreviewPanel } from "~/features/pages/components/draft-preview-panel";
 import {
   defaultEditorMode,
   editorModeValidator,
   EditPreviewToggle,
 } from "~/features/pages/components/edit-preview-toggle";
 import { OpenInNewTab } from "~/features/pages/components/open-in-new-tab";
-import { PreviewIframe } from "~/features/pages/components/preview-iframe";
 import {
   defaultViewport,
   ViewportToggle,
@@ -27,15 +27,13 @@ import { pageQueries } from "~/features/pages/lib/page-queries";
 export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
 )({
-  component: RouteComponent,
+  component: DraftEditor,
   validateSearch: z.object({
     viewport: viewportValidator.default(defaultViewport),
     mode: editorModeValidator.default(defaultEditorMode),
   }),
   beforeLoad: ({ params }) => {
-    // No harm in asserting the type here as pageDrafts id
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const draftId = params.draftId as Id<"pageDrafts">;
+    const draftId = toId<"pageDrafts">(params.draftId);
     return { draftId };
   },
   loader: async ({ context }) => {
@@ -46,13 +44,13 @@ export const Route = createFileRoute(
   shouldReload: false,
 });
 
-function RouteComponent() {
+function DraftEditor() {
   const {
     blocks,
     setBlocks,
     mode,
-    viewport,
     setMode,
+    viewport,
     setViewport,
     previewUrl,
   } = useDraftEditor();
@@ -68,20 +66,11 @@ function RouteComponent() {
         )}
         <EditPreviewToggle value={mode} onChange={setMode} />
       </div>
-
       <Activity mode={mode === "edit" ? "visible" : "hidden"}>
-        <div className="flex flex-1 flex-col overflow-y-auto pt-4">
-          <div className="mx-auto w-full max-w-3xl">
-            <BlockList blocks={blocks} setBlocks={setBlocks} />
-          </div>
-        </div>
+        <DraftEditPanel blocks={blocks} setBlocks={setBlocks} />
       </Activity>
       <Activity mode={mode === "preview" ? "visible" : "hidden"}>
-        <PreviewIframe
-          url={previewUrl}
-          title={`Preview of draft`}
-          viewport={viewport}
-        />
+        <DraftPreviewPanel url={previewUrl} viewport={viewport} />
       </Activity>
     </div>
   );
@@ -102,18 +91,6 @@ function useDraftEditor() {
 
   useAutosave({ draftId: draft._id, blocks });
 
-  const { mode, viewport } = Route.useSearch({
-    select: (search) => ({ mode: search.mode, viewport: search.viewport }),
-  });
-
-  const navigate = Route.useNavigate();
-  async function setMode(newMode: EditorMode) {
-    await navigate({ search: { mode: newMode, viewport }, replace: true });
-  }
-  async function setViewport(newViewport: Viewport) {
-    await navigate({ search: { mode, viewport: newViewport }, replace: true });
-  }
-
   const pageId = useRouteContext({
     from: "/_authenticated/_authorized/pages/$pageId",
     select: (ctx) => ctx.pageId,
@@ -126,12 +103,29 @@ function useDraftEditor() {
 
   const previewUrl = `${env.VITE_SHOP_URL}${page.path}?draftId=${draftId}`;
 
+  const mode = Route.useSearch({ select: (s) => s.mode });
+  const viewport = Route.useSearch({ select: (s) => s.viewport });
+
+  const navigate = Route.useNavigate();
+  async function setMode(next: EditorMode) {
+    await navigate({
+      search: (prev) => ({ ...prev, mode: next }),
+      replace: true,
+    });
+  }
+  async function setViewport(next: Viewport) {
+    await navigate({
+      search: (prev) => ({ ...prev, viewport: next }),
+      replace: true,
+    });
+  }
+
   return {
     blocks,
     setBlocks,
     mode,
-    viewport,
     setMode,
+    viewport,
     setViewport,
     previewUrl,
   };

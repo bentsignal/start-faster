@@ -21,7 +21,8 @@
     "typecheck": "turbo run typecheck",
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "ui-add": "turbo run ui-add",
-    "create-package": "turbo gen init"
+    "create-package": "turbo gen init",
+    "loc": "cloc --exclude-dir=_generated --not-match-f=routeTree.gen.ts apps/*/src packages/*/src"
   },
   "devDependencies": {
     "@acme/prettier-config": "workspace:*",

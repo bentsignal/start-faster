@@ -19,4 +19,12 @@ export const shopQueries = {
     queryOptions({
       ...convexQuery(api.pages.drafts.getPreview, { draftId }),
     }),
+  getScheduledPreview: (scheduledId: Id<"pageScheduled">) =>
+    queryOptions({
+      ...convexQuery(api.pages.scheduled.getPreview, { scheduledId }),
+    }),
+  getReleasePreview: (releaseId: Id<"pageReleases">) =>
+    queryOptions({
+      ...convexQuery(api.pages.releases.getPreview, { releaseId }),
+    }),
 };

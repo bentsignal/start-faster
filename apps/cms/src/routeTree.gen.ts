@@ -20,6 +20,9 @@ import { Route as AuthenticatedAuthorizedPagesIndexRouteImport } from './app/_au
 import { Route as AuthenticatedAuthorizedPagesPageIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId'
 import { Route as AuthenticatedAuthorizedPagesPageIdIndexRouteImport } from './app/_authenticated/_authorized/pages.$pageId.index'
 import { Route as AuthenticatedAuthorizedPagesPageIdSettingsRouteImport } from './app/_authenticated/_authorized/pages.$pageId.settings'
+import { Route as AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId.scheduled.$scheduledId'
+import { Route as AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId.release.$releaseId'
+import { Route as AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId.draftPreview.$draftId'
 import { Route as AuthenticatedAuthorizedPagesPageIdDraftDraftIdRouteImport } from './app/_authenticated/_authorized/pages.$pageId.draft.$draftId'
 
 const CallbackRoute = CallbackRouteImport.update({
@@ -82,6 +85,24 @@ const AuthenticatedAuthorizedPagesPageIdSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
   } as any)
+const AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute =
+  AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRouteImport.update({
+    id: '/scheduled/$scheduledId',
+    path: '/scheduled/$scheduledId',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute =
+  AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRouteImport.update({
+    id: '/release/$releaseId',
+    path: '/release/$releaseId',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
+const AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute =
+  AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRouteImport.update({
+    id: '/draftPreview/$draftId',
+    path: '/draftPreview/$draftId',
+    getParentRoute: () => AuthenticatedAuthorizedPagesPageIdRoute,
+  } as any)
 const AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute =
   AuthenticatedAuthorizedPagesPageIdDraftDraftIdRouteImport.update({
     id: '/draft/$draftId',
@@ -100,6 +121,9 @@ export interface FileRoutesByFullPath {
   '/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
   '/pages/$pageId/': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
   '/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
+  '/pages/$pageId/draftPreview/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute
+  '/pages/$pageId/release/$releaseId': typeof AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute
+  '/pages/$pageId/scheduled/$scheduledId': typeof AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
@@ -111,6 +135,9 @@ export interface FileRoutesByTo {
   '/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
   '/pages/$pageId': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
   '/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
+  '/pages/$pageId/draftPreview/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute
+  '/pages/$pageId/release/$releaseId': typeof AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute
+  '/pages/$pageId/scheduled/$scheduledId': typeof AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,6 +153,9 @@ export interface FileRoutesById {
   '/_authenticated/_authorized/pages/$pageId/settings': typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
   '/_authenticated/_authorized/pages/$pageId/': typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
   '/_authenticated/_authorized/pages/$pageId/draft/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
+  '/_authenticated/_authorized/pages/$pageId/draftPreview/$draftId': typeof AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute
+  '/_authenticated/_authorized/pages/$pageId/release/$releaseId': typeof AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute
+  '/_authenticated/_authorized/pages/$pageId/scheduled/$scheduledId': typeof AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,6 +170,9 @@ export interface FileRouteTypes {
     | '/pages/$pageId/settings'
     | '/pages/$pageId/'
     | '/pages/$pageId/draft/$draftId'
+    | '/pages/$pageId/draftPreview/$draftId'
+    | '/pages/$pageId/release/$releaseId'
+    | '/pages/$pageId/scheduled/$scheduledId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/callback'
@@ -151,6 +184,9 @@ export interface FileRouteTypes {
     | '/pages/$pageId/settings'
     | '/pages/$pageId'
     | '/pages/$pageId/draft/$draftId'
+    | '/pages/$pageId/draftPreview/$draftId'
+    | '/pages/$pageId/release/$releaseId'
+    | '/pages/$pageId/scheduled/$scheduledId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -165,6 +201,9 @@ export interface FileRouteTypes {
     | '/_authenticated/_authorized/pages/$pageId/settings'
     | '/_authenticated/_authorized/pages/$pageId/'
     | '/_authenticated/_authorized/pages/$pageId/draft/$draftId'
+    | '/_authenticated/_authorized/pages/$pageId/draftPreview/$draftId'
+    | '/_authenticated/_authorized/pages/$pageId/release/$releaseId'
+    | '/_authenticated/_authorized/pages/$pageId/scheduled/$scheduledId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,6 +290,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdSettingsRouteImport
       parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
     }
+    '/_authenticated/_authorized/pages/$pageId/scheduled/$scheduledId': {
+      id: '/_authenticated/_authorized/pages/$pageId/scheduled/$scheduledId'
+      path: '/scheduled/$scheduledId'
+      fullPath: '/pages/$pageId/scheduled/$scheduledId'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
+    '/_authenticated/_authorized/pages/$pageId/release/$releaseId': {
+      id: '/_authenticated/_authorized/pages/$pageId/release/$releaseId'
+      path: '/release/$releaseId'
+      fullPath: '/pages/$pageId/release/$releaseId'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
+    '/_authenticated/_authorized/pages/$pageId/draftPreview/$draftId': {
+      id: '/_authenticated/_authorized/pages/$pageId/draftPreview/$draftId'
+      path: '/draftPreview/$draftId'
+      fullPath: '/pages/$pageId/draftPreview/$draftId'
+      preLoaderRoute: typeof AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRouteImport
+      parentRoute: typeof AuthenticatedAuthorizedPagesPageIdRoute
+    }
     '/_authenticated/_authorized/pages/$pageId/draft/$draftId': {
       id: '/_authenticated/_authorized/pages/$pageId/draft/$draftId'
       path: '/draft/$draftId'
@@ -265,6 +325,9 @@ interface AuthenticatedAuthorizedPagesPageIdRouteChildren {
   AuthenticatedAuthorizedPagesPageIdSettingsRoute: typeof AuthenticatedAuthorizedPagesPageIdSettingsRoute
   AuthenticatedAuthorizedPagesPageIdIndexRoute: typeof AuthenticatedAuthorizedPagesPageIdIndexRoute
   AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute: typeof AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute
+  AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute: typeof AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute
+  AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute: typeof AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute
+  AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute: typeof AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute
 }
 
 const AuthenticatedAuthorizedPagesPageIdRouteChildren: AuthenticatedAuthorizedPagesPageIdRouteChildren =
@@ -275,6 +338,12 @@ const AuthenticatedAuthorizedPagesPageIdRouteChildren: AuthenticatedAuthorizedPa
       AuthenticatedAuthorizedPagesPageIdIndexRoute,
     AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute:
       AuthenticatedAuthorizedPagesPageIdDraftDraftIdRoute,
+    AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute:
+      AuthenticatedAuthorizedPagesPageIdDraftPreviewDraftIdRoute,
+    AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute:
+      AuthenticatedAuthorizedPagesPageIdReleaseReleaseIdRoute,
+    AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute:
+      AuthenticatedAuthorizedPagesPageIdScheduledScheduledIdRoute,
   }
 
 const AuthenticatedAuthorizedPagesPageIdRouteWithChildren =

@@ -10,6 +10,7 @@
     "./model": {
       "types": "./src/_generated/dataModel.d.ts"
     },
+    "./ids": "./src/ids.ts",
     "./types": "./src/validators.ts",
     "./privileges": "./src/privileges.ts",
     "./page-utils": "./src/pages/utils.ts",

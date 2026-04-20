@@ -1,5 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
+import type { Id } from "../_generated/dataModel";
+import type { AuthNmutationCtx } from "../custom";
 import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
 import { ensureCmsScopeOrAdmin } from "../privileges";
@@ -51,6 +53,33 @@ export const create = authNmutation({
   },
 });
 
+function validateTitle(rawTitle: string) {
+  const title = rawTitle.trim();
+  if (!title) {
+    throw new ConvexError("Title is required");
+  }
+  return title;
+}
+
+async function resolveUniquePath(
+  ctx: AuthNmutationCtx,
+  rawPath: string,
+  pageId: Id<"pages">,
+) {
+  const pathResult = validatePath(rawPath);
+  if (pathResult.status === "invalid") {
+    throw new ConvexError(pathResult.error);
+  }
+  const existing = await ctx.db
+    .query("pages")
+    .withIndex("by_path", (q) => q.eq("path", pathResult.path))
+    .first();
+  if (existing && existing._id !== pageId) {
+    throw new ConvexError("A page with this path already exists");
+  }
+  return pathResult.path;
+}
+
 export const updateMetadata = authNmutation({
   args: {
     pageId: v.id("pages"),
@@ -66,38 +95,13 @@ export const updateMetadata = authNmutation({
       throw new ConvexError("Page not found");
     }
 
-    // eslint-disable-next-line no-restricted-syntax -- this is safe, just makes it easier to patch the changes values only
-    const updates: { title?: string; path?: string; isVisible?: boolean } = {};
-
-    if (args.isVisible !== undefined) {
-      updates.isVisible = args.isVisible;
-    }
-
-    if (args.title !== undefined) {
-      const title = args.title.trim();
-      if (!title) {
-        throw new ConvexError("Title is required");
-      }
-      updates.title = title;
-    }
-
-    if (args.path !== undefined) {
-      const pathResult = validatePath(args.path);
-      if (pathResult.status === "invalid") {
-        throw new ConvexError(pathResult.error);
-      }
-
-      // Check path uniqueness (exclude current page)
-      const existing = await ctx.db
-        .query("pages")
-        .withIndex("by_path", (q) => q.eq("path", pathResult.path))
-        .first();
-      if (existing && existing._id !== args.pageId) {
-        throw new ConvexError("A page with this path already exists");
-      }
-
-      updates.path = pathResult.path;
-    }
+    const updates = {
+      ...(args.isVisible !== undefined && { isVisible: args.isVisible }),
+      ...(args.title !== undefined && { title: validateTitle(args.title) }),
+      ...(args.path !== undefined && {
+        path: await resolveUniquePath(ctx, args.path, args.pageId),
+      }),
+    };
 
     if (Object.keys(updates).length > 0) {
       await ctx.db.patch(args.pageId, updates);
@@ -196,21 +200,6 @@ export const getById = authNquery({
         ? { _id: createdByUser._id, name: createdByUser.name }
         : null,
     };
-  },
-});
-
-export const listRecentReleases = authNquery({
-  args: {
-    pageId: v.id("pages"),
-  },
-  handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
-
-    return await ctx.db
-      .query("pageReleases")
-      .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
-      .order("desc")
-      .take(3);
   },
 });
 
