@@ -1,11 +1,41 @@
+import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
-import type { Id } from "../_generated/dataModel";
-import type { AuthNmutationCtx } from "../custom";
-import { query } from "../_generated/server";
+import type { Doc, Id } from "../_generated/dataModel";
+import type { AuthNmutationCtx, AuthNqueryCtx } from "../custom";
+import { internalMutation, query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
 import { ensureCmsScopeOrAdmin } from "../privileges";
 import { validatePath } from "./utils";
+
+function pageSearchText(title: string, path: string) {
+  return `${title} ${path}`.toLowerCase();
+}
+
+async function enrichPage(ctx: AuthNqueryCtx, page: Doc<"pages">) {
+  const drafts = await ctx.db
+    .query("pageDrafts")
+    .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
+    .collect();
+
+  const latestRelease = await ctx.db
+    .query("pageReleases")
+    .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
+    .order("desc")
+    .first();
+
+  const createdByUser = await ctx.db.get(page.createdByUserId);
+
+  return {
+    ...page,
+    hasRelease: latestRelease !== null,
+    hasDraft: drafts.length > 0,
+    draftCount: drafts.length,
+    createdBy: createdByUser
+      ? { _id: createdByUser._id, name: createdByUser.name }
+      : null,
+  };
+}
 
 export const create = authNmutation({
   args: {
@@ -39,6 +69,7 @@ export const create = authNmutation({
       path: pathResult.path,
       isVisible: true,
       createdByUserId: ctx.user._id,
+      searchText: pageSearchText(title, pathResult.path),
     });
 
     const draftId = await ctx.db.insert("pageDrafts", {
@@ -95,19 +126,37 @@ export const updateMetadata = authNmutation({
       throw new ConvexError("Page not found");
     }
 
-    const updates = {
-      ...(args.isVisible !== undefined && { isVisible: args.isVisible }),
-      ...(args.title !== undefined && { title: validateTitle(args.title) }),
-      ...(args.path !== undefined && {
-        path: await resolveUniquePath(ctx, args.path, args.pageId),
-      }),
-    };
-
+    const updates = await buildPageUpdates(ctx, page, args);
     if (Object.keys(updates).length > 0) {
       await ctx.db.patch(args.pageId, updates);
     }
   },
 });
+
+async function buildPageUpdates(
+  ctx: AuthNmutationCtx,
+  page: Doc<"pages">,
+  args: { title?: string; path?: string; isVisible?: boolean },
+) {
+  const nextTitle =
+    args.title !== undefined ? validateTitle(args.title) : undefined;
+  const nextPath =
+    args.path !== undefined
+      ? await resolveUniquePath(ctx, args.path, page._id)
+      : undefined;
+
+  return {
+    ...(args.isVisible !== undefined && { isVisible: args.isVisible }),
+    ...(nextTitle !== undefined && { title: nextTitle }),
+    ...(nextPath !== undefined && { path: nextPath }),
+    ...((nextTitle !== undefined || nextPath !== undefined) && {
+      searchText: pageSearchText(
+        nextTitle ?? page.title,
+        nextPath ?? page.path,
+      ),
+    }),
+  };
+}
 
 export const publish = authNmutation({
   args: {
