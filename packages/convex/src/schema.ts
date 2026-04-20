@@ -44,7 +44,10 @@ export default defineSchema(
       searchText: v.optional(v.string()),
     })
       .index("by_path", ["path"])
-      .index("by_createdByUserId", ["createdByUserId"]),
+      .index("by_createdByUserId", ["createdByUserId"])
+      .searchIndex("search_text", {
+        searchField: "searchText",
+      }),
     pageDrafts: defineTable({
       pageId: v.id("pages"),
       name: v.string(),
