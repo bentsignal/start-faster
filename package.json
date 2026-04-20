@@ -8,8 +8,8 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "build": "turbo run build",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo run clean",
+    "clean:root": "git clean -xdf node_modules .turbo",
+    "clean": "pnpm run clean:root && turbo run clean",
     "dev": "turbo run dev --parallel --continue",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",

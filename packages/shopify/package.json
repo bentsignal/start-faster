@@ -21,10 +21,10 @@
     "codegen:customer": "pnpm run codegen --project customer",
     "build": "concurrently \"pnpm run codegen:storefront\" \"pnpm run codegen:customer\"",
     "dev": "concurrently \"pnpm run codegen:storefront --watch\" \"pnpm run codegen:customer --watch\"",
-    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "clean": "git clean -xdf .cache .turbo dist node_modules src/**/_generated",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "format:fix": "prettier --write . --ignore-path ../../.gitignore --ignore-path .prettierignore",
-    "lint": "eslint",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
     "with-env": "dotenv -e ../../.env --",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },

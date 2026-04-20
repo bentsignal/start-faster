@@ -21,8 +21,9 @@
     "build": "convex deploy",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "format:fix": "prettier --write . --ignore-path ../../.gitignore --ignore-path .prettierignore",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "typecheck": "tsc",
     "setup": "convex dev --until-success",
     "logs": "convex logs"
   },
