@@ -3,7 +3,7 @@ import { ConvexError, v } from "convex/values";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { AuthNmutationCtx, AuthNqueryCtx } from "../custom";
-import { internalMutation, query } from "../_generated/server";
+import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
 import { ensureCmsScopeOrAdmin } from "../privileges";
 import { validatePath } from "./utils";
@@ -194,22 +194,6 @@ export const list = authNquery({
     const pages = await ctx.db.query("pages").order("desc").collect();
 
     return await Promise.all(pages.map((page) => enrichPage(ctx, page)));
-  },
-});
-
-export const backfillSearchText = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const pages = await ctx.db.query("pages").collect();
-    let updated = 0;
-    for (const page of pages) {
-      if (page.searchText !== undefined) continue;
-      await ctx.db.patch(page._id, {
-        searchText: pageSearchText(page.title, page.path),
-      });
-      updated++;
-    }
-    return { scanned: pages.length, updated };
   },
 });
 
