@@ -26,9 +26,8 @@ export function CreatePageButton() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button>
+          <Button size="icon" aria-label="Create Page">
             <Plus className="size-4" />
-            Create Page
           </Button>
         }
       />

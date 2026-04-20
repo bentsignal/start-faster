@@ -7,9 +7,17 @@ import { api } from "@acme/convex/api";
 export const DRAFTS_PAGE_SIZE = 20;
 export const RELEASES_PAGE_SIZE = 20;
 export const SCHEDULED_PAGE_SIZE = 20;
+export const PAGES_PAGE_SIZE = 30;
 
 export const pageQueries = {
   list: () => queryOptions({ ...convexQuery(api.pages.manage.list, {}) }),
+  listFirstPage: (searchTerm: string) =>
+    queryOptions({
+      ...convexQuery(api.pages.manage.listPaginated, {
+        searchTerm,
+        paginationOpts: { numItems: PAGES_PAGE_SIZE, cursor: null },
+      }),
+    }),
   getById: (pageId: Id<"pages">) =>
     queryOptions({ ...convexQuery(api.pages.manage.getById, { pageId }) }),
   getDraft: (draftId: Id<"pageDrafts">) =>
