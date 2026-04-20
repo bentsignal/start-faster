@@ -144,32 +144,50 @@ export const list = authNquery({
 
     const pages = await ctx.db.query("pages").order("desc").collect();
 
-    return await Promise.all(
-      pages.map(async (page) => {
-        const drafts = await ctx.db
-          .query("pageDrafts")
-          .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
-          .collect();
+    return await Promise.all(pages.map((page) => enrichPage(ctx, page)));
+  },
+});
 
-        const latestRelease = await ctx.db
-          .query("pageReleases")
-          .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
-          .order("desc")
-          .first();
+export const backfillSearchText = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const pages = await ctx.db.query("pages").collect();
+    let updated = 0;
+    for (const page of pages) {
+      if (page.searchText !== undefined) continue;
+      await ctx.db.patch(page._id, {
+        searchText: pageSearchText(page.title, page.path),
+      });
+      updated++;
+    }
+    return { scanned: pages.length, updated };
+  },
+});
 
-        const createdByUser = await ctx.db.get(page.createdByUserId);
+export const listPaginated = authNquery({
+  args: {
+    searchTerm: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
 
-        return {
-          ...page,
-          hasRelease: latestRelease !== null,
-          hasDraft: drafts.length > 0,
-          draftCount: drafts.length,
-          createdBy: createdByUser
-            ? { _id: createdByUser._id, name: createdByUser.name }
-            : null,
-        };
-      }),
+    const normalized = args.searchTerm?.trim().toLowerCase();
+
+    const result = normalized
+      ? await ctx.db
+          .query("pages")
+          .withSearchIndex("search_text", (q) =>
+            q.search("searchText", normalized),
+          )
+          .paginate(args.paginationOpts)
+      : await ctx.db.query("pages").order("desc").paginate(args.paginationOpts);
+
+    const enriched = await Promise.all(
+      result.page.map((page) => enrichPage(ctx, page)),
     );
+
+    return { ...result, page: enriched };
   },
 });
 

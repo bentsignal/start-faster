@@ -39,6 +39,9 @@ export default defineSchema(
       path: v.string(),
       isVisible: v.boolean(),
       createdByUserId: v.id("users"),
+      // Optional for the duration of the backfill; tighten to v.string() after
+      // running api.pages.manage.backfillSearchText on all environments.
+      searchText: v.optional(v.string()),
     })
       .index("by_path", ["path"])
       .index("by_createdByUserId", ["createdByUserId"]),
