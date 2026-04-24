@@ -11,6 +11,9 @@ import { toast } from "@acme/ui/toaster";
 import { PageVisibilityToggle } from "~/features/pages/components/page-visibility-toggle";
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
 import { pageQueries } from "~/features/pages/lib/page-queries";
+import { PermissionNoticeBanner } from "~/features/permissions/components/permission-notice";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 import { useIsPending } from "~/hooks/use-is-pending";
 
 export const Route = createFileRoute(
@@ -21,10 +24,14 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const form = usePageSettings();
+  const canEdit = useHasCmsScope("can-manage-page-metadata");
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-10 sm:px-8">
       <h1 className="text-2xl font-semibold tracking-tight">Page Settings</h1>
+      {canEdit ? null : (
+        <PermissionNoticeBanner scope="can-manage-page-metadata" />
+      )}
       <PageVisibilityToggle pageId={form.pageId} />
       <form
         onSubmit={(e) => {
@@ -43,6 +50,7 @@ function RouteComponent() {
               value={form.title}
               onChange={(e) => form.setTitle(e.target.value)}
               placeholder="Page title"
+              disabled={!canEdit}
             />
             <p className="text-muted-foreground text-xs">
               The title is displayed in the browser tab and search engine
@@ -59,6 +67,7 @@ function RouteComponent() {
               onChange={(e) => form.setPath(e.target.value)}
               onBlur={() => form.validatePathField()}
               placeholder="/about"
+              disabled={!canEdit}
             />
             {form.pathError ? (
               <p className="text-destructive text-xs">{form.pathError}</p>
@@ -69,22 +78,58 @@ function RouteComponent() {
             )}
           </div>
         </div>
-        <Button
-          type="submit"
-          disabled={form.isPending || !form.hasChanges || !!form.pathError}
-          variant={form.isError ? "destructive" : "default"}
-        >
-          {form.isError ? (
-            <>
-              <RotateCcw className="size-4" /> Failed to update settings, try
-              again
-            </>
-          ) : (
-            "Save Settings"
-          )}
-        </Button>
+        <SaveSettingsButton
+          canEdit={canEdit}
+          isPending={form.isPending}
+          hasChanges={form.hasChanges}
+          pathError={form.pathError}
+          isError={form.isError}
+        />
       </form>
     </div>
+  );
+}
+
+interface SaveSettingsButtonProps {
+  canEdit: boolean;
+  isPending: boolean;
+  hasChanges: boolean;
+  pathError: string | null;
+  isError: boolean;
+}
+
+function SaveSettingsButton(props: SaveSettingsButtonProps) {
+  if (!props.canEdit) {
+    return (
+      <RestrictedTooltip scope="can-manage-page-metadata">
+        <SaveSettingsButtonInner {...props} />
+      </RestrictedTooltip>
+    );
+  }
+  return <SaveSettingsButtonInner {...props} />;
+}
+
+function SaveSettingsButtonInner({
+  canEdit,
+  isPending,
+  hasChanges,
+  pathError,
+  isError,
+}: SaveSettingsButtonProps) {
+  return (
+    <Button
+      type="submit"
+      disabled={!canEdit || isPending || !hasChanges || !!pathError}
+      variant={isError ? "destructive" : "default"}
+    >
+      {isError ? (
+        <>
+          <RotateCcw className="size-4" /> Failed to update settings, try again
+        </>
+      ) : (
+        "Save Settings"
+      )}
+    </Button>
   );
 }
 

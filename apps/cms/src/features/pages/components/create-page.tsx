@@ -17,10 +17,23 @@ import {
 import { Input } from "@acme/ui/input";
 
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 import { useIsPending } from "~/hooks/use-is-pending";
 
 export function CreatePageButton() {
   const [open, setOpen] = useState(false);
+  const canCreate = useHasCmsScope("can-create-new-pages");
+
+  if (!canCreate) {
+    return (
+      <RestrictedTooltip scope="can-create-new-pages">
+        <Button size="icon" aria-label="Create Page" disabled>
+          <Plus className="size-4" />
+        </Button>
+      </RestrictedTooltip>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

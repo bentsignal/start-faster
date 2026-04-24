@@ -16,6 +16,8 @@ import {
   useDeleteDraft,
 } from "~/features/pages/components/delete-draft-button";
 import { useCreateDraftFromVersion } from "~/features/pages/hooks/use-create-draft-from-version";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
+import { getScopeDeniedMessage } from "~/features/permissions/lib/cms-scope-messages";
 import { EllipsisTrigger } from "./ellipsis-trigger";
 
 interface UseDraftActionsMenuArgs {
@@ -104,6 +106,7 @@ export function DraftActionsMenu(props: {
     handleSchedule,
     handleConfirmDelete,
   } = useDraftActionsMenu(props);
+  const canEdit = useHasCmsScope("can-manage-page-content");
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
@@ -125,6 +128,7 @@ export function DraftActionsMenu(props: {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleCreateNewDraftFromThis}
+            disabled={!canEdit}
             className="hover:cursor-pointer"
           >
             <CopyPlus className="size-3.5" />
@@ -132,6 +136,7 @@ export function DraftActionsMenu(props: {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleSchedule}
+            disabled={!canEdit}
             className="hover:cursor-pointer"
           >
             <CalendarClock className="size-3.5" />
@@ -146,6 +151,7 @@ export function DraftActionsMenu(props: {
           ) : (
             <DropdownMenuItem
               variant="destructive"
+              disabled={!canEdit}
               closeOnClick={false}
               onClick={startConfirming}
               className="hover:cursor-pointer"
@@ -153,6 +159,11 @@ export function DraftActionsMenu(props: {
               <Trash2 className="size-3.5" />
               Delete draft
             </DropdownMenuItem>
+          )}
+          {canEdit ? null : (
+            <p className="text-muted-foreground px-3 py-1.5 text-xs italic">
+              {getScopeDeniedMessage("can-manage-page-content")}
+            </p>
           )}
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -9,8 +9,26 @@ import {
 } from "@acme/ui/tooltip";
 
 import { useFileUpload } from "~/features/files/hooks/use-file-upload";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 
 export function UploadButton() {
+  const canUpload = useHasCmsScope("can-upload-files");
+
+  if (!canUpload) {
+    return (
+      <RestrictedTooltip scope="can-upload-files">
+        <Button size="icon" aria-label="Upload a new file" disabled>
+          <Upload className="size-4" />
+        </Button>
+      </RestrictedTooltip>
+    );
+  }
+
+  return <UploadButtonInner />;
+}
+
+function UploadButtonInner() {
   const { inputRef, isUploading, triggerPicker, uploadSelected } =
     useFileUpload();
 

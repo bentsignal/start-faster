@@ -8,6 +8,8 @@ import { toast } from "@acme/ui/toaster";
 
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
 import { pageQueries } from "~/features/pages/lib/page-queries";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 
 export function PageVisibilityToggle({ pageId }: { pageId: Id<"pages"> }) {
   const {
@@ -18,18 +20,19 @@ export function PageVisibilityToggle({ pageId }: { pageId: Id<"pages"> }) {
     toggle,
     isPending,
   } = usePageVisibilityToggle(pageId);
+  const canEdit = useHasCmsScope("can-manage-page-metadata");
 
   return (
     <div className="flex flex-col gap-2">
       <div className="text-sm font-medium">Visibility</div>
       <div className="flex items-center gap-4 rounded-xl border p-4">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           {isVisible ? (
-            <Eye className="text-muted-foreground mt-0.5 size-4 shrink-0" />
+            <Eye className="text-muted-foreground size-4 shrink-0" />
           ) : (
-            <EyeOff className="text-muted-foreground mt-0.5 size-4 shrink-0" />
+            <EyeOff className="text-muted-foreground size-4 shrink-0" />
           )}
-          <div className="min-w-0 space-y-1">
+          <div className="ml-1 min-w-0 space-y-1">
             <p className="truncate text-sm font-medium">
               {isVisible ? "Visible to the public" : "Hidden from the public"}
             </p>
@@ -41,7 +44,13 @@ export function PageVisibilityToggle({ pageId }: { pageId: Id<"pages"> }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center justify-end gap-2">
-          {confirming ? (
+          {!canEdit ? (
+            <RestrictedTooltip scope="can-manage-page-metadata">
+              <Button size="sm" variant="outline" disabled>
+                {isVisible ? "Hide page" : "Make visible"}
+              </Button>
+            </RestrictedTooltip>
+          ) : confirming ? (
             <>
               <span className="text-muted-foreground text-xs whitespace-nowrap">
                 Are you sure?

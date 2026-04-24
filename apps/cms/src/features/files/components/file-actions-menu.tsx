@@ -15,6 +15,8 @@ import { toast } from "@acme/ui/toaster";
 
 import { useFileMutations } from "~/features/files/lib/file-mutations";
 import { DeleteConfirmation } from "~/features/pages/components/delete-draft-button";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
+import { getScopeDeniedMessage } from "~/features/permissions/lib/cms-scope-messages";
 import { FileRenameDialog } from "./file-rename-dialog";
 
 type Placement = "row" | "tile";
@@ -85,6 +87,7 @@ function useFileActionsMenu({
 export function FileActionsMenu(props: FileActionsMenuProps) {
   const { fileId, fileName, downloadUrl, placement, isOpen, setOpen } = props;
   const actions = useFileActionsMenu({ fileId, setOpen });
+  const canManage = useHasCmsScope("can-upload-files");
   const triggerClass =
     placement === "row" ? ROW_TRIGGER_CLASS : TILE_TRIGGER_CLASS;
 
@@ -104,6 +107,7 @@ export function FileActionsMenu(props: FileActionsMenuProps) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={actions.handleRename}
+              disabled={!canManage}
               className="hover:cursor-pointer"
             >
               <Pencil className="size-3.5" />
@@ -131,6 +135,7 @@ export function FileActionsMenu(props: FileActionsMenuProps) {
             ) : (
               <DropdownMenuItem
                 variant="destructive"
+                disabled={!canManage}
                 closeOnClick={false}
                 onClick={actions.startConfirming}
                 className="hover:cursor-pointer"
@@ -138,6 +143,11 @@ export function FileActionsMenu(props: FileActionsMenuProps) {
                 <Trash2 className="size-3.5" />
                 Delete
               </DropdownMenuItem>
+            )}
+            {canManage ? null : (
+              <p className="text-muted-foreground px-3 py-1.5 text-xs italic">
+                {getScopeDeniedMessage("can-upload-files")}
+              </p>
             )}
           </DropdownMenuGroup>
         </DropdownMenuContent>

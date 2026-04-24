@@ -215,8 +215,8 @@ export const ensureDownloadTokens = internalMutation({
 export const list = authNquery({
   args: {},
   handler: async (ctx) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-upload-files");
-
+    // Viewing the shared asset library is open to anyone with CMS access;
+    // uploading, renaming, and deleting are still gated on `can-upload-files`.
     const files = await ctx.db.query("files").order("desc").collect();
 
     return await Promise.all(

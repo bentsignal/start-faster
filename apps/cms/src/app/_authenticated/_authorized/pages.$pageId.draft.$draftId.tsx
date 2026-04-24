@@ -23,6 +23,8 @@ import {
 } from "~/features/pages/components/viewport-controls";
 import { useAutosave } from "~/features/pages/hooks/use-autosave";
 import { pageQueries } from "~/features/pages/lib/page-queries";
+import { PermissionNoticeBanner } from "~/features/permissions/components/permission-notice";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 
 export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
@@ -54,9 +56,15 @@ function DraftEditor() {
     setViewport,
     previewUrl,
   } = useDraftEditor();
+  const canEdit = useHasCmsScope("can-manage-page-content");
 
   return (
     <div className="flex h-full flex-1 flex-col">
+      {canEdit ? null : (
+        <div className="shrink-0 px-4 pt-4">
+          <PermissionNoticeBanner scope="can-manage-page-content" />
+        </div>
+      )}
       <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-2">
         {mode === "preview" && (
           <>

@@ -18,10 +18,25 @@ import { toast } from "@acme/ui/toaster";
 
 import { useNavigateToPageHubTab } from "~/features/pages/hooks/use-navigate-to-page-hub-tab";
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 import { useIsPending } from "~/hooks/use-is-pending";
 
 export function PublishButton() {
   const { isPublishing, publish, open, setOpen } = usePublishDraft();
+  const canPublish = useHasCmsScope("can-manage-page-content");
+
+  if (!canPublish) {
+    return (
+      <RestrictedTooltip scope="can-manage-page-content" className="w-full">
+        <Button variant="default" size="sm" className="w-full" disabled>
+          <Upload className="size-3.5" />
+          Publish
+        </Button>
+      </RestrictedTooltip>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger

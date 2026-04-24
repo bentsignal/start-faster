@@ -1,9 +1,8 @@
 import { Activity } from "react";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { z } from "zod";
 
-import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
 import { Input } from "@acme/ui/input";
 
 import { FilePreviewModal } from "~/features/files/components/file-preview-modal";
@@ -27,11 +26,6 @@ export const Route = createFileRoute("/_authenticated/_authorized/files")({
     view: filesViewModeValidator.default(defaultFilesViewMode),
     q: z.string().default(""),
   }),
-  beforeLoad: ({ context }) => {
-    if (!hasCmsScopeOrAdmin(context.user, "can-upload-files")) {
-      throw redirect({ to: "/dashboard" });
-    }
-  },
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(fileQueries.list());
   },

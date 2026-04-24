@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { z } from "zod";
 
+import { hasCmsScopeOrAdmin } from "@acme/convex/privileges";
 import { Input } from "@acme/ui/input";
 
 import type { PagesViewMode } from "~/features/pages/components/pages-view-toggle";
@@ -15,6 +16,8 @@ import {
   PagesViewToggle,
 } from "~/features/pages/components/pages-view-toggle";
 import { pageQueries } from "~/features/pages/lib/page-queries";
+import { PermissionNoticeBlocked } from "~/features/permissions/components/permission-notice";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 import { useDebouncedInput } from "~/hooks/use-debounced-input";
 
 export const Route = createFileRoute("/_authenticated/_authorized/pages/")({
@@ -25,6 +28,9 @@ export const Route = createFileRoute("/_authenticated/_authorized/pages/")({
   }),
   loaderDeps: ({ search }) => ({ q: search.q }),
   loader: async ({ context, deps }) => {
+    // Skip prefetch if the user cannot view pages — the route component
+    // renders a permission notice instead of running the list queries.
+    if (!hasCmsScopeOrAdmin(context.user, "can-view-pages")) return;
     await Promise.all([
       context.queryClient.ensureQueryData(pageQueries.listFirstPage(deps.q)),
       context.queryClient.ensureQueryData(pageQueries.list()),
@@ -63,6 +69,14 @@ function usePagesIndex() {
 }
 
 function RouteComponent() {
+  const canView = useHasCmsScope("can-view-pages");
+  if (!canView) {
+    return <PermissionNoticeBlocked scope="can-view-pages" />;
+  }
+  return <PagesIndex />;
+}
+
+function PagesIndex() {
   const { viewMode, setViewMode, searchValue, setSearchValue } =
     usePagesIndex();
 

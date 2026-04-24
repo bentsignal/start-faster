@@ -14,6 +14,8 @@ import { toast } from "@acme/ui/toaster";
 
 import { useNavigateToPageHubTab } from "~/features/pages/hooks/use-navigate-to-page-hub-tab";
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
+import { getScopeDeniedMessage } from "~/features/permissions/lib/cms-scope-messages";
 import { EllipsisTrigger } from "./ellipsis-trigger";
 
 function useScheduledActionsMenu({
@@ -78,6 +80,7 @@ export function ScheduledActionsMenu({
 }) {
   const { handlePreview, handleReschedule, handleRevert } =
     useScheduledActionsMenu({ scheduledId, setOpen, onOpenReschedule });
+  const canEdit = useHasCmsScope("can-manage-page-content");
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setOpen}>
@@ -99,6 +102,7 @@ export function ScheduledActionsMenu({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleReschedule}
+            disabled={!canEdit}
             className="hover:cursor-pointer"
           >
             <CalendarClock className="size-3.5" />
@@ -106,11 +110,17 @@ export function ScheduledActionsMenu({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleRevert}
+            disabled={!canEdit}
             className="hover:cursor-pointer"
           >
             <X className="size-3.5" />
             Cancel
           </DropdownMenuItem>
+          {canEdit ? null : (
+            <p className="text-muted-foreground px-3 py-1.5 text-xs italic">
+              {getScopeDeniedMessage("can-manage-page-content")}
+            </p>
+          )}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -14,6 +14,8 @@ import {
 } from "@acme/ui/tooltip";
 
 import { usePageMutations } from "~/features/pages/hooks/use-page-mutations";
+import { RestrictedTooltip } from "~/features/permissions/components/restricted-tooltip";
+import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
 
 export function DeleteDraftButton() {
   const [confirming, setConfirming] = useState(false);
@@ -31,6 +33,23 @@ export function DeleteDraftButton() {
     draftId,
     behavior: "navigate-before-delete",
   });
+  const canDelete = useHasCmsScope("can-manage-page-content");
+
+  if (!canDelete) {
+    return (
+      <RestrictedTooltip scope="can-manage-page-content" className="w-full">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-destructive/70 w-full justify-start gap-2"
+          disabled
+        >
+          <Trash2 className="size-3.5 shrink-0" />
+          Delete draft
+        </Button>
+      </RestrictedTooltip>
+    );
+  }
 
   if (confirming) {
     return (
