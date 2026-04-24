@@ -9,6 +9,7 @@
     "./image/sizes": "./src/image/sizes.ts",
     "./layout/account-item": "./src/layout/account-item.tsx",
     "./layout/sign-out-item": "./src/layout/sign-out-item.tsx",
+    "./layout/theme-toggle-item": "./src/layout/theme-toggle-item.tsx",
     "./quick-link": "./src/quick-link/quick-link.tsx",
     "./screen": "./src/screen/index.tsx",
     "./theme": "./src/theme/index.tsx"
@@ -40,6 +41,7 @@
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@types/node": "catalog:",
     "great-time": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:react19",

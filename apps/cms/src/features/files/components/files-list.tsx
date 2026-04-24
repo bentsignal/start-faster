@@ -1,78 +1,131 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { convexQuery } from "@convex-dev/react-query";
+import { useState } from "react";
 
-import { api } from "@acme/convex/api";
-import { Card, CardContent } from "@acme/ui/card";
+import type { PreviewTarget } from "~/features/files/hooks/use-files-index";
+import type { FileRow } from "~/features/files/types";
+import { Image } from "~/components/image";
+import { useFilteredFiles } from "~/features/files/hooks/use-files-index";
+import {
+  formatDate,
+  formatFileSize,
+  isImageContentType,
+} from "~/features/files/lib/format";
+import { FileActionsMenu } from "./file-actions-menu";
+import { FileTypeIcon } from "./file-type-icon";
 
-import { formatDate, formatFileSize } from "~/features/files/lib/format";
+export function FilesListView({
+  searchTerm,
+  onPreview,
+}: {
+  searchTerm: string;
+  onPreview: (target: PreviewTarget) => void;
+}) {
+  const entries = useFilteredFiles(searchTerm);
 
-export function FilesList() {
-  const { data: files } = useSuspenseQuery({
-    ...convexQuery(api.files.list, {}),
-    select: (data) =>
-      data.map((file) => ({
-        _id: file._id,
-        fileName: file.fileName,
-        contentType: file.contentType,
-        size: file.size,
-        uploadedBy: file.uploadedBy,
-        _creationTime: file._creationTime,
-      })),
-  });
-
-  if (files.length === 0) {
+  if (entries.length === 0) {
     return (
-      <section className="space-y-4">
-        <FilesListHeading />
-        <Card size="sm">
-          <CardContent className="py-10 text-center">
-            <p className="text-muted-foreground text-sm">
-              No files have been uploaded yet.
-            </p>
-          </CardContent>
-        </Card>
-      </section>
+      <div className="text-muted-foreground px-1 py-8 text-sm">
+        {searchTerm ? "No files match your search." : "No files yet."}
+      </div>
     );
   }
 
   return (
-    <section className="space-y-4">
-      <FilesListHeading />
-      <div className="space-y-3">
-        {files.map((file) => (
-          <Card key={file._id} size="sm">
-            <CardContent className="flex flex-col gap-3 py-1 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-1">
-                <p className="font-medium">{file.fileName}</p>
-                <p className="text-muted-foreground text-sm">
-                  {file.contentType ?? "Unknown type"} ·{" "}
-                  {formatFileSize(file.size)}
-                </p>
-              </div>
-              <div className="text-muted-foreground space-y-1 text-sm sm:text-right">
-                <p>
-                  Uploaded by{" "}
-                  {file.uploadedBy?.name ??
-                    file.uploadedBy?.email ??
-                    "Unknown user"}
-                </p>
-                <p>{formatDate(file._creationTime)}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+    <ul className="flex flex-col gap-1.5">
+      {entries.map(({ file, url }) => (
+        <li key={file._id}>
+          <FileListRow
+            file={file}
+            url={url}
+            onPreview={() => {
+              if (url) onPreview({ fileName: file.fileName, url });
+            }}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
 
-function FilesListHeading() {
+const CONTENT_CLASS =
+  "flex min-w-0 flex-1 items-center gap-3 rounded-md text-left outline-none";
+
+export function FileListRow({
+  file,
+  url,
+  onPreview,
+}: {
+  file: FileRow;
+  url: string | null;
+  onPreview: () => void;
+}) {
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const isImage = isImageContentType(file.contentType);
+  const clickable = isImage && url !== null;
+
   return (
-    <div className="space-y-1">
-      <h2 className="text-lg font-semibold">Recent uploads</h2>
-      <p className="text-muted-foreground text-sm">
-        Newest shared CMS assets appear first.
-      </p>
+    <div
+      className="group/file-row border-border/60 bg-background hover:bg-muted/50 relative flex items-center gap-2 rounded-lg border px-3 py-2 transition-colors"
+      data-menu-open={isMenuOpen || undefined}
+    >
+      {clickable ? (
+        <button
+          type="button"
+          className={`${CONTENT_CLASS} cursor-zoom-in`}
+          onClick={onPreview}
+        >
+          <RowInner file={file} url={url} isImage={isImage} />
+        </button>
+      ) : (
+        <div className={CONTENT_CLASS}>
+          <RowInner file={file} url={url} isImage={isImage} />
+        </div>
+      )}
+      <FileActionsMenu
+        fileId={file._id}
+        fileName={file.fileName}
+        downloadUrl={url}
+        placement="row"
+        isOpen={isMenuOpen}
+        setOpen={setMenuOpen}
+      />
     </div>
+  );
+}
+
+function RowInner({
+  file,
+  url,
+  isImage,
+}: {
+  file: FileRow;
+  url: string | null;
+  isImage: boolean;
+}) {
+  return (
+    <>
+      <div className="bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md">
+        {isImage && url ? (
+          <Image
+            src={url}
+            alt={file.fileName}
+            width={40}
+            height={40}
+            preserveSearch
+            className="size-full object-cover"
+          />
+        ) : (
+          <FileTypeIcon
+            contentType={file.contentType}
+            className="text-muted-foreground size-4"
+          />
+        )}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-sm font-medium">{file.fileName}</span>
+        <span className="text-muted-foreground truncate text-xs">
+          {formatFileSize(file.size)} · {formatDate(file._creationTime)}
+        </span>
+      </div>
+    </>
   );
 }

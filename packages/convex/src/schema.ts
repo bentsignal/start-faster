@@ -18,6 +18,7 @@ export default defineSchema(
       size: v.number(),
       sha256: v.string(),
       uploadedByUserId: v.id("users"),
+      downloadToken: v.optional(v.string()),
     })
       .index("by_storageId", ["storageId"])
       .index("by_uploadedByUserId", ["uploadedByUserId"]),

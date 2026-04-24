@@ -28,15 +28,16 @@ const getVercelOptimizedUrl = (
   return `${getVercelImageEndpoint(optimizerBaseUrl)}?${searchParams.toString()}`;
 };
 
-const normalizeImageSourceUrl = (src: string) => {
+const normalizeImageSourceUrl = (src: string, preserveSearch: boolean) => {
   if (src.startsWith("/")) {
+    if (preserveSearch) return src.split("#")[0] ?? src;
     return src.split("?")[0]?.split("#")[0] ?? src;
   }
 
   try {
     const url = new URL(src);
     url.hash = "";
-    url.search = "";
+    if (!preserveSearch) url.search = "";
 
     return url.toString();
   } catch {
@@ -80,14 +81,16 @@ export const useVercelOptimizedImageProps = ({
   height,
   sizes,
   optimizerBaseUrl,
+  preserveSearch = false,
 }: {
   src: string;
   width: number;
   height: number;
   sizes?: string;
   optimizerBaseUrl?: string;
+  preserveSearch?: boolean;
 }) => {
-  const normalizedSrc = normalizeImageSourceUrl(src);
+  const normalizedSrc = normalizeImageSourceUrl(src, preserveSearch);
 
   if (process.env.NODE_ENV === "development") {
     return { src, width, height, sizes };

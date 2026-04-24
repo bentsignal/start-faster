@@ -11,7 +11,7 @@ const http = httpRouter();
 registerRoutes(http, components.convexFilesControl, {
   pathPrefix: "files",
   enableUploadRoute: true,
-  enableDownloadRoute: false,
+  enableDownloadRoute: true,
   defaultUploadProvider: "convex",
   checkUploadRequest: async (ctx, args) => {
     if (args.provider !== "convex") {
@@ -47,6 +47,17 @@ registerRoutes(http, components.convexFilesControl, {
         status: 403,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    const contentType = args.file instanceof File ? args.file.type : "";
+    if (!contentType.startsWith("image/")) {
+      return new Response(
+        JSON.stringify({ error: "Only image uploads are allowed." }),
+        {
+          status: 415,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     return {

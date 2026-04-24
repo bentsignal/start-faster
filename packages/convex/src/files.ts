@@ -1,9 +1,11 @@
 import type { Infer } from "convex/values";
 import { ConvexError, v } from "convex/values";
 
+import type { MutationCtx } from "./_generated/server";
 import type { AuthNmutationCtx } from "./custom";
 import type { StorageProvider } from "./validators";
 import { components } from "./_generated/api";
+import { internalMutation } from "./_generated/server";
 import { authNmutation, authNquery } from "./custom";
 import { ensureCmsScopeOrAdmin } from "./privileges";
 import { storageProviderValidator } from "./validators";
@@ -24,6 +26,22 @@ function ensureConvexStorage(provider: StorageProvider) {
   }
 }
 
+async function createShareableDownloadToken(
+  ctx: AuthNmutationCtx | MutationCtx,
+  storageId: string,
+) {
+  const grant = await ctx.runMutation(
+    components.convexFilesControl.download.createDownloadGrant,
+    {
+      storageId,
+      maxUses: null,
+      expiresAt: null,
+      shareableLink: true,
+    },
+  );
+  return grant.downloadToken;
+}
+
 async function insertCmsFileRecord(
   ctx: AuthNmutationCtx,
   args: {
@@ -42,8 +60,17 @@ async function insertCmsFileRecord(
     .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))
     .unique();
   if (existingRecord) {
+    if (!existingRecord.downloadToken) {
+      const downloadToken = await createShareableDownloadToken(
+        ctx,
+        args.storageId,
+      );
+      await ctx.db.patch(existingRecord._id, { downloadToken });
+    }
     return existingRecord._id;
   }
+
+  const downloadToken = await createShareableDownloadToken(ctx, args.storageId);
 
   return await ctx.db.insert("files", {
     storageId: args.storageId,
@@ -53,6 +80,7 @@ async function insertCmsFileRecord(
     size: args.metadata.size,
     sha256: args.metadata.sha256,
     uploadedByUserId: ctx.user._id,
+    downloadToken,
   });
 }
 
@@ -118,6 +146,69 @@ export const recordUpload = authNmutation({
     ensureConvexStorage(args.storageProvider);
 
     return await insertCmsFileRecord(ctx, args);
+  },
+});
+
+export const rename = authNmutation({
+  args: {
+    fileId: v.id("files"),
+    fileName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-upload-files");
+
+    const trimmed = args.fileName.trim();
+    if (!trimmed) {
+      throw new ConvexError("File name cannot be empty.");
+    }
+
+    const file = await ctx.db.get(args.fileId);
+    if (!file) {
+      throw new ConvexError("File not found.");
+    }
+
+    await ctx.db.patch(args.fileId, { fileName: trimmed });
+  },
+});
+
+export const remove = authNmutation({
+  args: {
+    fileId: v.id("files"),
+  },
+  handler: async (ctx, args) => {
+    ensureCmsScopeOrAdmin(ctx.user, "can-upload-files");
+
+    const file = await ctx.db.get(args.fileId);
+    if (!file) {
+      throw new ConvexError("File not found.");
+    }
+
+    await ctx.runMutation(components.convexFilesControl.cleanUp.deleteFile, {
+      storageId: file.storageId,
+    });
+
+    await ctx.db.delete(args.fileId);
+  },
+});
+
+// One-shot backfill for records that predate the downloadToken field. Exposed
+// as an internal mutation so it can only be invoked from the Convex dashboard
+// (or a scheduled/internal caller), never from the client API.
+export const ensureDownloadTokens = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const files = await ctx.db.query("files").collect();
+    const missing = files.filter((file) => !file.downloadToken);
+
+    for (const file of missing) {
+      const downloadToken = await createShareableDownloadToken(
+        ctx,
+        file.storageId,
+      );
+      await ctx.db.patch(file._id, { downloadToken });
+    }
+
+    return { backfilled: missing.length };
   },
 });
 

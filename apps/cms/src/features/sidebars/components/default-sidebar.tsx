@@ -3,6 +3,7 @@ import { FileText, LayoutDashboard, Upload } from "lucide-react";
 
 import { AccountItem } from "@acme/features/layout/account-item";
 import { SignOutItem } from "@acme/features/layout/sign-out-item";
+import { ThemeToggleItem } from "@acme/features/layout/theme-toggle-item";
 import { QuickLink } from "@acme/features/quick-link";
 import {
   Sidebar,
@@ -14,7 +15,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "@acme/ui/sidebar";
 
 import { env } from "~/env";
@@ -37,7 +37,6 @@ export function DefaultSidebar() {
           CMS
         </span>
       </SidebarHeader>
-      <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -59,7 +58,7 @@ export function DefaultSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarSeparator className="mx-0" />
+        <ThemeToggleItem />
         <AccountItem />
         <SignOutItem
           loading={loading}

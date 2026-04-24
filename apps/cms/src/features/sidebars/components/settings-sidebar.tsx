@@ -9,7 +9,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarSeparator,
 } from "@acme/ui/sidebar";
 
 import { formatRelativeTime } from "~/features/pages/lib/format-relative-time";
@@ -19,7 +18,6 @@ export function SettingsSidebar() {
   return (
     <Sidebar variant="inset">
       <SettingsSidebarHeader />
-      <SidebarSeparator />
       <SidebarContent>
         <LastUpdated />
       </SidebarContent>

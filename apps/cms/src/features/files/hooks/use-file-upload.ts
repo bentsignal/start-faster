@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAccessToken } from "@workos/authkit-tanstack-react-start/client";
 
 import { api } from "@acme/convex/api";
@@ -21,17 +21,14 @@ const uploadFileOptions = {
 export function useFileUpload() {
   const { getAccessToken } = useAccessToken();
   const { uploadFile } = useUploadFile(api.files, uploadFileOptions);
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [inputKey, setInputKey] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  async function handleUpload() {
-    if (!selectedFile) {
-      toast.error("Choose a file before uploading.");
-      return;
-    }
+  function triggerPicker() {
+    inputRef.current?.click();
+  }
 
+  async function uploadSelected(file: File) {
     setIsUploading(true);
 
     const authToken = (await getAccessToken()) ?? null;
@@ -43,29 +40,22 @@ export function useFileUpload() {
 
     try {
       await uploadFile({
-        file: selectedFile,
+        file,
         http: {
           baseUrl: convexSiteUrl,
           authToken,
         },
       });
-
-      setSelectedFile(null);
-      setInputKey((value) => value + 1);
-      toast.success("File uploaded.");
     } catch (error) {
       console.error(error);
       toast.error("Failed to upload file");
     }
 
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
     setIsUploading(false);
   }
 
-  return {
-    selectedFile,
-    inputKey,
-    isUploading,
-    handleFileChange: setSelectedFile,
-    handleUpload,
-  };
+  return { inputRef, isUploading, triggerPicker, uploadSelected };
 }

@@ -13,9 +13,14 @@ export default defineConfig(async ({ mode }) => {
     import("./src/env"),
   ]);
 
+  const convexSiteUrl = env.VITE_CONVEX_URL.includes(".cloud")
+    ? env.VITE_CONVEX_URL.replace(".cloud", ".site")
+    : env.VITE_CONVEX_URL;
+
   const imageConfig = createImageConfig({
     uploadthingUrl: env.VITE_UT_URL,
     shopifyImageUrlStoreId: env.VITE_SHOPIFY_IMAGE_URL_STORE_ID,
+    convexSiteUrl,
     sizes: [...imageWidths],
   });
 

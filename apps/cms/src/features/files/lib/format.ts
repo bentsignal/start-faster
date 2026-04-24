@@ -28,3 +28,24 @@ export function formatFileSize(bytes: number) {
 export function toConvexSiteUrl(url: string) {
   return url.includes(".cloud") ? url.replace(".cloud", ".site") : url;
 }
+
+export function buildFileUrl({
+  convexSiteUrl,
+  downloadToken,
+  fileName,
+}: {
+  convexSiteUrl: string;
+  downloadToken: string;
+  fileName?: string;
+}) {
+  const params = new URLSearchParams({ token: downloadToken });
+  if (fileName) {
+    params.set("filename", fileName);
+  }
+  const base = convexSiteUrl.replace(/\/$/, "");
+  return `${base}/files/download?${params.toString()}`;
+}
+
+export function isImageContentType(contentType: string | null) {
+  return contentType?.startsWith("image/") ?? false;
+}

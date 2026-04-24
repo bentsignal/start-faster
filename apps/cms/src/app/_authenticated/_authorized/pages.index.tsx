@@ -67,7 +67,7 @@ function RouteComponent() {
     usePagesIndex();
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 py-10 sm:px-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10 sm:px-8">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -83,7 +83,7 @@ function RouteComponent() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight">All pages</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Pages</h2>
         <PagesViewToggle value={viewMode} onChange={setViewMode} />
       </div>
 

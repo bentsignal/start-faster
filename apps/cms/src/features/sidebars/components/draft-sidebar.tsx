@@ -9,7 +9,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarSeparator,
 } from "@acme/ui/sidebar";
 
 import { DeleteDraftButton } from "~/features/pages/components/delete-draft-button";
@@ -22,7 +21,6 @@ export function DraftSidebar() {
   return (
     <Sidebar variant="inset">
       <DraftSidebarHeader />
-      <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>

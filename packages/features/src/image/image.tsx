@@ -13,6 +13,7 @@ export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   optimizerBaseUrl?: string;
   disableReveal?: boolean;
   errorFallbackText?: string;
+  preserveSearch?: boolean;
 }
 
 type ImageLoadState = "loading" | "ready" | "error";
@@ -109,6 +110,7 @@ export function Image({
   onLoad,
   onError,
   style,
+  preserveSearch,
   ...props
 }: ImageProps) {
   const shouldReveal = !disableReveal;
@@ -118,6 +120,7 @@ export function Image({
     height,
     sizes,
     optimizerBaseUrl,
+    preserveSearch,
   });
   const imageSignature = getImageSignature({
     src: imgProps.src,
