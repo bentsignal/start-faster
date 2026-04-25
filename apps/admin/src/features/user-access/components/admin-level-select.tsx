@@ -7,13 +7,14 @@ import { toast } from "@acme/ui/toaster";
 
 import { useUpdateAdminLevel } from "~/features/user-access/hooks/use-update-user-access";
 import {
+  canManageAdminLevel,
   getAdminLevelLabel,
   isAdminLevel,
 } from "~/features/user-access/lib/access-utils";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
 import { adminQueries } from "~/lib/queries";
 
-export function AdminLevelSelect() {
+function useAdminSelect() {
   const id = useParams({
     from: "/_authenticated/_authorized/users/$id",
     select: (params) => params.id,
@@ -28,13 +29,23 @@ export function AdminLevelSelect() {
     }),
   });
 
-  const { data: currentUserAdminLevel } = useSuspenseQuery({
+  const { data: currentUser } = useSuspenseQuery({
     ...adminQueries.currentUser(),
-    select: (data) => data.adminLevel,
+    select: (data) => ({ _id: data._id, adminLevel: data.adminLevel }),
   });
 
   const updateAdminLevel = useUpdateAdminLevel();
-  const canManage = currentUserAdminLevel > user.adminLevel;
+  const canManage = canManageAdminLevel({
+    currentUserId: currentUser._id,
+    currentUserAdminLevel: currentUser.adminLevel,
+    targetUserId: user._id,
+  });
+
+  return { user, updateAdminLevel, canManage };
+}
+
+export function AdminLevelSelect() {
+  const { user, updateAdminLevel, canManage } = useAdminSelect();
 
   return (
     <section className="flex flex-col gap-3">
@@ -56,11 +67,7 @@ export function AdminLevelSelect() {
         aria-label={`Admin level for ${user.email}`}
       >
         {ADMIN_LEVELS.map((level) => (
-          <NativeSelectOption
-            key={level}
-            value={String(level)}
-            disabled={level >= currentUserAdminLevel}
-          >
+          <NativeSelectOption key={level} value={String(level)}>
             {level} — {getAdminLevelLabel(level)}
           </NativeSelectOption>
         ))}

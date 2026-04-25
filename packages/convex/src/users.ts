@@ -1,10 +1,13 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
+import type { Id } from "./_generated/dataModel";
+import type { AuthNctx } from "./custom";
 import { mutation } from "./_generated/server";
 import { authNmutation, authNquery } from "./custom";
 import {
-  ensureCallerIsHigherThanTarget,
+  ensureCanManageAdminLevel,
+  ensureCanManageCmsScopes,
   ensureMinimumAdminLevel,
 } from "./privileges";
 import {
@@ -15,6 +18,12 @@ import {
 
 function toSearchText(args: { name: string; email: string }) {
   return `${args.name} ${args.email}`.toLowerCase();
+}
+
+async function getUserByIdHelper(ctx: AuthNctx, id: Id<"users">) {
+  const user = await ctx.db.get("users", id);
+  if (!user) throw new ConvexError("User not found");
+  return user;
 }
 
 export const getCurrentUser = authNquery({
@@ -127,9 +136,9 @@ export const updateUserAdminLevel = authNmutation({
     adminLevel: adminLevelValidator,
   },
   handler: async (ctx, args) => {
-    ensureMinimumAdminLevel(ctx.user, args.adminLevel);
-    await ensureCallerIsHigherThanTarget(ctx, args.userId);
-    await ctx.db.patch(args.userId, { adminLevel: args.adminLevel });
+    const target = await getUserByIdHelper(ctx, args.userId);
+    ensureCanManageAdminLevel(ctx, target);
+    await ctx.db.patch(target._id, { adminLevel: args.adminLevel });
   },
 });
 
@@ -139,8 +148,9 @@ export const updateUserCmsScopes = authNmutation({
     cmsScopes: cmsScopesValidator,
   },
   handler: async (ctx, args) => {
-    await ensureCallerIsHigherThanTarget(ctx, args.userId);
-    await ctx.db.patch(args.userId, { cmsScopes: args.cmsScopes });
+    const target = await getUserByIdHelper(ctx, args.userId);
+    ensureCanManageCmsScopes(ctx, target);
+    await ctx.db.patch(target._id, { cmsScopes: args.cmsScopes });
   },
 });
 
@@ -149,7 +159,12 @@ export const revokeAllPermissions = authNmutation({
     userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    await ensureCallerIsHigherThanTarget(ctx, args.userId);
+    const target = await getUserByIdHelper(ctx, args.userId);
+    if (target.adminLevel === 0) {
+      ensureCanManageCmsScopes(ctx, target);
+    } else {
+      ensureCanManageAdminLevel(ctx, target);
+    }
     await ctx.db.patch(args.userId, { adminLevel: 0, cmsScopes: [] });
   },
 });

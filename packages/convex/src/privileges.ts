@@ -1,6 +1,6 @@
 import { ConvexError } from "convex/values";
 
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Doc } from "./_generated/dataModel";
 import type { AuthNctx } from "./custom";
 import type { AdminLevel, CmsScope } from "./validators";
 import { MIN_ADMIN_LEVEL } from "./validators";
@@ -50,16 +50,41 @@ export function ensureCmsScopeOrAdmin(
   }
 }
 
-export async function ensureCallerIsHigherThanTarget(
+/**
+ * Admin level changes (promotions, demotions, removing admin status) are
+ * reserved for super admins (level 2). Super admins can manage any other
+ * admin, including other super admins, but never themselves.
+ */
+export function ensureCanManageAdminLevel(
   ctx: AuthNctx,
-  targetUserId: Id<"users">,
+  targetUser: Doc<"users">,
 ) {
-  const targetUser = await ctx.db.get(targetUserId);
-  if (!targetUser) throw new ConvexError("Target user not found");
-  if (ctx.user.adminLevel <= targetUser.adminLevel) {
-    throw new ConvexError(
-      "You can only manage users with a lower admin level than yours",
-    );
+  if (ctx.user._id === targetUser._id) {
+    throw new ConvexError("You cannot change your own admin level");
+  }
+  if (ctx.user.adminLevel < 2) {
+    throw new ConvexError("Only super admins can change a user's admin level");
   }
   return targetUser;
+}
+
+/**
+ * CMS scope changes are permitted for:
+ * - Super admins (level 2), who can manage anyone (except themselves).
+ * - Basic admins (level 1), who can only manage non-admin users.
+ */
+export function ensureCanManageCmsScopes(
+  ctx: AuthNctx,
+  targetUser: Doc<"users">,
+) {
+  if (ctx.user._id === targetUser._id) {
+    throw new ConvexError("You cannot change your own permissions");
+  }
+  if (ctx.user.adminLevel >= 2) return targetUser;
+  if (ctx.user.adminLevel >= MIN_ADMIN_LEVEL && targetUser.adminLevel === 0) {
+    return targetUser;
+  }
+  throw new ConvexError(
+    "You don't have permission to manage this user's CMS scopes",
+  );
 }

@@ -14,7 +14,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "@acme/ui/sidebar";
 
 import { env } from "~/env";
@@ -35,7 +34,6 @@ export function AppSidebar() {
           Admin Portal
         </span>
       </SidebarHeader>
-      <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -57,7 +55,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarSeparator className="mx-0" />
         <AccountItem />
         <SignOutItem
           loading={loading}

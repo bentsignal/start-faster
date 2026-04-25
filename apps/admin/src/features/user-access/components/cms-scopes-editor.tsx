@@ -6,6 +6,7 @@ import { CMS_SCOPES } from "@acme/convex/types";
 import { toast } from "@acme/ui/toaster";
 
 import { useUpdateCmsScopes } from "~/features/user-access/hooks/use-update-user-access";
+import { canManageCmsScopes } from "~/features/user-access/lib/access-utils";
 import { userAccessQueries } from "~/features/user-access/lib/user-access-queries";
 import { adminQueries } from "~/lib/queries";
 
@@ -19,7 +20,7 @@ const SCOPE_LABELS = {
   "can-upload-files": "User can upload files to the shared asset library",
 } as const satisfies Record<CmsScope, string>;
 
-export function CmsScopesEditor() {
+function useScopes() {
   const id = useParams({
     from: "/_authenticated/_authorized/users/$id",
     select: (params) => params.id,
@@ -34,14 +35,28 @@ export function CmsScopesEditor() {
     }),
   });
 
-  const { data: currentUserAdminLevel } = useSuspenseQuery({
+  const { data: currentUser } = useSuspenseQuery({
     ...adminQueries.currentUser(),
-    select: (data) => data.adminLevel,
+    select: (data) => ({ _id: data._id, adminLevel: data.adminLevel }),
   });
 
   const updateCmsScopes = useUpdateCmsScopes();
-  const canManage = currentUserAdminLevel > user.adminLevel;
+  const canManage = canManageCmsScopes({
+    currentUserId: currentUser._id,
+    currentUserAdminLevel: currentUser.adminLevel,
+    targetUserId: user._id,
+    targetUserAdminLevel: user.adminLevel,
+  });
 
+  return {
+    user,
+    updateCmsScopes,
+    canManage,
+  };
+}
+
+export function CmsScopesEditor() {
+  const { user, updateCmsScopes, canManage } = useScopes();
   return (
     <section className="flex flex-col gap-3">
       <span className="text-muted-foreground text-sm">CMS Permissions</span>
