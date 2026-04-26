@@ -5,6 +5,7 @@ import fastDeepEqual from "fast-deep-equal";
 import type { Block } from "@acme/convex/page-validators";
 
 import { ContentBlockEditor } from "./content-block-editor";
+import { ImageBlockEditor } from "./image-block-editor";
 
 function BlockEditorComponent({
   block,
@@ -13,12 +14,12 @@ function BlockEditorComponent({
   block: Block;
   onChange: (block: Block) => void;
 }) {
-  /* eslint-disable @typescript-eslint/no-unnecessary-condition -- exhaustive switch for future block types */
   switch (block.type) {
     case "content":
       return <ContentBlockEditor block={block} onChange={onChange} />;
+    case "image":
+      return <ImageBlockEditor block={block} onChange={onChange} />;
   }
-  /* eslint-enable @typescript-eslint/no-unnecessary-condition */
 }
 
 export const BlockEditor = memo(

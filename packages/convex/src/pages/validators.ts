@@ -8,5 +8,25 @@ export const contentBlockValidator = v.object({
 });
 export type ContentBlock = Infer<typeof contentBlockValidator>;
 
-export const blockValidator = v.union(contentBlockValidator);
+export const imageBlockValidator = v.object({
+  type: v.literal("image"),
+  id: v.string(),
+  data: v.union(
+    v.object({ status: v.literal("empty") }),
+    v.object({
+      status: v.literal("ready"),
+      fileId: v.id("files"),
+      downloadToken: v.string(),
+      fileName: v.string(),
+      alt: v.string(),
+      widthScale: v.number(),
+    }),
+  ),
+});
+export type ImageBlock = Infer<typeof imageBlockValidator>;
+
+export const blockValidator = v.union(
+  contentBlockValidator,
+  imageBlockValidator,
+);
 export type Block = Infer<typeof blockValidator>;

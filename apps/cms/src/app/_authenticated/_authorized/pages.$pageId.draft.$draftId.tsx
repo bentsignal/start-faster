@@ -8,6 +8,7 @@ import { toId } from "@acme/convex/ids";
 import type { EditorMode } from "~/features/pages/components/edit-preview-toggle";
 import type { Viewport } from "~/features/pages/components/viewport-controls";
 import { env } from "~/env";
+import { fileQueries } from "~/features/files/lib/file-queries";
 import { DraftEditPanel } from "~/features/pages/components/draft-edit-panel";
 import { DraftPreviewPanel } from "~/features/pages/components/draft-preview-panel";
 import {
@@ -39,9 +40,12 @@ export const Route = createFileRoute(
     return { draftId };
   },
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      pageQueries.getDraft(context.draftId),
-    );
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        pageQueries.getDraft(context.draftId),
+      ),
+      context.queryClient.ensureQueryData(fileQueries.list()),
+    ]);
   },
   shouldReload: false,
 });

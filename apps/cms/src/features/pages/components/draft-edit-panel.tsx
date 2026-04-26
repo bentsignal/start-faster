@@ -14,6 +14,7 @@ export function DraftEditPanel({
       <div className="mx-auto w-full max-w-3xl">
         <BlockList blocks={blocks} setBlocks={setBlocks} />
       </div>
+      <div aria-hidden="true" className="h-[50vh] shrink-0" />
     </div>
   );
 }
