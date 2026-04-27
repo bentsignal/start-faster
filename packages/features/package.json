@@ -4,6 +4,8 @@
   "type": "module",
   "exports": {
     "./account": "./src/account/account-details.tsx",
+    "./heroes": "./src/heroes/hero-registry.tsx",
+    "./heroes/launch-collection": "./src/heroes/launch-collection-hero.tsx",
     "./image": "./src/image/image.tsx",
     "./image/config": "./src/image/create-image-config.ts",
     "./image/sizes": "./src/image/sizes.ts",
@@ -26,6 +28,7 @@
     "next-themes": "^0.4.6"
   },
   "devDependencies": {
+    "@acme/convex": "workspace:*",
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",

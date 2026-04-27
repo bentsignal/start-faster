@@ -1,7 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Hero, heroImageUrl } from "~/components/hero";
+import { FALLBACK_IMAGE } from "@acme/features/heroes";
+import { LaunchCollectionHero } from "@acme/features/heroes/launch-collection";
+
 import { env } from "~/env";
 import { ProductCarousel } from "~/features/product/components/product-carousel";
 import {
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/")({
       title: "Start Faster",
       description: defaultSeoDescription,
       canonicalUrl: `${env.VITE_SITE_URL}/`,
-      imageUrl: heroImageUrl,
+      imageUrl: FALLBACK_IMAGE,
       imageAlt: "Lifestyle photos from the launch collection",
     }),
 });
@@ -35,7 +37,7 @@ function RouteComponent() {
 
   return (
     <main className="flex w-full flex-col">
-      <Hero />
+      <LaunchCollectionHero optimizerBaseUrl={env.VITE_CMS_URL} />
       <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-4 py-16 sm:px-8 xl:px-24">
         <ProductCarousel products={products} />
       </section>

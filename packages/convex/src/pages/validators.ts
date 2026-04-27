@@ -1,4 +1,5 @@
 import type { Infer } from "convex/values";
+import { literals } from "convex-helpers/validators";
 import { v } from "convex/values";
 
 export const contentBlockValidator = v.object({
@@ -25,8 +26,20 @@ export const imageBlockValidator = v.object({
 });
 export type ImageBlock = Infer<typeof imageBlockValidator>;
 
+export const HEROES = ["launch-collection"] as const;
+export const heroIdValidator = literals(...HEROES);
+export type HeroId = (typeof HEROES)[number];
+
+export const heroBlockValidator = v.object({
+  type: v.literal("hero"),
+  id: v.string(),
+  data: v.object({ heroId: heroIdValidator }),
+});
+export type HeroBlock = Infer<typeof heroBlockValidator>;
+
 export const blockValidator = v.union(
   contentBlockValidator,
   imageBlockValidator,
+  heroBlockValidator,
 );
 export type Block = Infer<typeof blockValidator>;

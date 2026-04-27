@@ -28,16 +28,18 @@ export function ImageBlockView({
   fileName,
   alt,
   widthScale,
+  className,
 }: {
   downloadToken: string;
   fileName: string;
   alt: string;
   widthScale: number;
+  className?: string;
 }) {
   const src = buildImageUrl({ downloadToken, fileName });
 
   return (
-    <ImageBlockWrapper widthScale={widthScale}>
+    <ImageBlockWrapper widthScale={widthScale} className={className}>
       <Image
         src={src}
         alt={alt || fileName}

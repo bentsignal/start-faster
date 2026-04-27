@@ -702,6 +702,9 @@ importers:
         specifier: 'catalog:'
         version: 1.0.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
+      '@acme/convex':
+        specifier: workspace:*
+        version: link:../convex
       '@acme/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -12419,11 +12422,6 @@ snapshots:
     optionalDependencies:
       srvx: 0.10.1
 
-  crossws@0.4.4(srvx@0.11.9):
-    optionalDependencies:
-      srvx: 0.11.9
-    optional: true
-
   css-select@5.2.2:
     dependencies:
       boolbase: 1.0.0
@@ -13270,7 +13268,7 @@ snapshots:
       rou3: 0.7.12
       srvx: 0.11.9
     optionalDependencies:
-      crossws: 0.4.4(srvx@0.11.9)
+      crossws: 0.4.4(srvx@0.10.1)
 
   h3@2.0.1-rc.16(crossws@0.4.4(srvx@0.11.9)):
     dependencies:

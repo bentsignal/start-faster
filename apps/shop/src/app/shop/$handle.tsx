@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
+import { FALLBACK_IMAGE } from "@acme/features/heroes";
 import { ScreenSize, useScreenStore } from "@acme/features/screen";
 import { cn } from "@acme/ui/utils";
 
-import { heroImageUrl } from "~/components/hero";
 import { env } from "~/env";
 import { ProductActions } from "~/features/product/components/product-actions";
 import {
@@ -46,7 +46,7 @@ export const Route = createFileRoute("/shop/$handle")({
       imageUrl:
         product.featuredImage?.url ??
         product.images.nodes[0]?.url ??
-        heroImageUrl,
+        FALLBACK_IMAGE,
       imageAlt:
         product.featuredImage?.altText ??
         product.images.nodes[0]?.altText ??
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/shop/$handle")({
         type: "product",
         title: "Product",
         description: defaultSeoDescription,
-        imageUrl: heroImageUrl,
+        imageUrl: FALLBACK_IMAGE,
         canonicalUrl: `${env.VITE_SITE_URL}/shop`,
       });
     }

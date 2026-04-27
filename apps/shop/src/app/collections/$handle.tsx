@@ -1,7 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod/v4";
 
-import { heroImageUrl } from "~/components/hero";
+import { FALLBACK_IMAGE } from "@acme/features/heroes";
+
 import { env } from "~/env";
 import { CollectionFilters } from "~/features/collections/components/collection-filters";
 import { CollectionHeroImage } from "~/features/collections/components/collection-hero-image";
@@ -63,7 +64,7 @@ export const Route = createFileRoute("/collections/$handle")({
       title: collection.title,
       description: collection.description,
       canonicalPath: `/collections/${encodeURIComponent(params.handle)}`,
-      imageUrl: collection.image?.url ?? heroImageUrl,
+      imageUrl: collection.image?.url ?? FALLBACK_IMAGE,
       imageAlt: collection.image?.altText ?? undefined,
     };
   },
@@ -73,7 +74,7 @@ export const Route = createFileRoute("/collections/$handle")({
         title: "Collections",
         description: defaultSeoDescription,
         canonicalUrl: `${env.VITE_SITE_URL}/collections`,
-        imageUrl: heroImageUrl,
+        imageUrl: FALLBACK_IMAGE,
       });
     }
 

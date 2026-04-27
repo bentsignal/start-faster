@@ -1,7 +1,8 @@
 import type { ComponentType } from "react";
-import { FileText, ImageIcon } from "lucide-react";
+import { FileText, ImageIcon, Sparkles } from "lucide-react";
 
 import type { Block } from "@acme/convex/page-validators";
+import { HEROES } from "@acme/convex/page-validators";
 
 export function createContentBlock() {
   return {
@@ -19,9 +20,18 @@ export function createImageBlock() {
   } satisfies Block;
 }
 
+export function createHeroBlock() {
+  return {
+    type: "hero",
+    id: crypto.randomUUID(),
+    data: { heroId: HEROES[0] },
+  } satisfies Block;
+}
+
 export const BLOCK_TYPE_LABELS = {
   content: "Content",
   image: "Image",
+  hero: "Hero",
 } as const satisfies Record<Block["type"], string>;
 
 export const BLOCK_OPTIONS = [
@@ -36,6 +46,12 @@ export const BLOCK_OPTIONS = [
     label: BLOCK_TYPE_LABELS.image,
     icon: ImageIcon,
     create: createImageBlock,
+  },
+  {
+    type: "hero",
+    label: BLOCK_TYPE_LABELS.hero,
+    icon: Sparkles,
+    create: createHeroBlock,
   },
 ] satisfies readonly {
   type: Block["type"];

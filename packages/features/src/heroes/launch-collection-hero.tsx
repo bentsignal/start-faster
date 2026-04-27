@@ -1,23 +1,26 @@
-import { QuickLink } from "@acme/features/quick-link";
 import { Button } from "@acme/ui/button";
 
-import { Image } from "~/components/image";
-import { env } from "~/env";
+import { Image } from "../image/image";
+import { HERO_REGISTRY } from "./hero-registry";
 
-export const heroImageUrl = `${env.VITE_UT_URL}/f/dlAVwa1xZRzoPGPAVYMlRHnDjhbYXJ7ZpOdACLVk8KzfSW30`;
-
-export function Hero() {
+export function LaunchCollectionHero({
+  optimizerBaseUrl,
+}: {
+  optimizerBaseUrl?: string;
+}) {
+  const hero = HERO_REGISTRY["launch-collection"];
   return (
     <section className="grid w-full grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)]">
       <div className="w-full">
         <Image
-          src={heroImageUrl}
+          src={hero.image}
           alt="Lifestyle photos from the launch collection"
           width={1440}
           height={720}
           sizes="(min-width: 1280px) 60vw, 100vw"
           fetchPriority="high"
           loading="eager"
+          optimizerBaseUrl={optimizerBaseUrl}
           className="block h-auto w-full"
         />
       </div>
@@ -41,13 +44,9 @@ export function Hero() {
           variant="secondary"
           className="rounded-full px-8 text-sm font-medium tracking-wide uppercase"
           render={(props) => (
-            <QuickLink
-              to="/collections/$handle"
-              params={{ handle: "launch" }}
-              {...props}
-            >
+            <a href="/collections/launch" {...props}>
               Shop Now
-            </QuickLink>
+            </a>
           )}
         />
       </div>
