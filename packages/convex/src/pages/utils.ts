@@ -1,5 +1,4 @@
 const RESERVED_PATHS = [
-  "/",
   "/shop",
   "/collections",
   "/search",
