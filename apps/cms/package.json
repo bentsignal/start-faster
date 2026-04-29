@@ -32,6 +32,7 @@
     "@platejs/link": "^52.3.17",
     "@platejs/list-classic": "^52.3.10",
     "@platejs/markdown": "^52.3.22",
+    "@shopify/storefront-api-client": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "@tanstack/devtools-vite": "catalog:",
     "@tanstack/react-devtools": "catalog:",

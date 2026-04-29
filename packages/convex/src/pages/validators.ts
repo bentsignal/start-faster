@@ -37,9 +37,24 @@ export const heroBlockValidator = v.object({
 });
 export type HeroBlock = Infer<typeof heroBlockValidator>;
 
+export const productCarouselBlockValidator = v.object({
+  type: v.literal("product-carousel"),
+  id: v.string(),
+  data: v.union(
+    v.object({ status: v.literal("empty") }),
+    v.object({
+      status: v.literal("ready"),
+      collectionHandle: v.string(),
+      collectionTitle: v.string(),
+    }),
+  ),
+});
+export type ProductCarouselBlock = Infer<typeof productCarouselBlockValidator>;
+
 export const blockValidator = v.union(
   contentBlockValidator,
   imageBlockValidator,
   heroBlockValidator,
+  productCarouselBlockValidator,
 );
 export type Block = Infer<typeof blockValidator>;

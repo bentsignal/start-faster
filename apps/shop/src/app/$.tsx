@@ -9,6 +9,7 @@ import { DraftPreview } from "~/features/pages/components/draft-preview";
 import { PageWrapper } from "~/features/pages/components/page-wrapper";
 import { ReleasePreview } from "~/features/pages/components/release-preview";
 import { ScheduledPreview } from "~/features/pages/components/scheduled-preview";
+import { prefetchBlockData } from "~/features/pages/lib/prefetch-blocks";
 import { shopQueries } from "~/lib/queries";
 
 export const Route = createFileRoute("/$")({
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/$")({
         shopQueries.getDraftPreview(draftId),
       );
       if (!draft) throw notFound();
+      await prefetchBlockData(context.queryClient, draft.blocks);
       return { mode: "draft" as const, draftId };
     }
 
@@ -35,6 +37,7 @@ export const Route = createFileRoute("/$")({
         shopQueries.getScheduledPreview(scheduledId),
       );
       if (!scheduled) throw notFound();
+      await prefetchBlockData(context.queryClient, scheduled.blocks);
       return { mode: "scheduled" as const, scheduledId };
     }
 
@@ -44,6 +47,7 @@ export const Route = createFileRoute("/$")({
         shopQueries.getReleasePreview(releaseId),
       );
       if (!release) throw notFound();
+      await prefetchBlockData(context.queryClient, release.blocks);
       return { mode: "release" as const, releaseId };
     }
 
@@ -59,6 +63,7 @@ export const Route = createFileRoute("/$")({
       throw notFound();
     }
 
+    await prefetchBlockData(context.queryClient, page.blocks);
     return { mode: "page" as const, page };
   },
   head: ({ loaderData }) => {

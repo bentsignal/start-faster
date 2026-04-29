@@ -9,9 +9,11 @@ import {
 
 import { shopify } from "~/lib/shopify";
 
+export const CAROUSEL_PRODUCT_COUNT = 24;
+
 export const frontpageCollectionArgs = {
   handle: "frontpage",
-  first: 24,
+  first: CAROUSEL_PRODUCT_COUNT,
 } as const satisfies GetProductsByCollectionQueryVariables;
 
 export const productQueries = {

@@ -359,6 +359,9 @@ importers:
       '@platejs/markdown':
         specifier: ^52.3.22
         version: 52.3.22(platejs@52.3.21(@types/react@19.2.14)(immer@10.2.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)(use-sync-external-store@1.6.0(react@19.2.4)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@shopify/storefront-api-client':
+        specifier: 'catalog:'
+        version: 1.0.10
       '@t3-oss/env-core':
         specifier: 'catalog:'
         version: 0.13.10(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)

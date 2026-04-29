@@ -4,6 +4,7 @@ import { cn } from "@acme/ui/utils";
 import { ContentBlockView } from "./content-block-view";
 import { HeroBlockView } from "./hero-block-view";
 import { ImageBlockView } from "./image-block-view";
+import { ProductCarouselBlockView } from "./product-carousel-block-view";
 
 const TOP_SPACING = "pt-6 sm:pt-8 lg:pt-14";
 const BOTTOM_SPACING = "pb-6 sm:pb-8 lg:pb-14";
@@ -42,6 +43,14 @@ export function BlockRenderer({ blocks }: { blocks: Block[] }) {
             );
           case "hero":
             return <HeroBlockView key={block.id} heroId={block.data.heroId} />;
+          case "product-carousel":
+            if (block.data.status !== "ready") return null;
+            return (
+              <ProductCarouselBlockView
+                key={block.id}
+                collectionHandle={block.data.collectionHandle}
+              />
+            );
         }
       })}
     </div>

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { FileText, ImageIcon, Sparkles } from "lucide-react";
+import { FileText, GalleryHorizontal, ImageIcon, Sparkles } from "lucide-react";
 
 import type { Block } from "@acme/convex/page-validators";
 import { HEROES } from "@acme/convex/page-validators";
@@ -28,10 +28,19 @@ export function createHeroBlock() {
   } satisfies Block;
 }
 
+export function createProductCarouselBlock() {
+  return {
+    type: "product-carousel",
+    id: crypto.randomUUID(),
+    data: { status: "empty" },
+  } satisfies Block;
+}
+
 export const BLOCK_TYPE_LABELS = {
   content: "Content",
   image: "Image",
   hero: "Hero",
+  "product-carousel": "Product Carousel",
 } as const satisfies Record<Block["type"], string>;
 
 export const BLOCK_OPTIONS = [
@@ -52,6 +61,12 @@ export const BLOCK_OPTIONS = [
     label: BLOCK_TYPE_LABELS.hero,
     icon: Sparkles,
     create: createHeroBlock,
+  },
+  {
+    type: "product-carousel",
+    label: BLOCK_TYPE_LABELS["product-carousel"],
+    icon: GalleryHorizontal,
+    create: createProductCarouselBlock,
   },
 ] satisfies readonly {
   type: Block["type"];

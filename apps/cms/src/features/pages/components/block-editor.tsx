@@ -7,6 +7,7 @@ import type { Block } from "@acme/convex/page-validators";
 import { ContentBlockEditor } from "./content-block-editor";
 import { HeroBlockEditor } from "./hero-block-editor";
 import { ImageBlockEditor } from "./image-block-editor";
+import { ProductCarouselBlockEditor } from "./product-carousel-block-editor";
 
 function BlockEditorComponent({
   block,
@@ -22,6 +23,8 @@ function BlockEditorComponent({
       return <ImageBlockEditor block={block} onChange={onChange} />;
     case "hero":
       return <HeroBlockEditor block={block} onChange={onChange} />;
+    case "product-carousel":
+      return <ProductCarouselBlockEditor block={block} onChange={onChange} />;
   }
 }
 
