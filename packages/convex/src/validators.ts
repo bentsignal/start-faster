@@ -8,7 +8,7 @@ export type AdminLevel = Infer<typeof adminLevelValidator>;
 export const MIN_ADMIN_LEVEL = 1 satisfies AdminLevel;
 
 export const CMS_SCOPES = [
-  "can-view-pages",
+  "can-access-cms",
   "can-create-new-pages",
   "can-manage-page-content",
   "can-manage-page-metadata",

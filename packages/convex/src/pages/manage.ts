@@ -5,7 +5,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { AuthNmutationCtx, AuthNqueryCtx } from "../custom";
 import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
-import { ensureCmsScopeOrAdmin } from "../privileges";
+import { ensureCmsAccess, ensureCmsScopeOrAdmin } from "../privileges";
 import { validatePath } from "./utils";
 
 function pageSearchText(title: string, path: string) {
@@ -189,7 +189,7 @@ export const publish = authNmutation({
 export const list = authNquery({
   args: {},
   handler: async (ctx) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const pages = await ctx.db.query("pages").order("desc").collect();
 
@@ -203,7 +203,7 @@ export const listPaginated = authNquery({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const normalized = args.searchTerm?.trim().toLowerCase();
 
@@ -229,7 +229,7 @@ export const getById = authNquery({
     pageId: v.id("pages"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const page = await ctx.db.get(args.pageId);
     if (!page) {

@@ -6,7 +6,16 @@ import type { AdminLevel, CmsScope } from "./validators";
 import { MIN_ADMIN_LEVEL } from "./validators";
 
 export function hasCmsAccess(user: Doc<"users">) {
-  return user.adminLevel >= MIN_ADMIN_LEVEL || user.cmsScopes.length > 0;
+  return (
+    user.adminLevel >= MIN_ADMIN_LEVEL ||
+    user.cmsScopes.includes("can-access-cms")
+  );
+}
+
+export function ensureCmsAccess(user: Doc<"users">) {
+  if (!hasCmsAccess(user)) {
+    throw new ConvexError("CMS access required");
+  }
 }
 
 export function hasCmsScopeOrAdmin(user: Doc<"users">, scope: CmsScope) {

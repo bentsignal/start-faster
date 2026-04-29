@@ -1,7 +1,7 @@
 import type { CmsScope } from "@acme/convex/types";
 
 const SCOPE_ACTIONS = {
-  "can-view-pages": "view pages",
+  "can-access-cms": "access the CMS",
   "can-create-new-pages": "create new pages",
   "can-manage-page-content": "edit page content",
   "can-manage-page-metadata": "change page settings",

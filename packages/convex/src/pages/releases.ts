@@ -3,14 +3,14 @@ import { ConvexError, v } from "convex/values";
 
 import { query } from "../_generated/server";
 import { authNquery } from "../custom";
-import { ensureCmsScopeOrAdmin } from "../privileges";
+import { ensureCmsAccess } from "../privileges";
 
 export const get = authNquery({
   args: {
     releaseId: v.id("pageReleases"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const release = await ctx.db.get(args.releaseId);
     if (!release) {
@@ -47,7 +47,7 @@ export const listRecent = authNquery({
     pageId: v.id("pages"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     return await ctx.db
       .query("pageReleases")
@@ -63,7 +63,7 @@ export const list = authNquery({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     return await ctx.db
       .query("pageReleases")
@@ -78,7 +78,7 @@ export const listRecentlyPublished = authNquery({
     limit: v.number(),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const releases = await ctx.db
       .query("pageReleases")

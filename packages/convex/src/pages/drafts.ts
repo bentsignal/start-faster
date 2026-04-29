@@ -4,7 +4,7 @@ import { ConvexError, v } from "convex/values";
 import type { Block } from "./validators";
 import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
-import { ensureCmsScopeOrAdmin } from "../privileges";
+import { ensureCmsAccess, ensureCmsScopeOrAdmin } from "../privileges";
 import { blockValidator } from "./validators";
 
 export const save = authNmutation({
@@ -128,7 +128,7 @@ export const get = authNquery({
     draftId: v.id("pageDrafts"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const draft = await ctx.db.get(args.draftId);
     if (!draft) {
@@ -144,7 +144,7 @@ export const list = authNquery({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     return await ctx.db
       .query("pageDrafts")

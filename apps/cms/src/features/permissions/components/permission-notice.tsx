@@ -25,7 +25,7 @@ export function PermissionNoticeBanner({ scope }: { scope: CmsScope }) {
 
 /**
  * Full-section empty state for routes the user reached but cannot view the
- * contents of at all (e.g. /pages without `can-view-pages`). Use when there
+ * contents of at all. Use when there
  * is no surrounding UI to keep — the whole page is the notice.
  */
 export function PermissionNoticeBlocked({ scope }: { scope: CmsScope }) {

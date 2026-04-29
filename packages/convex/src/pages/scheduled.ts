@@ -4,7 +4,7 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 import { internalMutation, query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
-import { ensureCmsScopeOrAdmin } from "../privileges";
+import { ensureCmsAccess, ensureCmsScopeOrAdmin } from "../privileges";
 
 export const schedule = authNmutation({
   args: {
@@ -144,7 +144,7 @@ export const listForPage = authNquery({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     return await ctx.db
       .query("pageScheduled")
@@ -161,7 +161,7 @@ export const get = authNquery({
     scheduledId: v.id("pageScheduled"),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const row = await ctx.db.get(args.scheduledId);
     if (!row) {
@@ -198,7 +198,7 @@ export const listUpcoming = authNquery({
     limit: v.number(),
   },
   handler: async (ctx, args) => {
-    ensureCmsScopeOrAdmin(ctx.user, "can-view-pages");
+    ensureCmsAccess(ctx.user);
 
     const rows = await ctx.db
       .query("pageScheduled")
