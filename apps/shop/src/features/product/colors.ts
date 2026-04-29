@@ -20,6 +20,8 @@ const KNOWN_COLORS = {
   Orchid: "#E3DDE3",
   "Heather Grey": "#CDD1D6",
   Sandshell: "#E8E2D0",
+  "Desert Dust": "D0B7A3",
+  "India Ink Grey": "32404B",
 } as const satisfies Record<string, string>;
 
 /**
