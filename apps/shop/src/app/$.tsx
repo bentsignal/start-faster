@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { toId } from "@acme/convex/ids";
+import { FALLBACK_IMAGE } from "@acme/features/heroes";
 
 import { env } from "~/env";
 import { BlockRenderer } from "~/features/pages/components/block-renderer";
@@ -11,6 +12,7 @@ import { ReleasePreview } from "~/features/pages/components/release-preview";
 import { ScheduledPreview } from "~/features/pages/components/scheduled-preview";
 import { prefetchBlockData } from "~/features/pages/lib/prefetch-blocks";
 import { shopQueries } from "~/lib/queries";
+import { buildSeoHead, defaultSeoDescription } from "~/lib/seo";
 
 export const Route = createFileRoute("/$")({
   validateSearch: z.object({
@@ -68,19 +70,13 @@ export const Route = createFileRoute("/$")({
   },
   head: ({ loaderData }) => {
     if (loaderData?.mode !== "page") return {};
-    return {
-      meta: [
-        { title: loaderData.page.title },
-        {
-          name: "og:title",
-          content: loaderData.page.title,
-        },
-        {
-          name: "og:url",
-          content: `${env.VITE_SITE_URL}${loaderData.page.path}`,
-        },
-      ],
-    };
+    return buildSeoHead({
+      title: loaderData.page.title,
+      description: defaultSeoDescription,
+      canonicalUrl: `${env.VITE_SITE_URL}${loaderData.page.path}`,
+      imageUrl: FALLBACK_IMAGE,
+      imageAlt: "Lifestyle photos from our collection of apparel",
+    });
   },
 });
 

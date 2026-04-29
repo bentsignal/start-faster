@@ -14,7 +14,6 @@ import { Route as SearchRouteImport } from './app/search'
 import { Route as CallbackRouteImport } from './app/callback'
 import { Route as AuthenticatedRouteImport } from './app/_authenticated'
 import { Route as SplatRouteImport } from './app/$'
-import { Route as IndexRouteImport } from './app/index'
 import { Route as ShopHandleRouteImport } from './app/shop/$handle'
 import { Route as CollectionsHandleRouteImport } from './app/collections/$handle'
 import { Route as AuthenticatedSettingsRouteImport } from './app/_authenticated/settings'
@@ -45,11 +44,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopHandleRoute = ShopHandleRouteImport.update({
@@ -89,8 +83,8 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -103,8 +97,8 @@ export interface FileRoutesByFullPath {
   '/shop/$handle': typeof ShopHandleRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -118,7 +112,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
@@ -135,8 +128,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/$'
+    | '/'
     | '/callback'
     | '/search'
     | '/sitemap.xml'
@@ -149,8 +142,8 @@ export interface FileRouteTypes {
     | '/shop/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/$'
+    | '/'
     | '/callback'
     | '/search'
     | '/sitemap.xml'
@@ -163,7 +156,6 @@ export interface FileRouteTypes {
     | '/shop/$handle'
   id:
     | '__root__'
-    | '/'
     | '/$'
     | '/_authenticated'
     | '/callback'
@@ -179,7 +171,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CallbackRoute: typeof CallbackRoute
@@ -226,13 +217,6 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop/$handle': {
@@ -304,7 +288,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CallbackRoute: CallbackRoute,
