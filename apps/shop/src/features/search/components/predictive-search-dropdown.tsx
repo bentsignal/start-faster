@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 // eslint-disable-next-line no-restricted-imports -- conditional fetch: only runs when search term >= 2 chars
 import { useQuery } from "@tanstack/react-query";
 
 import type { GetPredictiveSearchQuery } from "@acme/shopify/storefront/generated";
 import { QuickLink } from "@acme/features/quick-link";
+import { cn } from "@acme/ui/utils";
 
 import { Image } from "~/components/image";
 import {
@@ -43,6 +45,24 @@ export function PredictiveSearchDropdown() {
   );
 }
 
+function useSyncPredictiveProducts(
+  visibleProducts: PredictiveSearchProduct[] | null,
+) {
+  const setPredictiveProducts = useSearchBarStore(
+    (s) => s.setPredictiveProducts,
+  );
+  const handlesKey = visibleProducts?.map((p) => p.handle).join(",") ?? "";
+
+  // eslint-disable-next-line no-restricted-syntax -- syncs predictive product handles to store for keyboard navigation
+  useEffect(() => {
+    const handles = handlesKey === "" ? [] : handlesKey.split(",");
+    setPredictiveProducts(handles);
+    return () => {
+      setPredictiveProducts([]);
+    };
+  }, [handlesKey, setPredictiveProducts]);
+}
+
 function PredictiveProductsSection() {
   const rawQueryText = useSearchBarStore((s) => s.searchTerm.trim());
   const queryText = useSearchBarStore((s) => s.debouncedSearchTerm.trim());
@@ -58,6 +78,8 @@ function PredictiveProductsSection() {
     rawQueryText.length >= 2 &&
     (rawQueryText !== queryText || isFetching || visibleProducts === null);
 
+  useSyncPredictiveProducts(visibleProducts);
+
   if (shouldShowPlaceholder || visibleProducts === null) {
     return <PredictiveProductsPlaceholder />;
   }
@@ -72,8 +94,12 @@ function PredictiveProductsSection() {
 
   return (
     <section className="space-y-1.5">
-      {visibleProducts.map((product) => (
-        <PredictiveProductRow key={product.id} product={product} />
+      {visibleProducts.map((product, index) => (
+        <PredictiveProductRow
+          key={product.id}
+          product={product}
+          index={index}
+        />
       ))}
     </section>
   );
@@ -81,8 +107,10 @@ function PredictiveProductsSection() {
 
 function PredictiveProductRow({
   product,
+  index,
 }: {
   product: PredictiveSearchProduct;
+  index: number;
 }) {
   const imageUrl = product.featuredImage?.url;
   const imageAlt = product.featuredImage?.altText ?? product.title;
@@ -91,6 +119,7 @@ function PredictiveProductRow({
     product.priceRange.minVariantPrice.currencyCode,
   );
 
+  const isSelected = useSearchBarStore((s) => s.selectedIndex === index);
   const setIsPredictiveOpen = useSearchBarStore((s) => s.setIsPredictiveOpen);
 
   function onSelect() {
@@ -101,7 +130,10 @@ function PredictiveProductRow({
     <QuickLink
       to="/shop/$handle"
       params={{ handle: product.handle }}
-      className="hover:bg-muted flex items-center gap-3 rounded-lg px-2 py-2"
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-2 py-2",
+        isSelected ? "bg-accent" : "hover:bg-muted",
+      )}
       onClick={onSelect}
     >
       {imageUrl ? (
@@ -128,6 +160,9 @@ function PredictiveProductRow({
 function ViewAllResultsLink() {
   const activeQuery = useSearchBarStore((s) => s.searchTerm.trim());
   const setIsPredictiveOpen = useSearchBarStore((s) => s.setIsPredictiveOpen);
+  const isSelected = useSearchBarStore(
+    (s) => s.selectedIndex === s.predictiveProducts.length,
+  );
 
   function onSelect() {
     setIsPredictiveOpen(false);
@@ -143,7 +178,12 @@ function ViewAllResultsLink() {
           sortDirection: "desc",
           filters: [],
         }}
-        className="text-muted-foreground block rounded-lg px-2 py-1.5 text-sm font-medium hover:underline"
+        className={cn(
+          "block rounded-lg px-2 py-1.5 text-sm font-medium",
+          isSelected
+            ? "bg-accent text-accent-foreground"
+            : "text-muted-foreground hover:underline",
+        )}
         onClick={onSelect}
       >
         View all results

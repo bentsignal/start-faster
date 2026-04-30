@@ -15,7 +15,8 @@ export function SearchInput({
   const setSearchTerm = useSearchBarStore((s) => s.setSearchTerm);
   const inputRef = useSearchBarStore((s) => s.inputRef);
   const setIsPredictiveOpen = useSearchBarStore((s) => s.setIsPredictiveOpen);
-  const performSearch = useSearchBarStore((s) => s.performSearch);
+  const navigateResults = useSearchBarStore((s) => s.navigateResults);
+  const confirmSelection = useSearchBarStore((s) => s.confirmSelection);
 
   return (
     <input
@@ -45,9 +46,16 @@ export function SearchInput({
           setIsPredictiveOpen(false);
         }
 
+        if (event.key === "Tab") {
+          const handled = navigateResults(event.shiftKey ? "prev" : "next");
+          if (handled) {
+            event.preventDefault();
+          }
+        }
+
         if (event.key === "Enter") {
           event.preventDefault();
-          performSearch();
+          confirmSelection();
         }
 
         onKeyDown?.(event);

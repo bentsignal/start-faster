@@ -73,7 +73,7 @@ function useSearchBarActions(
     setIsPredictiveOpen(false);
   }
 
-  return { focusInput, performSearch };
+  return { focusInput, performSearch, navigate };
 }
 
 function useInternalStore({
@@ -86,20 +86,66 @@ function useInternalStore({
   const inputRef = useRef<HTMLInputElement>(null);
   const {
     value: searchTerm,
-    setValue: setSearchTerm,
+    setValue: setSearchTermInternal,
     debouncedValue: debouncedSearchTerm,
   } = useDebouncedInput({
     time: debounceTime,
     initialValue: initialSearchTerm,
   });
-  const [isPredictiveOpen, setIsPredictiveOpen] = useState(false);
+  const [isPredictiveOpenRaw, setIsPredictiveOpenRaw] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [predictiveProducts, setPredictiveProducts] = useState<string[]>([]);
+
+  const isPredictiveOpen = isPredictiveOpenRaw;
+
+  function setSearchTerm(value: string) {
+    setSearchTermInternal(value);
+    setSelectedIndex(-1);
+  }
+
+  function setIsPredictiveOpen(open: boolean) {
+    setIsPredictiveOpenRaw(open);
+    if (!open) {
+      setSelectedIndex(-1);
+    }
+  }
 
   useSearchPrefetch(debouncedSearchTerm);
-  const { focusInput, performSearch } = useSearchBarActions(
+  const { focusInput, performSearch, navigate } = useSearchBarActions(
     inputRef,
     searchTerm,
     setIsPredictiveOpen,
   );
+
+  function navigateResults(direction: "next" | "prev") {
+    if (!isPredictiveOpen) return false;
+    const totalItems = predictiveProducts.length + 1; // products + "View all results"
+    if (totalItems === 0) return false;
+
+    setSelectedIndex((prev) => {
+      if (direction === "next") {
+        return prev >= totalItems - 1 ? 0 : prev + 1;
+      }
+      return prev <= 0 ? totalItems - 1 : prev - 1;
+    });
+    return true;
+  }
+
+  function confirmSelection() {
+    if (selectedIndex >= 0 && selectedIndex < predictiveProducts.length) {
+      const handle = predictiveProducts[selectedIndex];
+      if (handle) {
+        inputRef.current?.blur();
+        void navigate({
+          to: "/shop/$handle",
+          params: { handle },
+        });
+        setIsPredictiveOpen(false);
+      }
+    } else {
+      performSearch();
+    }
+  }
 
   return {
     searchTerm,
@@ -110,6 +156,11 @@ function useInternalStore({
     focusInput,
     inputRef,
     performSearch,
+    selectedIndex,
+    predictiveProducts,
+    setPredictiveProducts,
+    navigateResults,
+    confirmSelection,
   };
 }
 
