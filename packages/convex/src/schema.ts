@@ -41,6 +41,15 @@ export default defineSchema(
       isVisible: v.boolean(),
       createdByUserId: v.id("users"),
       searchText: v.string(),
+      seoDescription: v.optional(v.string()),
+      seoImage: v.optional(
+        v.object({
+          fileId: v.id("files"),
+          downloadToken: v.string(),
+          fileName: v.string(),
+          alt: v.string(),
+        }),
+      ),
     })
       .index("by_path", ["path"])
       .index("by_createdByUserId", ["createdByUserId"])

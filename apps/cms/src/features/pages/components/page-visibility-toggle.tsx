@@ -24,7 +24,6 @@ export function PageVisibilityToggle({ pageId }: { pageId: Id<"pages"> }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-sm font-medium">Visibility</div>
       <div className="flex items-center gap-4 rounded-xl border p-4">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           {isVisible ? (

@@ -34,6 +34,7 @@
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@types/node": "catalog:",
     "eslint": "catalog:",
+    "eslint-plugin-check-file": "^3.3.1",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },

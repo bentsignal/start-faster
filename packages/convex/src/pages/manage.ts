@@ -1,41 +1,11 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
-import type { Doc, Id } from "../_generated/dataModel";
-import type { AuthNmutationCtx, AuthNqueryCtx } from "../custom";
 import { query } from "../_generated/server";
 import { authNmutation, authNquery } from "../custom";
 import { ensureCmsAccess, ensureCmsScopeOrAdmin } from "../privileges";
+import { buildPageUpdates, enrichPage, pageSearchText } from "./manage_helpers";
 import { validatePath } from "./utils";
-
-function pageSearchText(title: string, path: string) {
-  return `${title} ${path}`.toLowerCase();
-}
-
-async function enrichPage(ctx: AuthNqueryCtx, page: Doc<"pages">) {
-  const drafts = await ctx.db
-    .query("pageDrafts")
-    .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
-    .collect();
-
-  const latestRelease = await ctx.db
-    .query("pageReleases")
-    .withIndex("by_pageId", (q) => q.eq("pageId", page._id))
-    .order("desc")
-    .first();
-
-  const createdByUser = await ctx.db.get(page.createdByUserId);
-
-  return {
-    ...page,
-    hasRelease: latestRelease !== null,
-    hasDraft: drafts.length > 0,
-    draftCount: drafts.length,
-    createdBy: createdByUser
-      ? { _id: createdByUser._id, name: createdByUser.name }
-      : null,
-  };
-}
 
 export const create = authNmutation({
   args: {
@@ -55,7 +25,6 @@ export const create = authNmutation({
       throw new ConvexError(pathResult.error);
     }
 
-    // Check path uniqueness
     const existing = await ctx.db
       .query("pages")
       .withIndex("by_path", (q) => q.eq("path", pathResult.path))
@@ -84,39 +53,24 @@ export const create = authNmutation({
   },
 });
 
-function validateTitle(rawTitle: string) {
-  const title = rawTitle.trim();
-  if (!title) {
-    throw new ConvexError("Title is required");
-  }
-  return title;
-}
-
-async function resolveUniquePath(
-  ctx: AuthNmutationCtx,
-  rawPath: string,
-  pageId: Id<"pages">,
-) {
-  const pathResult = validatePath(rawPath);
-  if (pathResult.status === "invalid") {
-    throw new ConvexError(pathResult.error);
-  }
-  const existing = await ctx.db
-    .query("pages")
-    .withIndex("by_path", (q) => q.eq("path", pathResult.path))
-    .first();
-  if (existing && existing._id !== pageId) {
-    throw new ConvexError("A page with this path already exists");
-  }
-  return pathResult.path;
-}
-
 export const updateMetadata = authNmutation({
   args: {
     pageId: v.id("pages"),
     title: v.optional(v.string()),
     path: v.optional(v.string()),
     isVisible: v.optional(v.boolean()),
+    seoDescription: v.optional(v.string()),
+    seoImage: v.optional(
+      v.union(
+        v.object({
+          fileId: v.id("files"),
+          downloadToken: v.string(),
+          fileName: v.string(),
+          alt: v.string(),
+        }),
+        v.null(),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     ensureCmsScopeOrAdmin(ctx.user, "can-manage-page-metadata");
@@ -132,31 +86,6 @@ export const updateMetadata = authNmutation({
     }
   },
 });
-
-async function buildPageUpdates(
-  ctx: AuthNmutationCtx,
-  page: Doc<"pages">,
-  args: { title?: string; path?: string; isVisible?: boolean },
-) {
-  const nextTitle =
-    args.title !== undefined ? validateTitle(args.title) : undefined;
-  const nextPath =
-    args.path !== undefined
-      ? await resolveUniquePath(ctx, args.path, page._id)
-      : undefined;
-
-  return {
-    ...(args.isVisible !== undefined && { isVisible: args.isVisible }),
-    ...(nextTitle !== undefined && { title: nextTitle }),
-    ...(nextPath !== undefined && { path: nextPath }),
-    ...((nextTitle !== undefined || nextPath !== undefined) && {
-      searchText: pageSearchText(
-        nextTitle ?? page.title,
-        nextPath ?? page.path,
-      ),
-    }),
-  };
-}
 
 export const publish = authNmutation({
   args: {
@@ -181,7 +110,6 @@ export const publish = authNmutation({
       publishedByUserId: ctx.user._id,
     });
 
-    // Delete the draft after publishing
     await ctx.db.delete(args.draftId);
   },
 });
@@ -316,6 +244,8 @@ export const getByPath = query({
       title: page.title,
       path: page.path,
       blocks: latestRelease.blocks,
+      seoDescription: page.seoDescription,
+      seoImage: page.seoImage,
     };
   },
 });

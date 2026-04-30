@@ -14,6 +14,19 @@ import { prefetchBlockData } from "~/features/pages/lib/prefetch-blocks";
 import { shopQueries } from "~/lib/queries";
 import { buildSeoHead, defaultSeoDescription } from "~/lib/seo";
 
+function toConvexSiteUrl(url: string) {
+  return url.includes(".cloud") ? url.replace(".cloud", ".site") : url;
+}
+
+function buildSeoImageUrl(downloadToken: string, fileName: string) {
+  const base = toConvexSiteUrl(env.VITE_CONVEX_URL).replace(/\/$/, "");
+  const params = new URLSearchParams({
+    token: downloadToken,
+    filename: fileName,
+  });
+  return `${base}/files/download?${params.toString()}`;
+}
+
 export const Route = createFileRoute("/$")({
   validateSearch: z.object({
     draftId: z.string().optional(),
@@ -70,12 +83,17 @@ export const Route = createFileRoute("/$")({
   },
   head: ({ loaderData }) => {
     if (loaderData?.mode !== "page") return {};
+    const { page } = loaderData;
+    const imageUrl = page.seoImage
+      ? buildSeoImageUrl(page.seoImage.downloadToken, page.seoImage.fileName)
+      : FALLBACK_IMAGE;
+    const imageAlt = page.seoImage?.alt ?? undefined;
     return buildSeoHead({
-      title: loaderData.page.title,
-      description: defaultSeoDescription,
-      canonicalUrl: `${env.VITE_SITE_URL}${loaderData.page.path}`,
-      imageUrl: FALLBACK_IMAGE,
-      imageAlt: "Lifestyle photos from our collection of apparel",
+      title: page.title,
+      description: page.seoDescription ?? defaultSeoDescription,
+      canonicalUrl: `${env.VITE_SITE_URL}${page.path}`,
+      imageUrl,
+      imageAlt,
     });
   },
 });

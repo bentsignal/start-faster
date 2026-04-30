@@ -27,6 +27,7 @@
     "./sidebar": "./src/components/sidebar.tsx",
     "./skeleton": "./src/components/skeleton.tsx",
     "./slider": "./src/components/slider.tsx",
+    "./textarea": "./src/components/textarea.tsx",
     "./toaster": "./src/components/sonner.tsx",
     "./tooltip": "./src/components/tooltip.tsx"
   },

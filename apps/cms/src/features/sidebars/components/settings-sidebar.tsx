@@ -1,6 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { getRouteApi, useRouteContext } from "@tanstack/react-router";
+import { ChevronLeft, Eye, Info, Search, Settings } from "lucide-react";
 
 import { QuickLink } from "@acme/features/quick-link";
 import {
@@ -8,18 +7,36 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@acme/ui/sidebar";
 
-import { formatRelativeTime } from "~/features/pages/lib/format-relative-time";
-import { pageQueries } from "~/features/pages/lib/page-queries";
+import type { SettingsTab } from "~/features/pages/lib/settings-tab";
+
+const settingsRoute = getRouteApi(
+  "/_authenticated/_authorized/pages/$pageId/settings",
+);
+
+const TABS = [
+  { value: "general", label: "General", icon: Settings },
+  { value: "seo", label: "SEO", icon: Search },
+  { value: "visibility", label: "Visibility", icon: Eye },
+  { value: "information", label: "Information", icon: Info },
+] as const satisfies readonly {
+  value: SettingsTab;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[];
 
 export function SettingsSidebar() {
   return (
     <Sidebar variant="inset">
       <SettingsSidebarHeader />
       <SidebarContent>
-        <LastUpdated />
+        <SettingsNav />
       </SidebarContent>
     </Sidebar>
   );
@@ -45,23 +62,32 @@ function SettingsSidebarHeader() {
   );
 }
 
-function LastUpdated() {
-  const pageId = useRouteContext({
-    from: "/_authenticated/_authorized/pages/$pageId",
-    select: (ctx) => ctx.pageId,
-  });
+function SettingsNav() {
+  const activeTab = settingsRoute.useSearch({ select: (s) => s.settingsTab });
+  const navigate = settingsRoute.useNavigate();
 
-  const { data } = useSuspenseQuery({
-    ...pageQueries.getById(pageId),
-    select: (data) => ({ creationTime: data._creationTime }),
-  });
+  function selectTab(tab: SettingsTab) {
+    void navigate({ search: (prev) => ({ ...prev, settingsTab: tab }) });
+  }
 
   return (
     <SidebarGroup>
+      <SidebarGroupLabel>Settings</SidebarGroupLabel>
       <SidebarGroupContent>
-        <p className="text-sidebar-foreground/40 flex h-8 items-center px-2 text-xs">
-          Created {formatRelativeTime(data.creationTime)}
-        </p>
+        <SidebarMenu>
+          {TABS.map((tab) => (
+            <SidebarMenuItem key={tab.value}>
+              <SidebarMenuButton
+                size="sm"
+                isActive={activeTab === tab.value}
+                onClick={() => selectTab(tab.value)}
+              >
+                <tab.icon className="size-3.5" />
+                <span>{tab.label}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
   );
