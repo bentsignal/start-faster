@@ -3,12 +3,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
+  withSiteOrigin,
 } from "~/lib/auth";
 
 export const Route = createFileRoute("/callback")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      GET: async ({ request: rawRequest }) => {
+        const request = withSiteOrigin(rawRequest);
         const url = new URL(request.url);
         const code = url.searchParams.get("code");
         const state = url.searchParams.get("state");

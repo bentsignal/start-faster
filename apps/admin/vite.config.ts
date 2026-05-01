@@ -11,7 +11,7 @@ export default defineConfig(async ({ mode }) => {
 
   return {
     server: {
-      port: 3002,
+      port: process.env.PORT ? Number(process.env.PORT) : undefined,
       host: true,
     },
     plugins: [

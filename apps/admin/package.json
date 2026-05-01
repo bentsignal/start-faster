@@ -5,7 +5,8 @@
   "scripts": {
     "build": "pnpm with-env vite build",
     "clean": "git clean -xdf .cache .output .tanstack .vercel .vinxi dist .turbo node_modules",
-    "dev": "pnpm with-env vite dev",
+    "dev": "portless",
+    "dev:app": "pnpm with-env vite dev",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "format:fix": "prettier --write . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
@@ -59,6 +60,10 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:"
+  },
+  "portless": {
+    "name": "admin.start-faster",
+    "script": "dev:app"
   },
   "prettier": "@acme/prettier-config"
 }

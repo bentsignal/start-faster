@@ -84,6 +84,10 @@
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
-    "npm_lifecycle_event"
+    "npm_lifecycle_event",
+    "PORT",
+    "HOST",
+    "PORTLESS_URL",
+    "NODE_EXTRA_CA_CERTS"
   ]
 }

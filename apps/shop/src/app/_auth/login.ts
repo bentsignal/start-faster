@@ -5,17 +5,20 @@ import {
   appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
   isTrustedCustomerAuthRequest,
+  withSiteOrigin,
 } from "~/lib/auth";
 
 export const Route = createFileRoute("/_auth/login")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async ({ request: rawRequest }) => {
+        const request = withSiteOrigin(rawRequest);
         const url = new URL(request.url);
         const callbackOrigin = new URL(
           env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI,
         ).origin;
         if (url.origin !== callbackOrigin) {
+          console.log(url.origin, callbackOrigin);
           return new Response("Auth origin mismatch.", { status: 400 });
         }
 

@@ -14,7 +14,7 @@ export default defineConfig(async ({ mode }) => {
 
   return {
     server: {
-      port: 3000,
+      port: process.env.PORT ? Number(process.env.PORT) : undefined,
       host: true,
       allowedHosts:
         isDevelopment && env.VITE_DEV_ALLOWED_HOST

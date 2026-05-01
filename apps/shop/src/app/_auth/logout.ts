@@ -5,12 +5,14 @@ import {
   appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
   isTrustedCustomerAuthRequest,
+  withSiteOrigin,
 } from "~/lib/auth";
 
 export const Route = createFileRoute("/_auth/logout")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async ({ request: rawRequest }) => {
+        const request = withSiteOrigin(rawRequest);
         if (!isTrustedCustomerAuthRequest(request)) {
           return new Response("Invalid auth request origin.", { status: 403 });
         }

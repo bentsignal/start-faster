@@ -155,6 +155,17 @@ export function normalizeCustomerReturnTo(returnTo: string) {
   }
 }
 
+/** Rewrite the request origin to match VITE_SITE_URL (portless proxies to 127.0.0.1:PORT). */
+export function withSiteOrigin(request: Request) {
+  const siteUrl = new URL(env.VITE_SITE_URL);
+  const requestUrl = new URL(request.url);
+  if (requestUrl.origin === siteUrl.origin) return request;
+  requestUrl.protocol = siteUrl.protocol;
+  requestUrl.hostname = siteUrl.hostname;
+  requestUrl.port = siteUrl.port;
+  return new Request(requestUrl.toString(), request);
+}
+
 export function isTrustedCustomerAuthRequest(request: Request) {
   const expectedOrigin = new URL(env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI)
     .origin;

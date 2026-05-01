@@ -160,6 +160,9 @@ importers:
       dotenv-cli:
         specifier: 10.0.0
         version: 10.0.0
+      portless:
+        specifier: ^0.12.0
+        version: 0.12.0
       prettier:
         specifier: 'catalog:'
         version: 3.8.1
@@ -7380,6 +7383,12 @@ packages:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
+  portless@0.12.0:
+    resolution: {integrity: sha512-zE8EYJ5xIEtKEBu1wnD+FavOE90/GNxRixF4Mu2hxMvDuVx1ftUbA6VbjbxI9sP9LUt0L26l6OiENGo4EFtLfw==}
+    engines: {node: '>=20'}
+    os: [darwin, linux, win32]
+    hasBin: true
+
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -13610,6 +13619,11 @@ snapshots:
     optionalDependencies:
       srvx: 0.10.1
 
+  crossws@0.4.4(srvx@0.11.9):
+    optionalDependencies:
+      srvx: 0.11.9
+    optional: true
+
   css-select@5.2.2:
     dependencies:
       boolbase: 1.0.0
@@ -14608,7 +14622,7 @@ snapshots:
       rou3: 0.7.12
       srvx: 0.11.9
     optionalDependencies:
-      crossws: 0.4.4(srvx@0.10.1)
+      crossws: 0.4.4(srvx@0.11.9)
 
   h3@2.0.1-rc.16(crossws@0.4.4(srvx@0.11.9)):
     dependencies:
@@ -16198,6 +16212,8 @@ snapshots:
       - react-native
       - scheduler
       - use-sync-external-store
+
+  portless@0.12.0: {}
 
   possible-typed-array-names@1.1.0: {}
 
