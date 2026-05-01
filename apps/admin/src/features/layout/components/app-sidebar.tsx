@@ -1,7 +1,6 @@
 import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { ShieldUser } from "lucide-react";
 
-import { appUrls } from "~/urls";
 import { AccountItem } from "@acme/features/layout/account-item";
 import { SignOutItem } from "@acme/features/layout/sign-out-item";
 import { QuickLink } from "@acme/features/quick-link";
@@ -16,6 +15,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@acme/ui/sidebar";
+
+import { appUrls } from "~/urls";
 
 const NAV_ITEMS = [
   { label: "User Management", to: "/dashboard", icon: ShieldUser },

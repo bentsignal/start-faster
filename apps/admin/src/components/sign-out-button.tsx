@@ -1,8 +1,9 @@
 import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { LogOut } from "lucide-react";
 
-import { appUrls } from "~/urls";
 import { Button } from "@acme/ui/button";
+
+import { appUrls } from "~/urls";
 
 export function SignOutButton() {
   const { signOut, loading: isSigningOut } = useAuth();

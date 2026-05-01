@@ -3,7 +3,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { appUrls } from "~/urls";
 import { toId } from "@acme/convex/ids";
 
 import type { EditorMode } from "~/features/pages/components/edit-preview-toggle";
@@ -26,6 +25,7 @@ import { useAutosave } from "~/features/pages/hooks/use-autosave";
 import { pageQueries } from "~/features/pages/lib/page-queries";
 import { PermissionNoticeBanner } from "~/features/permissions/components/permission-notice";
 import { useHasCmsScope } from "~/features/permissions/hooks/use-has-cms-scope";
+import { appUrls } from "~/urls";
 
 export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/draft/$draftId",
