@@ -18,8 +18,21 @@ pnpm --filter @acme/files run topo
 WT_NAME="$(basename "$NEW_WT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-*//;s/-*$//')"
 
 cd "$NEW_WT/packages/convex"
+
+# Pull env vars from the main deployment before switching
+TEMP_ENV=$(mktemp)
+nlx convex env list > "$TEMP_ENV"
+
 nlx convex deployment create "dev/$WT_NAME" --select --expiration "in 7 days" --type dev < /dev/null
 nlx convex deployment token create "$WT_NAME" --save-env < /dev/null
+
+# Push env vars to the new deployment
+if [ -s "$TEMP_ENV" ]; then
+  nlx convex env set --from-file "$TEMP_ENV" < /dev/null
+  echo "copied environment variables to new deployment"
+fi
+rm -f "$TEMP_ENV"
+
 cd "$NEW_WT"
 
 # Update root .env with the new deployment's URL
