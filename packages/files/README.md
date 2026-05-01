@@ -161,8 +161,8 @@ HTTP upload requires `multipart/form-data` with fields:
 - `expiresAt` (optional, timestamp or `null`)
 
 Access keys are not accepted via the form; they must come from
-`checkUploadRequest`. Additional form fields are available on
-`onUploadComplete` via `formData`.
+`checkUploadRequest`. Additional form fields are available on `onUploadComplete`
+via `formData`.
 
 Useful route options:
 

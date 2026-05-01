@@ -7,9 +7,8 @@ pnpm install
 pnpm run dev
 ```
 
-`pnpm run dev` watches and rebuilds the package only.
-Use a consuming app in this monorepo to exercise the package during manual
-testing.
+`pnpm run dev` watches and rebuilds the package only. Use a consuming app in
+this monorepo to exercise the package during manual testing.
 
 ## Testing
 
