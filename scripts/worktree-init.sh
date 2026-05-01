@@ -12,6 +12,7 @@ if [ -n "$MAIN_REPO" ] && [ "$MAIN_REPO" != "$NEW_WT" ]; then
   cd "$NEW_WT"
 fi
 ni
+pnpm --filter @acme/files run topo
 
 # Create a worktree-specific Convex deployment
 WT_NAME="$(basename "$NEW_WT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-*//;s/-*$//')"
