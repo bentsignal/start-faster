@@ -1,9 +1,8 @@
 import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { LogOut } from "lucide-react";
 
+import { appUrls } from "~/urls";
 import { Button } from "@acme/ui/button";
-
-import { env } from "~/env";
 
 export function SignOutButton() {
   const { signOut, loading: isSigningOut } = useAuth();
@@ -12,7 +11,7 @@ export function SignOutButton() {
     <Button
       variant="outline"
       onClick={() => {
-        void signOut({ returnTo: env.VITE_SITE_URL });
+        void signOut({ returnTo: appUrls.admin });
       }}
       disabled={isSigningOut}
     >

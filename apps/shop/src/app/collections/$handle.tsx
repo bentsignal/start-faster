@@ -3,7 +3,6 @@ import { z } from "zod/v4";
 
 import { FALLBACK_IMAGE } from "@acme/features/heroes";
 
-import { env } from "~/env";
 import { CollectionFilters } from "~/features/collections/components/collection-filters";
 import { CollectionHeroImage } from "~/features/collections/components/collection-hero-image";
 import { CollectionPagination } from "~/features/collections/components/collection-pagination";
@@ -23,6 +22,7 @@ import {
   defaultSeoDescription,
   toSeoDescription,
 } from "~/lib/seo";
+import { appUrls } from "~/urls";
 
 export const Route = createFileRoute("/collections/$handle")({
   params: z.object({
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/collections/$handle")({
       return buildSeoHead({
         title: "Collections",
         description: defaultSeoDescription,
-        canonicalUrl: `${env.VITE_SITE_URL}/collections`,
+        canonicalUrl: `${appUrls.shop}/collections`,
         imageUrl: FALLBACK_IMAGE,
       });
     }
@@ -84,7 +84,7 @@ export const Route = createFileRoute("/collections/$handle")({
         loaderData.description,
         `Shop the ${loaderData.title} collection at Start Faster.`,
       ),
-      canonicalUrl: `${env.VITE_SITE_URL}${loaderData.canonicalPath}`,
+      canonicalUrl: `${appUrls.shop}${loaderData.canonicalPath}`,
       imageUrl: loaderData.imageUrl,
       imageAlt: loaderData.imageAlt,
     });

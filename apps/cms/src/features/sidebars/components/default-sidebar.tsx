@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
 } from "@acme/ui/sidebar";
 
-import { env } from "~/env";
+import { appUrls } from "~/urls";
 
 const NAV_ITEMS = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -62,7 +62,7 @@ export function DefaultSidebar() {
         <AccountItem />
         <SignOutItem
           loading={loading}
-          onSignOut={() => void signOut({ returnTo: env.VITE_SITE_URL })}
+          onSignOut={() => void signOut({ returnTo: appUrls.cms })}
         />
       </SidebarFooter>
     </Sidebar>

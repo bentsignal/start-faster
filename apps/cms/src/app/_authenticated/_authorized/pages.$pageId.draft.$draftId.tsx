@@ -3,11 +3,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { appUrls } from "~/urls";
 import { toId } from "@acme/convex/ids";
 
 import type { EditorMode } from "~/features/pages/components/edit-preview-toggle";
 import type { Viewport } from "~/features/pages/components/viewport-controls";
-import { env } from "~/env";
 import { fileQueries } from "~/features/files/lib/file-queries";
 import { DraftEditPanel } from "~/features/pages/components/draft-edit-panel";
 import { DraftPreviewPanel } from "~/features/pages/components/draft-preview-panel";
@@ -113,7 +113,7 @@ function useDraftEditor() {
     select: (data) => ({ path: data.path }),
   });
 
-  const previewUrl = `${env.VITE_SHOP_URL}${page.path}?draftId=${draftId}`;
+  const previewUrl = `${appUrls.shop}${page.path}?draftId=${draftId}`;
 
   const mode = Route.useSearch({ select: (s) => s.mode });
   const viewport = Route.useSearch({ select: (s) => s.viewport });

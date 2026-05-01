@@ -175,6 +175,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@acme/app-config':
+        specifier: workspace:*
+        version: link:../../packages/app-config
       '@acme/convex':
         specifier: workspace:*
         version: link:../../packages/convex
@@ -311,6 +314,9 @@ importers:
 
   apps/cms:
     dependencies:
+      '@acme/app-config':
+        specifier: workspace:*
+        version: link:../../packages/app-config
       '@acme/convex':
         specifier: workspace:*
         version: link:../../packages/convex
@@ -565,6 +571,9 @@ importers:
 
   apps/shop:
     dependencies:
+      '@acme/app-config':
+        specifier: workspace:*
+        version: link:../../packages/app-config
       '@acme/convex':
         specifier: workspace:*
         version: link:../../packages/convex
@@ -710,6 +719,30 @@ importers:
       vite-tsconfig-paths:
         specifier: 'catalog:'
         version: 5.1.4(typescript@5.9.3)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
+
+  packages/app-config:
+    devDependencies:
+      '@acme/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
+      '@acme/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@acme/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.0
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.8.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
 
   packages/convex:
     dependencies:

@@ -16,17 +16,13 @@ export const env = createEnv({
     WORKOS_CLIENT_ID: z.string().min(1),
     WORKOS_API_KEY: z.string().min(1),
     WORKOS_COOKIE_PASSWORD: z.string().min(32),
-    WORKOS_REDIRECT_URI: z.url(),
     CONVEX_DEPLOY_KEY: z.string().min(1).optional(),
   },
   client: {
-    VITE_NODE_ENV: z
-      .enum(["development", "production", "test"])
-      .default("production"),
+    VITE_NODE_ENV: z.enum(["development", "production"]).default("production"),
     VITE_CONVEX_URL: z.url(),
-    VITE_SITE_URL: z.url(),
-    VITE_SHOP_URL: z.url(),
     VITE_UT_URL: z.url(),
+    VITE_WORKTREE_ID: z.string().optional(),
     VITE_SHOPIFY_STORE_DOMAIN: z.string().min(1),
     VITE_SHOPIFY_PUBLIC_TOKEN: z.string().min(1),
     VITE_SHOPIFY_IMAGE_URL_STORE_ID: z.string().min(1),

@@ -13,6 +13,7 @@ import { ScheduledPreview } from "~/features/pages/components/scheduled-preview"
 import { prefetchBlockData } from "~/features/pages/lib/prefetch-blocks";
 import { shopQueries } from "~/lib/queries";
 import { buildSeoHead, defaultSeoDescription } from "~/lib/seo";
+import { appUrls } from "~/urls";
 
 function toConvexSiteUrl(url: string) {
   return url.includes(".cloud") ? url.replace(".cloud", ".site") : url;
@@ -91,7 +92,7 @@ export const Route = createFileRoute("/$")({
     return buildSeoHead({
       title: page.title,
       description: page.seoDescription ?? defaultSeoDescription,
-      canonicalUrl: `${env.VITE_SITE_URL}${page.path}`,
+      canonicalUrl: `${appUrls.shop}${page.path}`,
       imageUrl,
       imageAlt,
     });

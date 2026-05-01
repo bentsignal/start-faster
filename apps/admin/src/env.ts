@@ -16,16 +16,12 @@ export const env = createEnv({
     WORKOS_CLIENT_ID: z.string().min(1),
     WORKOS_API_KEY: z.string().min(1),
     WORKOS_COOKIE_PASSWORD: z.string().min(32),
-    WORKOS_REDIRECT_URI: z.url(),
     CONVEX_DEPLOY_KEY: z.string().min(1).optional(),
   },
   client: {
-    VITE_NODE_ENV: z
-      .enum(["development", "production", "test"])
-      .default("production"),
+    VITE_NODE_ENV: z.enum(["development", "production"]).default("production"),
     VITE_CONVEX_URL: z.url(),
-    VITE_SITE_URL: z.url(),
-    VITE_CMS_URL: z.url(),
+    VITE_WORKTREE_ID: z.string().optional(),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,

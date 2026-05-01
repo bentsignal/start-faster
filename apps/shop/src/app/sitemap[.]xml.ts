@@ -7,6 +7,7 @@ import { listProductHandles } from "@acme/shopify/storefront/product";
 
 import { env } from "~/env";
 import { shopify } from "~/lib/shopify";
+import { appUrls } from "~/urls";
 
 const SHOPIFY_PAGE_SIZE = 250;
 
@@ -41,7 +42,7 @@ async function fetchAllProductEntries() {
   const entries = [];
   for await (const node of iterateProductHandles()) {
     entries.push({
-      loc: `${env.VITE_SITE_URL}/shop/${encodeURIComponent(node.handle)}`,
+      loc: `${appUrls.shop}/shop/${encodeURIComponent(node.handle)}`,
       lastmod: node.updatedAt,
       imageLoc: node.featuredImage?.url,
     });
@@ -74,7 +75,7 @@ async function fetchAllCollectionEntries() {
   const entries = [];
   for await (const node of iterateCollectionHandles()) {
     entries.push({
-      loc: `${env.VITE_SITE_URL}/collections/${encodeURIComponent(node.handle)}`,
+      loc: `${appUrls.shop}/collections/${encodeURIComponent(node.handle)}`,
       lastmod: node.updatedAt,
       imageLoc: node.image?.url,
     });
@@ -87,7 +88,7 @@ async function fetchCmsPageEntries() {
   const pages = await convex.query(api.pages.manage.listForSitemap, {});
 
   return pages.map((page) => ({
-    loc: `${env.VITE_SITE_URL}${page.path}`,
+    loc: `${appUrls.shop}${page.path}`,
     lastmod: new Date(page.updatedAt).toISOString(),
   }));
 }
@@ -145,7 +146,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const childEntries = [...collections, ...products, ...cmsPages];
 
         const homepage = {
-          loc: `${env.VITE_SITE_URL}/`,
+          loc: `${appUrls.shop}/`,
           lastmod: pickLatestLastmod(childEntries),
         };
 

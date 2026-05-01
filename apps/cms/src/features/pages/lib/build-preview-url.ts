@@ -1,5 +1,5 @@
 import type { PageVersionKind } from "~/features/pages/lib/page-version-kind";
-import { env } from "~/env";
+import { appUrls } from "~/urls";
 
 const QUERY_PARAM = {
   draft: "draftId",
@@ -17,5 +17,5 @@ export function buildPreviewUrl(args: {
   mode: PageVersionKind;
   id: string;
 }) {
-  return `${env.VITE_SHOP_URL}${args.path}?${QUERY_PARAM[args.mode]}=${args.id}`;
+  return `${appUrls.shop}${args.path}?${QUERY_PARAM[args.mode]}=${args.id}`;
 }

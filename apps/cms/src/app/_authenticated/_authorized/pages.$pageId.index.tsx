@@ -3,7 +3,6 @@ import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { z } from "zod";
 
 import type { Viewport } from "~/features/pages/components/viewport-controls";
-import { env } from "~/env";
 import { OpenInNewTab } from "~/features/pages/components/open-in-new-tab";
 import { PageHubHiddenEmpty } from "~/features/pages/components/page-hub-hidden-empty";
 import { PageHubNoReleaseEmpty } from "~/features/pages/components/page-hub-no-release-empty";
@@ -14,6 +13,7 @@ import {
   viewportValidator,
 } from "~/features/pages/components/viewport-controls";
 import { pageQueries } from "~/features/pages/lib/page-queries";
+import { appUrls } from "~/urls";
 
 export const Route = createFileRoute(
   "/_authenticated/_authorized/pages/$pageId/",
@@ -61,7 +61,7 @@ function usePageHub() {
     });
   }
 
-  const url = `${env.VITE_SHOP_URL}${data.path}`;
+  const url = `${appUrls.shop}${data.path}`;
 
   return {
     hasRelease: data.hasRelease,

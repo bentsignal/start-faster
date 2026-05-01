@@ -11,11 +11,19 @@ if [ -n "$MAIN_REPO" ] && [ "$MAIN_REPO" != "$NEW_WT" ]; then
   done
   cd "$NEW_WT"
 fi
+
 ni
 pnpm --filter @acme/files run topo
 
 # Create a worktree-specific Convex deployment
 WT_NAME="$(basename "$NEW_WT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-*//;s/-*$//')"
+
+if grep -q '^VITE_WORKTREE_ID=' .env; then
+  sed -i '' "s|^VITE_WORKTREE_ID=.*|VITE_WORKTREE_ID=$WT_NAME|" .env
+else
+  printf '\nVITE_WORKTREE_ID=%s\n' "$WT_NAME" >> .env
+fi
+echo "updated VITE_WORKTREE_ID to $WT_NAME"
 
 cd "$NEW_WT/packages/convex"
 

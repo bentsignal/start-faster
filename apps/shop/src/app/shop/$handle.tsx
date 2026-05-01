@@ -5,7 +5,6 @@ import { FALLBACK_IMAGE } from "@acme/features/heroes";
 import { ScreenSize, useScreenStore } from "@acme/features/screen";
 import { cn } from "@acme/ui/utils";
 
-import { env } from "~/env";
 import { ProductActions } from "~/features/product/components/product-actions";
 import {
   ProductDescription,
@@ -25,6 +24,7 @@ import {
   jsonLdScript,
   toSeoDescription,
 } from "~/lib/seo";
+import { appUrls } from "~/urls";
 
 export const Route = createFileRoute("/shop/$handle")({
   component: ProductPage,
@@ -63,11 +63,11 @@ export const Route = createFileRoute("/shop/$handle")({
         title: "Product",
         description: defaultSeoDescription,
         imageUrl: FALLBACK_IMAGE,
-        canonicalUrl: `${env.VITE_SITE_URL}/shop`,
+        canonicalUrl: `${appUrls.shop}/shop`,
       });
     }
 
-    const canonicalUrl = `${env.VITE_SITE_URL}${loaderData.canonicalPath}`;
+    const canonicalUrl = `${appUrls.shop}${loaderData.canonicalPath}`;
     const description = toSeoDescription(
       loaderData.description,
       `Shop ${loaderData.title} at Start Faster.`,

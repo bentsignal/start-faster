@@ -1,6 +1,7 @@
 import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { ShieldUser } from "lucide-react";
 
+import { appUrls } from "~/urls";
 import { AccountItem } from "@acme/features/layout/account-item";
 import { SignOutItem } from "@acme/features/layout/sign-out-item";
 import { QuickLink } from "@acme/features/quick-link";
@@ -15,8 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@acme/ui/sidebar";
-
-import { env } from "~/env";
 
 const NAV_ITEMS = [
   { label: "User Management", to: "/dashboard", icon: ShieldUser },
@@ -58,7 +57,7 @@ export function AppSidebar() {
         <AccountItem />
         <SignOutItem
           loading={loading}
-          onSignOut={() => void signOut({ returnTo: env.VITE_SITE_URL })}
+          onSignOut={() => void signOut({ returnTo: appUrls.admin })}
         />
       </SidebarFooter>
     </Sidebar>

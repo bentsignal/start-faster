@@ -10,6 +10,7 @@ import { createCustomerAccountClient } from "@shopify/hydrogen";
 import type { GetCustomerIdentityQuery } from "@acme/shopify/customer/generated";
 
 import { env } from "~/env";
+import { appUrls } from "~/urls";
 
 function isSecureRequest(request: Request) {
   const url = new URL(request.url);
@@ -155,9 +156,9 @@ export function normalizeCustomerReturnTo(returnTo: string) {
   }
 }
 
-/** Rewrite the request origin to match VITE_SITE_URL (portless proxies to 127.0.0.1:PORT). */
+/** Rewrite the request origin to match the public shop URL. */
 export function withSiteOrigin(request: Request) {
-  const siteUrl = new URL(env.VITE_SITE_URL);
+  const siteUrl = new URL(appUrls.shop);
   const requestUrl = new URL(request.url);
   if (requestUrl.origin === siteUrl.origin) return request;
   requestUrl.protocol = siteUrl.protocol;

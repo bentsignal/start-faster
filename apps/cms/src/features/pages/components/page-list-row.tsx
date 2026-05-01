@@ -3,7 +3,7 @@ import { Circle, ExternalLink } from "lucide-react";
 import type { Id } from "@acme/convex/model";
 import { QuickLink } from "@acme/features/quick-link";
 
-import { env } from "~/env";
+import { appUrls } from "~/urls";
 
 interface PageRow {
   _id: Id<"pages">;
@@ -81,7 +81,7 @@ function PageStatus({
           e.preventDefault();
           e.stopPropagation();
           window.open(
-            `${env.VITE_SHOP_URL}${path}`,
+            `${appUrls.shop}${path}`,
             "_blank",
             "noopener,noreferrer",
           );
