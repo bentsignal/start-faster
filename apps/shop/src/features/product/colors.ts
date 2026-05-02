@@ -22,6 +22,7 @@ const KNOWN_COLORS = {
   Sandshell: "#E8E2D0",
   "Desert Dust": "#D0B7A3",
   "India Ink Grey": "#32404B",
+  "French Navy": "#18344A",
 } as const satisfies Record<string, string>;
 
 /**
