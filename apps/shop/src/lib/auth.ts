@@ -10,7 +10,7 @@ import { createCustomerAccountClient } from "@shopify/hydrogen";
 import type { GetCustomerIdentityQuery } from "@acme/shopify/customer/generated";
 
 import { env } from "~/env";
-import { appUrls } from "~/urls";
+import { appUrls, shopifyCustomerRedirectUri } from "~/urls";
 
 function isSecureRequest(request: Request) {
   const url = new URL(request.url);
@@ -158,7 +158,15 @@ export function normalizeCustomerReturnTo(returnTo: string) {
 
 /** Rewrite the request origin to match the public shop URL. */
 export function withSiteOrigin(request: Request) {
-  const siteUrl = new URL(appUrls.shop);
+  return withOrigin(request, appUrls.shop);
+}
+
+export function withCustomerAuthOrigin(request: Request) {
+  return withOrigin(request, shopifyCustomerRedirectUri);
+}
+
+function withOrigin(request: Request, origin: string) {
+  const siteUrl = new URL(origin);
   const requestUrl = new URL(request.url);
   if (requestUrl.origin === siteUrl.origin) return request;
   requestUrl.protocol = siteUrl.protocol;
@@ -168,8 +176,7 @@ export function withSiteOrigin(request: Request) {
 }
 
 export function isTrustedCustomerAuthRequest(request: Request) {
-  const expectedOrigin = new URL(env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI)
-    .origin;
+  const expectedOrigin = new URL(shopifyCustomerRedirectUri).origin;
   const origin = request.headers.get("origin");
   if (origin) {
     return origin === expectedOrigin;

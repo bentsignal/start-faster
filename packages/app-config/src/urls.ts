@@ -1,5 +1,5 @@
 const APP_HOSTS = {
-  shop: "start-faster",
+  shop: "www.start-faster",
   admin: "admin.start-faster",
   cms: "cms.start-faster",
   docs: "docs.start-faster",

@@ -69,7 +69,7 @@
     "vite-tsconfig-paths": "catalog:"
   },
   "portless": {
-    "name": "start-faster",
+    "name": "www.start-faster",
     "script": "dev:app"
   },
   "prettier": "@acme/prettier-config"

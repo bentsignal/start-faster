@@ -19,9 +19,7 @@ export const env = createEnv({
     SHOPIFY_CUSTOMER_ACCOUNT_AUTHORIZATION_ENDPOINT: z.url(),
     SHOPIFY_CUSTOMER_ACCOUNT_TOKEN_ENDPOINT: z.url(),
     SHOPIFY_CUSTOMER_ACCOUNT_LOGOUT_ENDPOINT: z.url(),
-    SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI: z.url(),
     SHOPIFY_CUSTOMER_ACCOUNT_SCOPES: z.string().min(1).optional(),
-    SHOPIFY_CUSTOMER_ACCOUNT_LOGOUT_REDIRECT_URI: z.url(),
   },
   client: {
     VITE_NODE_ENV: z.enum(["development", "production"]).default("production"),

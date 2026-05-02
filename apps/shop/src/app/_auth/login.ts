@@ -1,24 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { env } from "~/env";
 import {
   appendPendingSessionCookie,
   createHydrogenCustomerAuthContext,
   isTrustedCustomerAuthRequest,
-  withSiteOrigin,
+  withCustomerAuthOrigin,
 } from "~/lib/auth";
+import { shopifyCustomerRedirectUri } from "~/urls";
 
 export const Route = createFileRoute("/_auth/login")({
   server: {
     handlers: {
       POST: async ({ request: rawRequest }) => {
-        const request = withSiteOrigin(rawRequest);
+        const request = withCustomerAuthOrigin(rawRequest);
         const url = new URL(request.url);
-        const callbackOrigin = new URL(
-          env.SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI,
-        ).origin;
+        const callbackOrigin = new URL(shopifyCustomerRedirectUri).origin;
         if (url.origin !== callbackOrigin) {
-          console.log(url.origin, callbackOrigin);
           return new Response("Auth origin mismatch.", { status: 400 });
         }
 
