@@ -3,7 +3,7 @@
 <br />
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/bentsignal/hmmm.docs/refs/heads/main/assets/hmm-bumper-1-optimized.gif" alt="Animation demonstrating functionality of Start Faster" width="500px">
+  <img src="https://bsx-main.b-cdn.net/start-faster-gif-test.gif" alt="Animation demonstrating functionality of Start Faster" width="500px">
   <br />
   <br />
   <br />
