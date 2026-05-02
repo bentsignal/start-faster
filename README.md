@@ -19,13 +19,12 @@
 
 The fastest shopping experience you've ever seen.
 
-For more information, head over to the [docs](https://docs.start-faster.com)
+Powered by [Shopify](https://www.shopify.com), [Convex](https://www.convex.dev),
+and [Tanstack Start](https://tanstack.com/start/latest)
 
 <br />
 <br />
 
 [x.com/bentsignal](https://x.com/bentsignal)
-
-<br />
 
 </div>
