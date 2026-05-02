@@ -17,13 +17,14 @@ pnpm --filter @acme/files run topo
 
 # Create a worktree-specific Convex deployment
 WT_NAME="$(basename "$NEW_WT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-*//;s/-*$//')"
+PORTLESS_WORKTREE_ID="$(printf '%s\n' "$WT_NAME" | sed -E 's/^.*-([a-f0-9]{8})$/\1/')"
 
 if grep -q '^VITE_WORKTREE_ID=' .env; then
-  sed -i '' "s|^VITE_WORKTREE_ID=.*|VITE_WORKTREE_ID=$WT_NAME|" .env
+  sed -i '' "s|^VITE_WORKTREE_ID=.*|VITE_WORKTREE_ID=$PORTLESS_WORKTREE_ID|" .env
 else
-  printf '\nVITE_WORKTREE_ID=%s\n' "$WT_NAME" >> .env
+  printf '\nVITE_WORKTREE_ID=%s\n' "$PORTLESS_WORKTREE_ID" >> .env
 fi
-echo "updated VITE_WORKTREE_ID to $WT_NAME"
+echo "updated VITE_WORKTREE_ID to $PORTLESS_WORKTREE_ID"
 
 cd "$NEW_WT/packages/convex"
 

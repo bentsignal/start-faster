@@ -13,11 +13,18 @@ interface AppUrlOptions {
 }
 
 function normalizeWorktreeId(worktreeId: string | undefined) {
-  return worktreeId
+  const slug = worktreeId
     ?.trim()
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "-")
     .replace(/^-+|-+$/g, "");
+
+  if (!slug) {
+    return undefined;
+  }
+
+  const t3WorktreeId = /(?:^|-)([a-f0-9]{8})$/.exec(slug);
+  return t3WorktreeId?.[1] ?? slug;
 }
 
 function getDomainSuffix(options: AppUrlOptions) {
