@@ -61,3 +61,6 @@ dist/
 .tanstack
 
 design
+
+# docs generated source output
+apps/docs/.source/
