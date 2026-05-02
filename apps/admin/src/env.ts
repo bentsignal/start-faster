@@ -17,7 +17,8 @@ export const env = createEnv({
     WORKOS_API_KEY: z.string().min(1),
     WORKOS_COOKIE_PASSWORD: z.string().min(32),
     // we set this programmatically so the env var doesn't actually get used, but the auth kit
-    // sdk throws an error if it isn't present so we have to set it to something
+    // sdk throws an error if it isn't present so we have to set it to something. just set to "placeholder"
+    // or something like that in your env in dev AND production.
     WORKOS_REDIRECT_URI: z.string().default("placeholder"),
     CONVEX_DEPLOY_KEY: z.string().min(1).optional(),
   },
