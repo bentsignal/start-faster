@@ -3,7 +3,7 @@
 <br />
 
 <div align="center">
-  <img src="https://bsx-main.b-cdn.net/shop-gif-lq-2.gif" alt="Animation demonstrating functionality of Start Faster" width="500px">
+  <video src="https://bsx-main.b-cdn.net/browsing-shop-web.mp4" alt="Animation demonstrating functionality of Start Faster" width="500px">
   <br />
   <br />
   <br />
