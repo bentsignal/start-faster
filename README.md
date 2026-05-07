@@ -3,9 +3,7 @@
 <br />
 
 <div align="center">
-  <video src="https://bsx-main.b-cdn.net/browsing-shop-web.mp4" alt="Animation demonstrating functionality of Start Faster" width="500px">
-  <br />
-  <br />
+  <video src="https://bsx-main.b-cdn.net/browsing-shop-web.mp4" width="500" controls></video>
   <br />
   <br />
   <a href="https://www.start-faster.com" target="_blank">
