@@ -3,7 +3,7 @@
 <br />
 
 <div align="center">
-  <video src="https://bsx-main.b-cdn.net/browsing-shop-web.mp4" width="500" controls></video>
+  <video src="https://github.com/user-attachments/assets/7ecadf02-a8e9-4599-8314-a5c321c1edef" width="500" controls></video>
   <br />
   <br />
   <a href="https://www.start-faster.com" target="_blank">
