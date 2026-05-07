@@ -5,6 +5,12 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@acme/ui/navigation-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@acme/ui/tooltip";
 import { cn } from "@acme/ui/utils";
 
 import { navItems } from "~/components/header/nav-data";
@@ -13,7 +19,7 @@ import { Image } from "~/components/image";
 const fallbackPromoImage =
   "https://lcjw4hjenc.ufs.sh/f/dlAVwa1xZRzoH0SAL5rjnuyOSNjPTGrVMHqA3WLlxJDvz2F5";
 
-function HorizontalMenuItem({
+function DisabledMenuItem({
   label,
   description,
 }: {
@@ -21,13 +27,18 @@ function HorizontalMenuItem({
   description: string;
 }) {
   return (
-    <button
-      type="button"
-      className="group hover:bg-primary/10 flex h-full w-full flex-col justify-center gap-1 rounded-md p-4 text-left"
-    >
-      <p className="text-popover-foreground text-lg font-bold">{label}</p>
-      <p className="text-md text-muted-foreground font-normal">{description}</p>
-    </button>
+    <Tooltip>
+      <TooltipTrigger
+        render={<div />}
+        className="group flex h-full w-full cursor-default flex-col justify-center gap-1 rounded-md p-4 text-left opacity-50"
+      >
+        <p className="text-popover-foreground text-lg font-bold">{label}</p>
+        <p className="text-md text-muted-foreground font-normal">
+          {description}
+        </p>
+      </TooltipTrigger>
+      <TooltipContent>Placeholder link for demo purposes.</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -35,55 +46,60 @@ export function HorizontalMenu() {
   return (
     <div className="border-border bg-background hidden border-b xl:block">
       <div className="container flex items-center justify-center px-6">
-        <NavigationMenu align="center" className="justify-center">
-          <NavigationMenuList className="flex w-full justify-between">
-            {navItems.map((item) => (
-              <NavigationMenuItem key={item.label}>
-                <NavigationMenuTrigger
-                  className={cn(
-                    item.label === "Sale"
-                      ? "rounded-none bg-transparent text-red-700 hover:bg-transparent hover:text-red-800 data-open:bg-transparent data-open:text-red-800 dark:text-red-400 dark:hover:text-red-400"
-                      : "text-foreground/80 hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent",
-                  )}
-                >
-                  {/* <item.icon className="mr-2 h-4 w-4" /> */}
-                  {item.label}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="p-0!">
-                  <div className="grid w-[min(90vw,72rem)] grid-cols-[1fr_1.5fr] gap-3 p-6">
-                    <div className="flex h-full items-center justify-center">
-                      <Image
-                        src={"ad" in item ? item.ad.image : fallbackPromoImage}
-                        alt={
-                          "ad" in item ? item.ad.alt : `${item.label} promotion`
-                        }
-                        width={960}
-                        height={720}
-                        sizes="(min-width: 1280px) 432px, 35vw"
-                        loading="lazy"
-                        fetchPriority="auto"
-                        className="h-auto w-full rounded-md object-cover"
-                      />
-                    </div>
-                    <div className="grid w-full grid-cols-2 gap-3">
-                      {item.items.map((subItem) => (
-                        <HorizontalMenuItem
-                          key={subItem.label}
-                          label={subItem.label}
-                          description={subItem.description}
+        <TooltipProvider>
+          <NavigationMenu align="center" className="justify-center">
+            <NavigationMenuList className="flex w-full justify-between">
+              {navItems.map((item) => (
+                <NavigationMenuItem key={item.label}>
+                  <NavigationMenuTrigger
+                    className={cn(
+                      item.label === "Sale"
+                        ? "rounded-none bg-transparent text-red-700 hover:bg-transparent hover:text-red-800 data-open:bg-transparent data-open:text-red-800 dark:text-red-400 dark:hover:text-red-400"
+                        : "text-foreground/80 hover:text-primary data-open:text-primary rounded-none bg-transparent hover:bg-transparent data-open:bg-transparent",
+                    )}
+                  >
+                    {item.label}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="p-0!">
+                    <div className="grid w-[min(90vw,72rem)] grid-cols-[1fr_1.5fr] gap-3 p-6">
+                      <div className="flex h-full items-center justify-center">
+                        <Image
+                          src={
+                            "ad" in item ? item.ad.image : fallbackPromoImage
+                          }
+                          alt={
+                            "ad" in item
+                              ? item.ad.alt
+                              : `${item.label} promotion`
+                          }
+                          width={960}
+                          height={720}
+                          sizes="(min-width: 1280px) 432px, 35vw"
+                          loading="lazy"
+                          fetchPriority="auto"
+                          className="h-auto w-full rounded-md object-cover"
                         />
-                      ))}
-                      <HorizontalMenuItem
-                        label="View all"
-                        description={`Shop all items from ${item.label}.`}
-                      />
+                      </div>
+                      <div className="grid w-full grid-cols-2 gap-3">
+                        {item.items.map((subItem) => (
+                          <DisabledMenuItem
+                            key={subItem.label}
+                            label={subItem.label}
+                            description={subItem.description}
+                          />
+                        ))}
+                        <DisabledMenuItem
+                          label="View all"
+                          description={`Shop all items from ${item.label}.`}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </TooltipProvider>
       </div>
     </div>
   );

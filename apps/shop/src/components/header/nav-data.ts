@@ -20,7 +20,10 @@ interface NavItem {
   items: { label: string; description: string }[];
 }
 
-export const secondaryNavLinks = ["Contact Us", "About Us"] as const;
+export const secondaryNavLinks = [
+  { label: "Support", href: "/support" },
+  { label: "About Us", href: "/about-us" },
+] as const;
 
 export const navItems = [
   {

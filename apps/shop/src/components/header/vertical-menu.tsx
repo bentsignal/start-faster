@@ -16,9 +16,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@acme/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@acme/ui/tooltip";
 
 import { navItems, secondaryNavLinks } from "~/components/header/nav-data";
 import { Image } from "~/components/image";
+
+function DisabledNavItem({ label }: { label: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={<span />}
+        className="text-muted-foreground/50 cursor-default py-1 text-left text-sm"
+      >
+        {label}
+      </TooltipTrigger>
+      <TooltipContent side="right">
+        Placeholder link for demo purposes.
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
 export function VerticalMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,55 +82,59 @@ export function VerticalMenu() {
           </button>
         </div>
         <ScrollArea className="h-full px-4">
-          <Accordion defaultValue={[]} className="mb-20 rounded-none border-0">
-            {navItems.map((item) => (
-              <AccordionItem key={item.label} value={item.label}>
+          <p className="text-muted-foreground/60 mt-1 mb-2 text-xs italic">
+            Grayed-out links are placeholders for demo purposes.
+          </p>
+          <TooltipProvider>
+            <Accordion
+              defaultValue={[]}
+              className="mb-20 rounded-none border-0"
+            >
+              {navItems.map((item) => (
+                <AccordionItem key={item.label} value={item.label}>
+                  <AccordionTrigger>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">
+                        {item.label}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col">
+                      <DisabledNavItem label="View all" />
+                      {item.items.map((subItem) => (
+                        <DisabledNavItem
+                          key={subItem.label}
+                          label={subItem.label}
+                        />
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+              <AccordionItem value="secondary">
                 <AccordionTrigger>
                   <div className="flex items-center gap-2">
-                    {/* <item.icon className="text-primary h-4 w-4" /> */}
-                    <span className="text-muted-foreground">{item.label}</span>
+                    <span className="text-muted-foreground">Resources</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="py-1 text-sm font-medium">View all</div>
                   <div className="flex flex-col">
-                    {item.items.map((subItem) => (
-                      <button
-                        key={subItem.label}
-                        type="button"
+                    {secondaryNavLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
                         className="text-muted-foreground py-1 text-left text-sm"
                         onClick={() => setIsOpen(false)}
                       >
-                        {subItem.label}
-                      </button>
+                        {link.label}
+                      </a>
                     ))}
                   </div>
                 </AccordionContent>
               </AccordionItem>
-            ))}
-            <AccordionItem value="secondary">
-              <AccordionTrigger>
-                <div className="flex items-center gap-2">
-                  {/* <Info className="text-primary h-4 w-4" /> */}
-                  <span className="text-muted-foreground">Resources</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col">
-                  {secondaryNavLinks.map((link) => (
-                    <button
-                      key={link}
-                      type="button"
-                      className="text-muted-foreground py-1 text-left text-sm"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {link}
-                    </button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+            </Accordion>
+          </TooltipProvider>
         </ScrollArea>
       </SheetContent>
     </Sheet>

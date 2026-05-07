@@ -4,7 +4,6 @@ import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { QuickLink } from "@acme/features/quick-link";
 import { ThemeToggle } from "@acme/features/theme";
-import { Button } from "@acme/ui/button";
 import {
   HoverCard,
   HoverCardContent,
@@ -87,13 +86,13 @@ export function TopRightControls() {
         </HoverCardTrigger>
         <HoverCardContent align="end" className="w-52 rounded-md p-2">
           {secondaryNavLinks.map((secondaryLink) => (
-            <Button
-              key={secondaryLink}
-              variant="ghost"
-              className="w-full justify-start"
+            <a
+              key={secondaryLink.label}
+              href={secondaryLink.href}
+              className="hover:bg-accent inline-flex h-9 w-full items-center justify-start rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors"
             >
-              {secondaryLink}
-            </Button>
+              {secondaryLink.label}
+            </a>
           ))}
           <ThemeToggle className="w-full" />
         </HoverCardContent>
