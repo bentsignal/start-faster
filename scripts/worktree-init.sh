@@ -53,4 +53,4 @@ else
   echo "updated VITE_CONVEX_URL to $NEW_URL"
 fi
 
-nr dev
+# nr dev
