@@ -20,6 +20,7 @@ import { Footer } from "~/components/footer";
 import { Header } from "~/components/header/header";
 import { MailingList } from "~/components/mailing-list";
 import { ReactScan } from "~/components/react-scan";
+import { ShutdownBanner } from "~/components/shutdown-banner";
 import { env } from "~/env";
 import { LoginModal } from "~/features/auth/components/login-modal";
 import { authQueries } from "~/features/auth/lib/auth-queries";
@@ -121,6 +122,7 @@ function RootComponent() {
                 initialTheme={context.theme}
               >
                 <Header />
+                <ShutdownBanner />
                 <CartSheet />
                 <LoginModal />
                 <Outlet />
