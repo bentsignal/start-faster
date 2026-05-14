@@ -1,11 +1,9 @@
 # AGENTS.md
 
-Guidance for coding agents working in `/Users/shawn/dev/projects/start-faster`.
-
 ## Repository Summary
 
-- Turborepo monorepo.
-- This project is very early on. Don't hestitate to make breaking changes. It has not yet been deployed to any users, so don't worry about things like migrations.
+- Turborepo monorepo
+- A suite of tools for building a custom storefront on top of Shopify.
 
 ## Required Validation After Changes
 
@@ -23,4 +21,5 @@ Then summarize changes for the user.
 
 ## Preferences
 
-Comments should be kept brief and should only be written when the code doesn't clearly explain what it is doing. Don't go overboard with them.
+Comments should be kept brief and should only be written when the code doesn't
+clearly explain what it is doing. Don't go overboard with them.
