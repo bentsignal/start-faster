@@ -1,16 +1,12 @@
-import { useMatch } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { QuickLink } from "@acme/features/quick-link";
 
 export function ShutdownBanner() {
-  const isShutdownPage = useMatch({
-    from: "/$",
-    shouldThrow: false,
-    select: (match) => match.params._splat === "shutdown",
-  });
+  const pathname = useLocation({ select: (location) => location.pathname });
 
-  if (isShutdownPage) {
+  if (pathname === "/shutdown") {
     return (
       <QuickLink
         to="/"
@@ -22,14 +18,18 @@ export function ShutdownBanner() {
     );
   }
 
-  return (
-    <QuickLink
-      to="/$"
-      params={{ _splat: "shutdown" }}
-      className="bg-destructive/10 text-destructive flex items-center justify-center gap-2 px-4 py-2.5 text-center text-sm font-medium"
-    >
-      Store shutdown &mdash; read more here
-      <ArrowRight className="size-4" />
-    </QuickLink>
-  );
+  if (pathname === "/") {
+    return (
+      <QuickLink
+        to="/$"
+        params={{ _splat: "shutdown" }}
+        className="bg-destructive/10 text-destructive flex items-center justify-center gap-2 px-4 py-2.5 text-center text-sm font-medium"
+      >
+        Store shutdown - read more here
+        <ArrowRight className="size-4" />
+      </QuickLink>
+    );
+  }
+
+  return null;
 }
