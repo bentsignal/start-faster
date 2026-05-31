@@ -6,6 +6,7 @@ import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/toaster";
 
 import { useCartStore } from "~/features/cart/cart-store";
+import { redirectToCheckout } from "~/features/cart/lib/checkout-redirect";
 import { cartMutations } from "../lib/cart-mutations";
 
 // we want to make sure that all cart mutations finish before we redirect to checkout
@@ -65,7 +66,7 @@ function useCartCheckout() {
       return;
     }
 
-    window.location.assign(checkoutUrl);
+    redirectToCheckout(checkoutUrl);
   }
 
   return { navigatingToCheckout, canCheckout, goToCheckout };

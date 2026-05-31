@@ -17,6 +17,7 @@ import {
   getProductIdChunks,
 } from "~/features/account/lib/get-order-product-ids";
 import { getOrdersListData } from "~/features/account/lib/orders-list-data";
+import { redirectToCheckout } from "~/features/cart/lib/checkout-redirect";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   component: RouteComponent,
@@ -52,7 +53,7 @@ function useRouteComponent() {
   const reorderMutation = useMutation({
     ...accountMutations.reorder(),
     onSuccess: (checkoutCart) => {
-      window.location.assign(checkoutCart.checkoutUrl);
+      redirectToCheckout(checkoutCart.checkoutUrl);
     },
     onError: () => {
       toast.error("Unable to start reorder checkout. Please try again.");

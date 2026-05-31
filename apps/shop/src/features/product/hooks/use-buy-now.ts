@@ -8,6 +8,7 @@ import {
   setStoredCartId,
   setStoredCartQuantity,
 } from "~/features/cart/lib/cart-storage";
+import { redirectToCheckout } from "~/features/cart/lib/checkout-redirect";
 import { productMutations } from "~/features/product/lib/product-mutations";
 
 export type ProductVariantNode = Product["variants"]["nodes"][number];
@@ -18,7 +19,7 @@ export function useBuyNow(selectedVariant: ProductVariantNode | null) {
     onSuccess: (nextCheckout) => {
       setStoredCartId(nextCheckout.id);
       setStoredCartQuantity(nextCheckout.totalQuantity);
-      window.location.assign(nextCheckout.checkoutUrl);
+      redirectToCheckout(nextCheckout.checkoutUrl);
     },
     onError: () => {
       toast.error("There was an error with your checkout. Please try again.");
